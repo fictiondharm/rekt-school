@@ -112,10 +112,10 @@ export async function POST(req: NextRequest) {
       console.warn('[payments/check] payment insert threw:', e);
     }
 
-    // Every REKT- code is accepted by /api/invite/redeem and unlocks the full course.
+    // Every paid unlock mints a single-use code accepted by /api/invite/redeem.
     const code = `REKT-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     try {
-      await supabase.from('invite_codes').insert({ code, source: 'payment' });
+      await supabase.from('invite_codes').insert({ code, max_uses: 1, used_count: 0 });
     } catch (e) {
       console.warn('[payments/check] invite code insert threw:', e);
     }

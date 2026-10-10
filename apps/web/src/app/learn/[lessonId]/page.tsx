@@ -220,7 +220,8 @@ export default function DynamicLessonPage({ params }: PageProps) {
                   {lesson.id}: {lesson.title}
                 </h3>
                 <p className="text-xs text-ink-soft leading-relaxed">
-                  This lesson is part of the full curriculum. Redeem your hackathon invite code or unlock for $1 USDC to continue.
+                  This lesson is part of the full curriculum. Unlock the full course for $1 USDC on
+                  Solana or Base, or ask the owner for an invite code to unlock for free.
                 </p>
               </div>
 
@@ -228,7 +229,7 @@ export default function DynamicLessonPage({ params }: PageProps) {
               <form onSubmit={handleRedeemInline} className="space-y-3">
                 <input
                   type="text"
-                  placeholder="Enter code (e.g. JUDGES or JUDGES-SOLANA-2026)"
+                  placeholder="Enter your unlock code"
                   value={inviteInput}
                   onChange={(e) => setInviteInput(e.target.value)}
                   className="w-full p-3 text-xs font-mono uppercase bg-bg rounded-lg border-2 border-ink focus:ring-2 focus:ring-accent focus:outline-none"

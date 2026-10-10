@@ -72,6 +72,12 @@ export function TopBar({ lessonTitle, aura = 0, streak = 0, showTourButton = fal
             >
               Glossary
             </Link>
+            <Link
+              href="/pro"
+              className="font-bold text-sm hover:underline underline-offset-4"
+            >
+              Pro
+            </Link>
           </nav>
 
           <div className="flex items-center gap-3">

@@ -510,18 +510,11 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
                   </h3>
                 </div>
                 <p className="text-sm text-ink-soft leading-relaxed">
-                  Hackathon judges and early testers: enter your code to unlock the full course,
-                  or get instant access for $1 USDC on Solana.
+                  Have a code from us? Enter it to unlock the full course for free — no payment
+                  needed. Otherwise, get instant access for $1 USDC on Solana or Base.
                 </p>
                 <p className="text-xs text-ink-faint">
-                  Evaluator codes:{' '}
-                  <code className="bg-muted px-2 py-1 rounded-lg text-ink font-mono font-bold border border-border">
-                    JUDGES
-                  </code>{' '}
-                  or{' '}
-                  <code className="bg-muted px-2 py-1 rounded-lg text-ink font-mono font-bold border border-border">
-                    JUDGES-SOLANA-2026
-                  </code>
+                  No code yet? Ask the owner to send you one so you can unlock without paying.
                 </p>
               </div>
 
