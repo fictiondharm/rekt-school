@@ -13,14 +13,18 @@ function jwtPayload(token: string): any {
 }
 
 export async function GET() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+  const url = rawUrl.trim().replace(/\/+$/, '');
   const host = url ? url.replace(/^https?:\/\//, '').replace(/\/.*$/, '') : null;
   const urlRef = host ? host.split('.')[0] : null;
   const payload = key ? jwtPayload(key) : null;
 
   const out: Record<string, unknown> = {
     configured: !!url && !url.includes('your-project') && !!key,
+    urlRaw: rawUrl,
+    urlEndsWithSlash: rawUrl.trim().endsWith('/'),
+    urlHasExtraPath: /supabase\.co\/.+/i.test(rawUrl.trim()),
     urlHost: host,
     urlProjectRef: urlRef,
     keyRole: payload?.role ?? null,
