@@ -30,7 +30,7 @@ import { I11Companion } from '@/components/lesson-engine/companions/I11Companion
 import { I12Companion } from '@/components/lesson-engine/companions/I12Companion';
 import { I13Companion } from '@/components/lesson-engine/companions/I13Companion';
 import { I14Companion } from '@/components/lesson-engine/companions/I14Companion';
-import { TaskCard, FaucetWidget, PaymentModal } from '@/components/onchain';
+import { FaucetWidget, PaymentModal, StuckChecklistCard, RaydiumSwapCard } from '@/components/onchain';
 import { canAccess, isAccessGateEnabled } from '@/lib/access';
 import { getLocalAura } from '@/lib/progress';
 import { Button, Card, Badge } from '@/components/ui';
@@ -120,42 +120,31 @@ export default function DynamicLessonPage({ params }: PageProps) {
       case 'B1':
         return <B1PracticeCompanion />;
       case 'B2':
-        return (
-          <div className="w-full max-w-lg space-y-6">
-            <B2Companion />
-            <TaskCard taskId="connect_wallet" onVerified={(awarded) => setAura((prev) => prev + awarded)} />
-          </div>
-        );
+        return <B2Companion />;
       case 'B3':
         return <B3Companion />;
       case 'B4':
-        return (
-          <div className="w-full max-w-lg space-y-6">
-            <B4Companion />
-            <FaucetWidget />
-            <TaskCard taskId="claim_gas" onVerified={(awarded) => setAura((prev) => prev + awarded)} />
-          </div>
-        );
+        return <B4Companion />;
       case 'B5':
         return (
           <div className="w-full max-w-lg space-y-6">
             <B5Companion />
             <FaucetWidget />
-            <TaskCard taskId="claim_fusdc" onVerified={(awarded) => setAura((prev) => prev + awarded)} />
           </div>
         );
       case 'B6':
         return (
           <div className="w-full max-w-lg space-y-6">
             <B6Companion />
-            <TaskCard taskId="mint_token" onVerified={(awarded) => setAura((prev) => prev + awarded)} />
+            <StuckChecklistCard />
           </div>
         );
       case 'B7':
         return (
           <div className="w-full max-w-lg space-y-6">
             <B7Companion />
-            <TaskCard taskId="swap_in_course_pool" onVerified={(awarded) => setAura((prev) => prev + awarded)} />
+            <StuckChecklistCard />
+            <RaydiumSwapCard />
           </div>
         );
       case 'B8':
@@ -205,6 +194,7 @@ export default function DynamicLessonPage({ params }: PageProps) {
         streak={1}
         showTourButton={lesson.id === 'B1'}
         tier={lesson.tier}
+        lessonId={lesson.id}
       />
 
       <div className="flex-1 flex min-h-0">

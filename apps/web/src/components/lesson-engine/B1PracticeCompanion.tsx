@@ -7,61 +7,22 @@ import {
   ArrowRight,
   CheckCircle2,
   ExternalLink,
-  ShieldCheck,
-  Lightbulb,
   RefreshCw,
+  RotateCcw,
   Fuel,
-  Coins,
-  Copy,
-  Check,
   HelpCircle,
-  Laptop,
-  CheckCircle,
-  Layers,
 } from 'lucide-react';
-import { COURSE_PROGRAM_IDS } from '@/lib/solana';
 import { TourWrapper } from '@/components/tour/TourWrapper';
 
 export function B1PracticeCompanion() {
   const [activeTab, setActiveTab] = useState<'onboarding' | 'preview'>('onboarding');
   const [currentSetupStep, setCurrentSetupStep] = useState(1);
-  const [copiedCA, setCopiedCA] = useState(false);
-  const [claimedGas, setClaimedGas] = useState(false);
-  const [claimedFusdc, setClaimedFusdc] = useState(false);
-  const [gasLoading, setGasLoading] = useState(false);
-  const [fusdcLoading, setFusdcLoading] = useState(false);
   const [isTourActive, setIsTourActive] = useState(false);
 
   // Preview simulator state
   const [txState, setTxState] = useState<'idle' | 'signing' | 'confirming' | 'success'>('idle');
   const [solBalance, setSolBalance] = useState(2.0);
   const [fusdcBalance, setFusdcBalance] = useState(10000);
-
-  const fusdcCA = COURSE_PROGRAM_IDS.FUSDC_MINT;
-
-  const handleCopyCA = () => {
-    navigator.clipboard.writeText(fusdcCA);
-    setCopiedCA(true);
-    setTimeout(() => setCopiedCA(false), 2000);
-  };
-
-  const handleClaimGas = () => {
-    setGasLoading(true);
-    setTimeout(() => {
-      setGasLoading(false);
-      setClaimedGas(true);
-      setSolBalance((prev) => prev + 0.5);
-    }, 900);
-  };
-
-  const handleClaimFusdc = () => {
-    setFusdcLoading(true);
-    setTimeout(() => {
-      setFusdcLoading(false);
-      setClaimedFusdc(true);
-      setFusdcBalance((prev) => prev + 10000);
-    }, 900);
-  };
 
   const handleTestTx = () => {
     setTxState('signing');
@@ -73,6 +34,14 @@ export function B1PracticeCompanion() {
         setFusdcBalance((prev) => prev - 25);
       }, 1000);
     }, 900);
+  };
+
+  const handleReset = () => {
+    setActiveTab('onboarding');
+    setCurrentSetupStep(1);
+    setTxState('idle');
+    setSolBalance(2.0);
+    setFusdcBalance(10000);
   };
 
   const onboardingSteps = [
@@ -89,12 +58,7 @@ export function B1PracticeCompanion() {
     {
       num: 3,
       title: 'Claim Test SOL',
-      desc: 'Get devnet SOL to pay micro-fees for all smart contract interactions.',
-    },
-    {
-      num: 4,
-      title: 'Claim 10,000 fUSDC & Add CA',
-      desc: 'Import the course test token Contract Address into your wallet.',
+      desc: 'Grab free devnet SOL from the official Solana faucet to pay micro-fees.',
     },
   ];
 
@@ -107,15 +71,9 @@ export function B1PracticeCompanion() {
     },
     {
       target: '[data-tour="setup-steps-nav"]',
-      title: 'The 4 Setup Milestones',
-      text: 'Follow these 4 simple steps to set up your Solana Devnet environment and claim your test funds.',
+      title: 'The 3 Setup Milestones',
+      text: 'Follow these 3 simple steps to set up your Solana Devnet environment and grab free test SOL.',
       side: 'bottom' as const,
-    },
-    {
-      target: '[data-tour="ca-copy-card"]',
-      title: 'Contract Address (CA)',
-      text: 'Click here to copy the fUSDC Contract Address. You will paste this into your wallet to view your 10,000 fUSDC!',
-      side: 'top' as const,
     },
   ];
 
@@ -129,24 +87,43 @@ export function B1PracticeCompanion() {
       />
 
       <div className="space-y-1">
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-start justify-between gap-3">
           <Badge variant="primary" className="text-[10px]">
             CHAPTER 0 • GETTING STARTED
           </Badge>
-          <button
-            type="button"
-            onClick={() => setIsTourActive(true)}
-            className="text-[11px] font-bold text-accent hover:underline flex items-center gap-1"
-          >
-            <Lightbulb className="w-3.5 h-3.5" /> Spotlight Tour
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setIsTourActive(true)}
+              className="gap-1.5 text-xs"
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-accent" /> Spotlight Tour
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleReset}
+              className="gap-1.5 text-xs"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </Button>
+          </div>
         </div>
         <h3 className="font-heading font-bold text-xl text-ink">
           Solana Devnet Setup & Faucet Hub
         </h3>
         <p className="text-xs text-ink-soft">
-          Complete your 3-minute wallet onboarding, switch to Devnet, and claim 10,000 fUSDC.
+          Complete your 3-minute wallet onboarding and switch to Devnet. You will grab free test SOL and mint your fUSDC in the coming lessons.
         </p>
+        <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+          <span className="text-[9px] font-mono uppercase tracking-wider text-ink-soft bg-surface border border-border px-2 py-0.5 rounded-full">
+            Sandbox
+          </span>
+          <span className="text-[9px] font-mono uppercase tracking-wider text-amber-900 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+            No real wallet · Nothing costs money
+          </span>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -178,7 +155,7 @@ export function B1PracticeCompanion() {
       {activeTab === 'onboarding' ? (
         <Card className="p-6 space-y-5 bg-surface border-2 border-ink rounded-xl shadow-pop-lg">
           {/* Step Progress Pills */}
-          <div data-tour="setup-steps-nav" className="grid grid-cols-4 gap-1.5 pb-2 border-b border-border">
+          <div data-tour="setup-steps-nav" className="grid grid-cols-3 gap-1.5 pb-2 border-b border-border">
             {onboardingSteps.map((step) => (
               <button
                 key={step.num}
@@ -201,7 +178,7 @@ export function B1PracticeCompanion() {
             <div className="space-y-4 animate-in fade-in duration-150">
               <div className="space-y-1">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-accent">
-                  Step 1 of 4
+                  Step 1 of 3
                 </span>
         <h4 className="font-heading font-bold text-base text-ink">
           Install a Web3 Solana Wallet
@@ -276,7 +253,7 @@ export function B1PracticeCompanion() {
             <div className="space-y-4 animate-in fade-in duration-150">
               <div className="space-y-1">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-accent">
-                  Step 2 of 4
+                  Step 2 of 3
                 </span>
         <h4 className="font-heading font-bold text-base text-ink">
           Switch Network to "Solana Devnet"
@@ -341,54 +318,39 @@ export function B1PracticeCompanion() {
             <div className="space-y-4 animate-in fade-in duration-150">
               <div className="space-y-1">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-accent">
-                  Step 3 of 4
+                  Step 3 of 3
                 </span>
         <h4 className="font-heading font-bold text-base text-ink">
           Claim Free Devnet Gas (SOL)
         </h4>
                 <p className="text-xs text-ink-soft leading-relaxed">
-                  Every transaction on Solana requires a micro-fee (~0.000005 SOL, or 5,000 lamports) paid to network validators. Claim free Devnet SOL below:
+                  Every transaction on Solana requires a micro-fee (~0.000005 SOL, or 5,000 lamports) paid to network validators. Grab free Devnet SOL from the official faucet:
                 </p>
               </div>
 
               <div className="p-4 rounded-xl bg-bg border border-border space-y-3">
                 <div className="flex justify-between items-center text-xs">
                   <span className="font-bold text-ink flex items-center gap-1.5">
-                    <Fuel className="w-4 h-4 text-amber-500" /> Instant Faucet Airdrop
+                    <Fuel className="w-4 h-4 text-amber-500" /> Official Solana Devnet Faucet
                   </span>
-                  <Badge variant="devnet" className="text-[10px]">0.50 SOL</Badge>
+                  <Badge variant="devnet" className="text-[10px]">FREE SOL</Badge>
                 </div>
 
-                <Button
-                  variant="primary"
-                  onClick={handleClaimGas}
-                  isLoading={gasLoading}
-                  className="w-full text-xs gap-1.5"
+                <p className="text-[11px] text-ink-soft leading-relaxed">
+                  Devnet SOL pays the tiny network fees (~0.000005 SOL per transaction). No simulation here —
+                  open the official Solana faucet, paste your wallet address, and grab real devnet SOL for free.
+                </p>
+
+                <a
+                  href="https://faucet.solana.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-full bg-accent text-white border-2 border-ink font-bold text-xs shadow-pop hover:shadow-pop-hover hover:-translate-x-[2px] hover:-translate-y-[2px] transition-all"
                 >
-                  {claimedGas ? (
-                    <>
-                      <CheckCircle className="w-4 h-4 text-emerald-300" />
-                      <span>Claimed +0.5 SOL!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Fuel className="w-4 h-4" />
-                      <span>Request 0.5 Devnet SOL</span>
-                    </>
-                  )}
-                </Button>
-
-                <div className="pt-1 text-[11px] text-ink-soft flex items-center justify-between">
-                  <span>Need more? Official Solana Faucet:</span>
-                  <a
-                    href="https://faucet.solana.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-accent font-bold hover:underline flex items-center gap-0.5"
-                  >
-                    faucet.solana.com <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
+                  <Fuel className="w-4 h-4" />
+                  <span>Claim Devnet SOL at faucet.solana.com</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
               </div>
 
               <div className="pt-2 flex justify-between">
@@ -401,109 +363,12 @@ export function B1PracticeCompanion() {
                   Back
                 </Button>
                 <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => setCurrentSetupStep(4)}
-                  className="gap-1.5 text-xs"
-                >
-                  <span>Next: Claim 10,000 fUSDC</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 4: CLAIM 10,000 fUSDC & CONTRACT ADDRESS (CA) */}
-          {currentSetupStep === 4 && (
-            <div className="space-y-4 animate-in fade-in duration-150">
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-accent">
-                  Step 4 of 4
-                </span>
-                <h4 className="font-heading font-bold text-base text-ink">
-                  Claim 10,000 fUSDC & Add via Contract Address (CA)
-                </h4>
-                <p className="text-xs text-ink-soft leading-relaxed">
-                  We mint <strong>10,000 fUSDC</strong> (fake USDC) into your account. To view your tokens inside Phantom or Solflare, import the Contract Address (CA) below!
-                </p>
-              </div>
-
-              {/* 10,000 fUSDC Faucet Button */}
-              <Button
-                variant="primary"
-                onClick={handleClaimFusdc}
-                isLoading={fusdcLoading}
-                className="w-full text-xs h-10 gap-2 shadow-sm"
-              >
-                {claimedFusdc ? (
-                  <>
-                    <CheckCircle className="w-4 h-4 text-emerald-300" />
-                    <span>Minted 10,000 fUSDC!</span>
-                  </>
-                ) : (
-                  <>
-                    <Coins className="w-4 h-4" />
-                    <span>Claim 10,000 fUSDC into Token Account</span>
-                  </>
-                )}
-              </Button>
-
-              {/* Contract Address Box */}
-              <div data-tour="ca-copy-card" className="p-3.5 rounded-xl bg-bg border border-border space-y-2">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold text-ink flex items-center gap-1.5">
-                    <Coins className="w-3.5 h-3.5 text-accent" /> fUSDC Contract Address (CA)
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleCopyCA}
-                    className="flex items-center gap-1 text-[11px] font-bold text-accent hover:text-accent-hover"
-                  >
-                    {copiedCA ? (
-                      <>
-                        <Check className="w-3 h-3 text-accent" />
-                        <span className="text-accent">Copied!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3 h-3" />
-                        <span>Copy CA</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-
-                <div className="font-mono text-[11px] text-ink break-all bg-surface p-2 rounded-lg border border-border select-all">
-                  {fusdcCA}
-                </div>
-
-                <div className="p-2.5 rounded-lg bg-surface border border-border text-[11px] text-ink-soft space-y-1">
-                  <strong className="text-ink block">How to add custom token to your wallet:</strong>
-                  <ol className="list-decimal pl-4 space-y-0.5">
-                    <li>Copy the CA above</li>
-                    <li>In Phantom/Solflare, scroll to bottom &gt; click <strong>Manage token list</strong> (or <strong>+</strong>)</li>
-                    <li>Paste the CA in the search field</li>
-                    <li>Click <strong>Import</strong>. Your 10,000 fUSDC balance will now show!</li>
-                  </ol>
-                </div>
-              </div>
-
-              <div className="pt-2 flex justify-between">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setCurrentSetupStep(3)}
-                  className="text-xs"
-                >
-                  Back
-                </Button>
-                <Button
                   variant="accent"
                   size="sm"
                   onClick={() => setActiveTab('preview')}
                   className="gap-1.5 text-xs"
                 >
-                  <span>Launch Live Sandbox</span>
+                  <span>Finish: Open Live Sandbox</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Button>
               </div>

@@ -18,13 +18,13 @@
       "id": "b7-intro",
       "type": "read",
       "title": "Trading Without a Middleman",
-      "body": "In traditional finance, trading stocks requires a broker, a clearing house, and bank business hours. In DeFi, a <Term id=\"swap\">swap</Term> happens directly against an on-chain smart contract in under 1 second!\n\nWhen you request a <Term id=\"quote\">quote</Term>, the AMM computes:\n1. The current spot exchange rate between the two pool reserves\n2. The expected output amount based on the pool formula\n3. The estimated <Term id=\"price_impact\">price impact</Term> of your order size"
+      "body": "In traditional finance, trading stocks requires a broker, a clearing house, and bank business hours. In DeFi, a <Term id=\"swap\">swap</Term> happens directly against an on-chain smart contract in under 1 second, 24/7, from anyone on earth.\n\nWhen you request a <Term id=\"quote\">quote</Term>, the <Term id=\"amm\">AMM</Term> computes three things before you commit:\n1. The current spot exchange rate between the two pool reserves\n2. The expected output amount based on the pool formula\n3. The estimated <Term id=\"price_impact\">price impact</Term> of your order size\n\n**Why the quote is not a promise.** The number you see is based on the pool's state *right now*. Between the moment you click and the moment your transaction lands, other traders can move the price. That is exactly why the next step - slippage - exists. Reading the quote carefully is how you avoid paying far more than you intended."
     },
     {
       "id": "b7-slippage",
       "type": "read",
       "title": "Slippage Tolerance: Your Safety Buffer",
-      "body": "Because multiple people trade on the blockchain at the same time, the pool price might move while your transaction is travelling to the validator.\n\nYour <Term id=\"slippage\">slippage tolerance</Term> (e.g. 0.5% or 1%) tells the contract: *'If the market moves against me and I would receive less than my minimum guaranteed amount, abort the transaction and refund my tokens.'*"
+      "body": "Because multiple people trade on the blockchain at the same time, the pool price might move while your transaction is travelling to the validator. Without protection, you could receive noticeably less than your quote promised.\n\nYour <Term id=\"slippage\">slippage tolerance</Term> (e.g. 0.5% or 1%) tells the contract: *'If the market moves against me and I would receive less than my minimum guaranteed amount, abort the transaction and refund my tokens.'*\n\n**Choosing the right number.** Set it too tight on a volatile token and your swap fails repeatedly; set it too loose and you expose yourself to <Term id=\"sandwich_attack\">sandwich attacks</Term> and terrible fills. For liquid pairs, ~0.5% is usually a healthy default. The tolerance is a safety buffer, not a target."
     },
     {
       "id": "b7-under-the-hood",

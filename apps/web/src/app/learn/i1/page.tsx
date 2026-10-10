@@ -27,6 +27,7 @@ export default function LessonI1Page() {
         lessonTitle={`${lesson.id}: ${lesson.title}`}
         aura={aura}
         streak={1}
+        lessonId={lesson.id}
       />
 
       <div className="flex-1 flex min-h-0">

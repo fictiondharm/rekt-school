@@ -18,7 +18,7 @@
       "id": "b10-intro",
       "type": "read",
       "title": "The Dark Side of Permissionless Finance",
-      "body": "Because anyone can deploy a token and pool on Solana in seconds, scammers exploit beginners who don't know how to read on-chain parameters.\n\nLearning how to identify malicious token contracts is the single most valuable protective skill in Web3."
+      "body": "Because anyone can deploy a token and pool on Solana in seconds, scammers have a near-infinite supply of fresh traps. Their weapon is not a server hack or a stolen password - it is *your* ignorance of on-chain parameters. They count on beginners who never read the fine print.\n\nLearning how to identify malicious token contracts is the single most valuable protective skill in Web3. Everything a token can do to you - freeze your balance, print infinite supply, drain the pool - is written in **public** account data you can inspect in seconds.\n\n**The mindset shift:** stop asking *'is this token a good investment?'* and start asking *'what is this token allowed to do to me?'* The second question has an objectively correct, on-chain answer."
     },
     {
       "id": "b10-red-flags",

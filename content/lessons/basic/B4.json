@@ -18,13 +18,13 @@
       "id": "b4-intro",
       "type": "read",
       "title": "Why Fees Exist: The Postage Stamp",
-      "body": "Every transaction on a blockchain requires a small network <Term id=\"gas_fee\">fee</Term> paid in the native currency (SOL on Solana).\n\nFees serve two critical purposes:\n1. **Validator compensation:** They reward the thousands of global computers validating and securing blocks.\n2. **Spam prevention:** If transactions were 100% free, malicious bots could flood the network with billions of useless requests. On Solana, a typical transaction fee is a fraction of a cent (approx. 0.000005 SOL)!"
+      "body": "Every transaction on a blockchain requires a small network <Term id=\"gas_fee\">fee</Term> paid in the native currency (SOL on Solana). Think of it as a postage stamp: your message does not travel for free.\n\nFees serve two critical purposes:\n1. **Validator compensation:** They reward the thousands of global computers validating and securing blocks. Without a fee, there is no incentive to keep the network honest.\n2. **Spam prevention:** If transactions were 100% free, malicious bots could flood the network with billions of useless requests and grind it to a halt.\n\n**How cheap is Solana?** A typical transaction fee is a fraction of a cent (approx. `0.000005 SOL`, known as 5,000 lamports). That predictability is a big reason Solana is popular for high-frequency DeFi: you can make hundreds of transactions and still spend less than a single dollar in fees."
     },
     {
       "id": "b4-rent",
       "type": "read",
       "title": "What is Rent on Solana?",
-      "body": "On Solana, accounts hold both token balances and executable program data. To keep this data stored permanently in validator RAM, Solana requires a small refundable deposit called <Term id=\"rent\">rent</Term> (usually ~0.002 SOL for a token account).\n\nOnce an account holds enough SOL to be 'rent-exempt', it stays on the network forever. When you close the account, that entire SOL deposit is refunded directly back to your wallet!"
+      "body": "On Solana, accounts hold both token balances and executable program data. To keep this data stored permanently in validator memory, Solana requires a small refundable deposit called <Term id=\"rent\">rent</Term> (usually ~`0.002 SOL` for a token account).\n\nThink of rent as a **security deposit on a storage locker**. Two things follow from that:\n\n- Once an account holds enough SOL to be **rent-exempt**, the network keeps it on-chain forever. Validators will never delete your data.\n- When you **close the account**, the entire SOL deposit is refunded straight back to your wallet. You are not paying the network - you are parking collateral against storage space.\n\nThis is why cleaning up empty token accounts is a real habit for power users: each closed account returns a little rent-exempt SOL to your balance."
     },
     {
       "id": "b4-under-the-hood",

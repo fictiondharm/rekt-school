@@ -13,17 +13,42 @@ import {
   Lock,
   Download,
   ExternalLink,
+  HelpCircle,
+  RotateCcw,
 } from 'lucide-react';
+import { TourWrapper } from '@/components/tour/TourWrapper';
 
 export function B3Companion() {
   const [isRevealed, setIsRevealed] = useState(false);
   const [showRedAlert, setShowRedAlert] = useState(false);
   const [selectedCase, setSelectedCase] = useState<number | null>(null);
+  const [isTourActive, setIsTourActive] = useState(false);
 
   const sampleSeedWords = [
     'banana', 'galaxy', 'rocket', 'matrix',
     'velvet', 'crypto', 'shadow', 'orange',
     'timber', 'silver', 'planet', 'dragon',
+  ];
+
+  const tourSteps = [
+    {
+      target: '[data-tour="b3-seed-vault"]',
+      title: 'The Seed Phrase Vault',
+      text: 'This is how a real 12-word recovery phrase is stored. Words stay blurred until you deliberately reveal them, exactly like a wallet backup screen.',
+      side: 'bottom' as const,
+    },
+    {
+      target: '[data-tour="b3-wallet-hub"]',
+      title: 'Official Wallet Extensions',
+      text: 'Only ever install wallets from these verified direct links. Typing "phantom" into a search engine is how most people download a fake drainer.',
+      side: 'bottom' as const,
+    },
+    {
+      target: '[data-tour="b3-phishing-list"]',
+      title: 'Spot The Phishing Scam',
+      text: 'Tap any scenario to inspect the URL and popup text, then read the verdict. Rehearse here so you recognize the pattern instantly in the wild.',
+      side: 'top' as const,
+    },
   ];
 
   const handleRevealSeed = () => {
@@ -32,6 +57,12 @@ export function B3Companion() {
     setTimeout(() => {
       setShowRedAlert(false);
     }, 4000);
+  };
+
+  const handleReset = () => {
+    setIsRevealed(false);
+    setShowRedAlert(false);
+    setSelectedCase(null);
   };
 
   const scenarios = [
@@ -63,6 +94,12 @@ export function B3Companion() {
 
   return (
     <div className="w-full max-w-xl mx-auto space-y-6">
+      <TourWrapper
+        steps={tourSteps}
+        isActive={isTourActive}
+        onComplete={() => setIsTourActive(false)}
+      />
+
       {/* FULL SCREEN EMERGENCY RED FLASH OVERLAY */}
       {showRedAlert && (
         <div className="fixed inset-0 z-50 bg-red-600/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-white animate-in fade-in duration-300">
@@ -91,19 +128,47 @@ export function B3Companion() {
 
       {/* Header */}
       <div className="space-y-1">
-        <Badge variant="warn" className="mb-1">
-          SECURITY LAB: B3
-        </Badge>
+        <div className="flex items-start justify-between gap-3">
+          <Badge variant="warn" className="mb-1">
+            SECURITY LAB: B3
+          </Badge>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setIsTourActive(true)}
+              className="gap-1.5 text-xs"
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-accent" /> Spotlight Tour
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleReset}
+              className="gap-1.5 text-xs"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </Button>
+          </div>
+        </div>
         <h3 className="font-heading font-semibold text-xl text-ink">
           The Secret Seed Phrase Vault
         </h3>
         <p className="text-xs text-ink-soft">
           Inspect how a real 12-word seed phrase looks, and why sharing it instantly wipes your portfolio.
         </p>
+        <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+          <span className="text-[9px] font-mono uppercase tracking-wider text-ink-soft bg-surface border border-border px-2 py-0.5 rounded-full">
+            Sandbox
+          </span>
+          <span className="text-[9px] font-mono uppercase tracking-wider text-amber-900 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+            Practice drills · Nothing costs money
+          </span>
+        </div>
       </div>
 
       {/* GLASSMORPHISM SEED PHRASE VAULT */}
-      <Card className="relative overflow-hidden p-6 rounded-xl bg-surface border border-border shadow-card space-y-4">
+      <Card data-tour="b3-seed-vault" className="relative overflow-hidden p-6 rounded-xl bg-surface border border-border shadow-card space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-red-500/10 text-red-600 flex items-center justify-center">
@@ -165,7 +230,7 @@ export function B3Companion() {
       </Card>
 
       {/* Official Wallet Install Hub */}
-      <Card className="p-4 bg-surface border border-border space-y-3">
+      <Card data-tour="b3-wallet-hub" className="p-4 bg-surface border border-border space-y-3">
         <div className="flex items-center justify-between text-xs font-semibold text-ink">
           <span className="flex items-center gap-1.5">
             <Download className="w-4 h-4 text-primary" />
@@ -214,7 +279,7 @@ export function B3Companion() {
       </Card>
 
       {/* Phishing Detection Scenarios */}
-      <div className="space-y-3">
+      <div data-tour="b3-phishing-list" className="space-y-3">
         <h4 className="font-heading font-semibold text-sm text-ink">
           Spot The Phishing Scam (Test Your Reflexes)
         </h4>

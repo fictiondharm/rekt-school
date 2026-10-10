@@ -18,13 +18,13 @@
       "id": "b6-intro",
       "type": "read",
       "title": "Anyone Can Mint a Token",
-      "body": "Blockchains are permissionless: you do not need permission from a government, bank, or corporation to invent a new token.\n\nTo create a token, you simply instruct the Solana Token Program to initialize a new <Term id=\"mint\">Mint account</Term>. You choose the name, ticker symbol, decimals, and initial <Term id=\"total_supply\">total supply</Term>."
+      "body": "Blockchains are permissionless: you do not need permission from a government, bank, or corporation to invent a new token. There is no application form and no gatekeeper - just code.\n\nTo create a token, you instruct the Solana Token Program to initialize a new <Term id=\"mint\">Mint account</Term>. You choose the name, ticker symbol, decimals, and initial <Term id=\"total_supply\">total supply</Term>.\n\n**The flip side of freedom.** The exact same 30-second process is available to scammers, meme-coin factories, and rug-pull artists. Nobody audits a token before it goes live; nobody approves it. That means the burden of checking a token's settings falls entirely on *you*, the buyer. Permissionlessness is why crypto is open - and why you must learn to read what a token is really allowed to do."
     },
     {
       "id": "b6-authorities",
       "type": "read",
       "title": "Mint Authority: The Printing Press",
-      "body": "When a token is created, an address is assigned as the **Mint Authority**.\n\nWhoever controls this address can print new tokens at any time, inflating the supply and devaluing existing holders. In honest decentralized projects, creators permanently **revoke** (set to null) the mint authority after the initial launch so no one can ever dilute the supply!"
+      "body": "When a token is created, an address is assigned as the **Mint Authority** - think of it as the printing press.\n\n**What it can do:** whoever controls that address can print brand-new tokens at any time, at zero cost. Each new token dilutes every existing holder and can be dumped on the market, crashing the price. An active mint authority is one of the most common <Term id=\"rug_pull\">rug pull</Term> risks in new launches.\n\n**The honest move - revoke it.** In trustworthy projects, the creator permanently **revokes** (sets to `null`) the mint authority right after launch. This is a cryptographic promise: because the Token Program code cannot be changed, the maximum supply is now frozen forever. No one - not even the original developer - can ever print another token.\n\nSo when you inspect a token, the first question is simple: **is mint authority revoked?** If not, you are trusting a stranger not to print money out of thin air."
     },
     {
       "id": "b6-under-the-hood",

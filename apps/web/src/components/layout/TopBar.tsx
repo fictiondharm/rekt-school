@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { WalletChip } from '@/components/onchain/WalletChip';
 import { Badge } from '@/components/ui';
-import { getNetworkMeta } from '@/lib/tier';
+import { getNetworkMeta, getNetworkMetaByLesson } from '@/lib/tier';
 import { Sparkles } from 'lucide-react';
 import type { Tier } from '@defi-mommy/content-schema';
 
@@ -13,9 +13,15 @@ interface TopBarProps {
   streak?: number;
   showTourButton?: boolean;
   tier?: Tier;
+  lessonId?: string;
 }
 
-export function TopBar({ lessonTitle, aura = 0, streak = 0, showTourButton = false, tier }: TopBarProps) {
+export function TopBar({ lessonTitle, aura = 0, streak = 0, showTourButton = false, tier, lessonId }: TopBarProps) {
+  const net = lessonId
+    ? getNetworkMetaByLesson(lessonId)
+    : tier
+    ? getNetworkMeta(tier)
+    : undefined;
   return (
     <header className="sticky top-0 z-30 bg-white border-b-2 border-ink">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -30,12 +36,12 @@ export function TopBar({ lessonTitle, aura = 0, streak = 0, showTourButton = fal
               {lessonTitle && (
                 <span className="font-medium text-xs tracking-wider text-ink-faint mt-1">{lessonTitle}</span>
               )}
-              {tier && (
+              {net && (
                 <Badge
-                  variant={getNetworkMeta(tier).badgeVariant}
+                  variant={net.badgeVariant}
                   className="mt-1 w-fit text-[9px] px-2 py-0.5"
                 >
-                  {getNetworkMeta(tier).badgeLabel}
+                  {net.badgeLabel}
                 </Badge>
               )}
             </div>

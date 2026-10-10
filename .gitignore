@@ -9,3 +9,7 @@ dist
 *.tsbuildinfo
 .vercel
 .env*.local
+
+# faucet keypairs
+apps/web/faucet-authority.json
+apps/web/faucet-mint.json

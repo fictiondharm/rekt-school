@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { Card, Button, Badge, Slider } from '@/components/ui';
-import { Landmark, TrendingUp, AlertTriangle, Layers, Info, CheckCircle2 } from 'lucide-react';
+import { Landmark, TrendingUp, AlertTriangle, Layers, Info, CheckCircle2, HelpCircle, RotateCcw } from 'lucide-react';
+import { TourWrapper } from '@/components/tour/TourWrapper';
 
 export function B9Companion() {
   const [solDeposits, setSolDeposits] = useState(5000); // 5,000 SOL
@@ -10,6 +11,7 @@ export function B9Companion() {
   const [usdcDeposits, setUsdcDeposits] = useState(1500000); // $1.5M USDC
   const [borrowedAmount, setBorrowedAmount] = useState(800000); // $800k borrowed
   const [excludeBorrowed, setExcludeBorrowed] = useState(true);
+  const [isTourActive, setIsTourActive] = useState(false);
 
   // Gross TVL = all assets in vaults
   const grossTVL = (solDeposits * solPrice) + usdcDeposits;
@@ -17,23 +19,86 @@ export function B9Companion() {
   const netTVL = grossTVL - (excludeBorrowed ? borrowedAmount : 0);
   const utilizationRate = grossTVL > 0 ? (borrowedAmount / grossTVL) * 100 : 0;
 
+  const tourSteps = [
+    {
+      target: '[data-tour="b9-controls"]',
+      title: 'Fill The Vaults',
+      text: 'Drag in SOL and stablecoin deposits, then move the SOL price. Every dollar locked in the protocol counts toward TVL.',
+      side: 'bottom' as const,
+    },
+    {
+      target: '[data-tour="b9-metrics"]',
+      title: 'Gross TVL Breakdown',
+      text: 'Gross TVL adds up every asset at market price. The split shows how much of that value depends on the volatile SOL price.',
+      side: 'bottom' as const,
+    },
+    {
+      target: '[data-tour="b9-net"]',
+      title: 'Net TVL: The Honest Number',
+      text: 'Toggle off the borrowed deduction to see how protocols inflate TVL by re-counting the same liquidity twice. Net TVL removes the illusion.',
+      side: 'top' as const,
+    },
+  ];
+
+  const handleReset = () => {
+    setSolDeposits(5000);
+    setSolPrice(200);
+    setUsdcDeposits(1500000);
+    setBorrowedAmount(800000);
+    setExcludeBorrowed(true);
+  };
+
   return (
     <div className="w-full max-w-lg space-y-5">
+      <TourWrapper
+        steps={tourSteps}
+        isActive={isTourActive}
+        onComplete={() => setIsTourActive(false)}
+      />
+
       <div className="space-y-1">
-        <Badge variant="primary" className="mb-1">
-          LAB B9 • PROTOCOL TVL EXPLORER
-        </Badge>
+        <div className="flex items-start justify-between gap-3">
+          <Badge variant="primary" className="mb-1">
+            LAB B9 • PROTOCOL TVL EXPLORER
+          </Badge>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setIsTourActive(true)}
+              className="gap-1.5 text-xs"
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-accent" /> Spotlight Tour
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleReset}
+              className="gap-1.5 text-xs"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </Button>
+          </div>
+        </div>
         <h3 className="font-heading font-semibold text-xl text-ink">
           Total Value Locked (TVL) Simulator
         </h3>
         <p className="text-xs text-ink-soft">
           See how asset deposits, market prices, and re-hypothecated borrowing shape protocol TVL.
         </p>
+        <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+          <span className="text-[9px] font-mono uppercase tracking-wider text-ink-soft bg-surface border border-border px-2 py-0.5 rounded-full">
+            Sandbox
+          </span>
+          <span className="text-[9px] font-mono uppercase tracking-wider text-amber-900 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+            No real wallet · Nothing costs money
+          </span>
+        </div>
       </div>
 
       <Card className="p-6 space-y-5 bg-surface border border-border shadow-sm">
         {/* Sliders */}
-        <div className="space-y-4">
+        <div data-tour="b9-controls" className="space-y-4">
           <Slider
             label="Deposited SOL in Vaults"
             value={solDeposits}
@@ -66,7 +131,7 @@ export function B9Companion() {
         </div>
 
         {/* TVL Metrics Display */}
-        <div className="p-4 rounded-xl bg-primary-light/30 border border-primary/20 space-y-3">
+        <div data-tour="b9-metrics" className="p-4 rounded-xl bg-primary-light/30 border border-primary/20 space-y-3">
           <div className="flex justify-between items-center">
             <span className="font-heading font-semibold text-xs uppercase tracking-wider text-ink">
               Protocol Gross TVL:
@@ -92,7 +157,7 @@ export function B9Companion() {
         </div>
 
         {/* Double-counting toggle */}
-        <div className="p-3.5 rounded-xl bg-bg border border-border flex items-center justify-between">
+        <div data-tour="b9-net" className="p-3.5 rounded-xl bg-bg border border-border flex items-center justify-between">
           <div className="space-y-0.5">
             <span className="font-heading font-semibold text-xs text-ink block">
               Deduct Outstanding Borrows (Net TVL)

@@ -9,9 +9,11 @@ import {
   CheckCircle2,
   XCircle,
   HelpCircle,
+  RotateCcw,
   Eye,
   FileCode,
 } from 'lucide-react';
+import { TourWrapper } from '@/components/tour/TourWrapper';
 
 interface ScamCase {
   id: string;
@@ -57,8 +59,30 @@ export function B10Companion() {
   const [currentCaseIndex, setCurrentCaseIndex] = useState(0);
   const [userChoice, setUserChoice] = useState<'approved' | 'rejected' | null>(null);
   const [score, setScore] = useState(0);
+  const [isTourActive, setIsTourActive] = useState(false);
 
   const currentCase = CASES[currentCaseIndex];
+
+  const tourSteps = [
+    {
+      target: '[data-tour="b10-prefight"]',
+      title: 'The Pre-Flight Simulation',
+      text: 'Real wallets show a plain-English preview before you sign. Read the warning box first — it is where drainers and honeypots reveal themselves.',
+      side: 'bottom' as const,
+    },
+    {
+      target: '[data-tour="b10-decisions"]',
+      title: 'Approve Or Reject',
+      text: 'Weigh the simulation warning against the claimed "reward". A free airdrop that asks for delegate authority over your tokens is always a trap.',
+      side: 'top' as const,
+    },
+    {
+      target: '[data-tour="b10-score"]',
+      title: 'Track Your Instincts',
+      text: 'Your running score shows how many threats you correctly flagged. Reset to run the gauntlet again from scratch.',
+      side: 'top' as const,
+    },
+  ];
 
   const handleDecision = (decision: 'approved' | 'rejected') => {
     setUserChoice(decision);
@@ -71,23 +95,69 @@ export function B10Companion() {
     setCurrentCaseIndex((prev) => (prev + 1) % CASES.length);
   };
 
+  const handleReset = () => {
+    setCurrentCaseIndex(0);
+    setUserChoice(null);
+    setScore(0);
+  };
+
   return (
     <div className="w-full max-w-lg space-y-5">
+      <TourWrapper
+        steps={tourSteps}
+        isActive={isTourActive}
+        onComplete={() => setIsTourActive(false)}
+      />
+
       <div className="space-y-1">
-        <Badge variant="warn" className="mb-1">
-          LAB B10 • TRANSACTION SIMULATOR
-        </Badge>
+        <div className="flex items-start justify-between gap-3">
+          <Badge variant="warn" className="mb-1">
+            LAB B10 • TRANSACTION SIMULATOR
+          </Badge>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setIsTourActive(true)}
+              className="gap-1.5 text-xs"
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-accent" /> Spotlight Tour
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleReset}
+              className="gap-1.5 text-xs"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </Button>
+          </div>
+        </div>
         <h3 className="font-heading font-semibold text-xl text-ink">
           Spot the Scam Transaction Analyzer
         </h3>
         <p className="text-xs text-ink-soft">
           Inspect wallet pre-flight simulation warnings and decide whether to Approve or Reject.
         </p>
+        <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+          <span className="text-[9px] font-mono uppercase tracking-wider text-ink-soft bg-surface border border-border px-2 py-0.5 rounded-full">
+            Sandbox
+          </span>
+          <span className="text-[9px] font-mono uppercase tracking-wider text-amber-900 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+            No real wallet · Nothing costs money
+          </span>
+          <span
+            data-tour="b10-score"
+            className="text-[9px] font-mono uppercase tracking-wider text-ink-soft bg-surface border border-border px-2 py-0.5 rounded-full"
+          >
+            Score: {score}/{CASES.length}
+          </span>
+        </div>
       </div>
 
       <Card className="p-6 space-y-5 bg-surface border border-border shadow-sm">
         {/* Mock Wallet Pre-Flight Screen */}
-        <div className="p-4 rounded-xl bg-bg border border-border space-y-3">
+        <div data-tour="b10-prefight" className="p-4 rounded-xl bg-bg border border-border space-y-3">
           <div className="flex justify-between items-center text-xs pb-2 border-b border-border">
             <span className="font-medium text-ink">Pre-Flight Simulation Screen</span>
             <Badge
@@ -134,7 +204,7 @@ export function B10Companion() {
 
         {/* Action Decision Buttons */}
         {!userChoice ? (
-          <div className="grid grid-cols-2 gap-3 pt-1">
+          <div data-tour="b10-decisions" className="grid grid-cols-2 gap-3 pt-1">
             <Button
               variant="danger"
               onClick={() => handleDecision('rejected')}

@@ -18,7 +18,7 @@
       "id": "b3-intro",
       "type": "read",
       "title": "The Golden Rules of Web3 Security",
-      "body": "In crypto, you are your own bank. That freedom comes with responsibility:\n\n1. **Bookmark official URLs:** Attackers buy sponsored Google ads with deceptive lookalike URLs (e.g. `phantorn.app` or `jup-airdrop.xyz`). Always check your browser address bar.\n2. **Inspect transaction simulation:** Wallets like Phantom show a preview of what tokens leave your wallet. If a site says 'Claim 5,000 Free USDC' but the wallet popup says '-2.5 SOL', reject it immediately!"
+      "body": "In crypto, you are your own bank. That freedom is powerful, but it means there is no fraud department to call and no chargeback to file. Your security habits *are* your bank vault. Two rules stop almost every attack:\n\n1. **Bookmark official URLs:** Attackers buy sponsored Google ads with deceptive lookalike URLs (e.g. `phantorn.app` or `jup-airdrop.xyz`). The safest habit is to type the URL manually or use a bookmark you saved yourself. Never sign in to a crypto app you reached through an ad or a DM link.\n2. **Trust your wallet's simulation over the website:** Wallets like Phantom show a preview of exactly what tokens leave your wallet before you sign. If a site promises *'Claim 5,000 Free USDC'* but the popup shows `-2.5 SOL` leaving you, that is the truth - reject it immediately.\n\n**A third, quieter rule:** slow down. Scams rely on urgency and FOMO. A real protocol never punishes you for taking 10 seconds to read the details."
     },
     {
       "id": "b3-under-the-hood",

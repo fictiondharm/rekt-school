@@ -20,6 +20,7 @@ import {
   Download,
   AlertCircle,
   HelpCircle,
+  RotateCcw,
   Star,
 } from 'lucide-react';
 import { TourWrapper } from '@/components/tour/TourWrapper';
@@ -96,6 +97,12 @@ export function B2Companion() {
     }
   };
 
+  const handleReset = () => {
+    setTxSignature(null);
+    setErrorMsg(null);
+    setIsSigning(false);
+  };
+
   const tourSteps = [
     {
       target: '[data-tour="wallet-install-options"]',
@@ -127,8 +134,8 @@ export function B2Companion() {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border pb-3">
         <div>
-          <Badge variant="primary" className="mb-1">
-            ON-CHAIN LAB: B2
+          <Badge variant="devnet" className="mb-1">
+            SOLANA DEVNET · B2
           </Badge>
           <h3 className="font-heading font-semibold text-xl text-ink">
             Connect & Initialize On-Chain Wallet
@@ -136,17 +143,36 @@ export function B2Companion() {
           <p className="text-xs text-ink-soft">
             Connect your real browser wallet and write your first zero-cost message to Solana Devnet.
           </p>
+          <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+            <span className="text-[9px] font-mono uppercase tracking-wider text-ink-soft bg-surface border border-border px-2 py-0.5 rounded-full">
+              Solana Devnet
+            </span>
+            <span className="text-[9px] font-mono uppercase tracking-wider text-amber-900 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+              Real testnet tx · Nothing costs money
+            </span>
+          </div>
         </div>
 
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => setIsTourActive(true)}
-          className="gap-1.5 text-xs self-start sm:self-center shrink-0"
-        >
-          <HelpCircle className="w-3.5 h-3.5 text-primary" />
-          Spotlight Tour
-        </Button>
+        <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => setIsTourActive(true)}
+            className="gap-1.5 text-xs"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-primary" />
+            Spotlight Tour
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleReset}
+            className="gap-1.5 text-xs"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            Reset
+          </Button>
+        </div>
       </div>
 
       {/* Official Wallet Download Hub */}

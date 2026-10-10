@@ -18,13 +18,13 @@
       "id": "b8-intro",
       "type": "read",
       "title": "Token Valuation Fundamentals",
-      "body": "Beginners often look only at a token's unit price (e.g. '$0.0001 must be cheap; $200 must be expensive!'). This is an illusion.\n\nA token's true scale is measured by its **Market Cap**:\n`Market Cap = Unit Price × Circulating Supply`\n\nA token priced at $0.0001 with 10 trillion supply has a $1 Billion market cap, whereas a token priced at $10 with only 10,000 supply has a $100,000 market cap!"
+      "body": "Beginners often look only at a token's unit price (e.g. *'$0.0001 must be cheap; $200 must be expensive!'*). This is an illusion. Price per coin tells you nothing without knowing how many coins exist.\n\nA token's true scale is measured by its **Market Cap**:\n`Market Cap = Unit Price × Circulating Supply`\n\nCompare two tokens:\n- Token A: `$0.0001` × 10,000,000,000,000 supply = **$1,000,000,000** market cap.\n- Token B: `$200` × 10,000 supply = **$2,000,000** market cap.\n\nToken A *looks* dirt-cheap per coin, but it is a billion-dollar asset - 500× bigger than Token B. **Unit price is a vanity metric; market cap is the real score.** Always multiply before you judge."
     },
     {
       "id": "b8-fdv",
       "type": "read",
       "title": "FDV: Fully Diluted Valuation & Low Float",
-      "body": "Many crypto projects launch with only 5% to 10% of their tokens circulating, while the remaining 90% are locked for team, venture investors, or future rewards.\n\n<Term id=\"fdv\">FDV (Fully Diluted Valuation)</Term> measures the hypothetical value if 100% of tokens were unlocked today:\n`FDV = Unit Price × Total Supply`\n\nIf a project has a $50M Market Cap but a $1B FDV, 95% of the supply is waiting to unlock and sell into the market over coming years!"
+      "body": "Many crypto projects launch with only 5% to 10% of their tokens circulating, while the remaining 90% are locked for the team, venture investors, or future rewards. That gap is the single most underrated trap in crypto.\n\n<Term id=\"fdv\">FDV (Fully Diluted Valuation)</Term> measures the hypothetical value if 100% of tokens were unlocked today:\n`FDV = Unit Price × Total Supply`\n\nCompare the two numbers a project shows you:\n- **Market Cap** = price × **circulating** supply (what exists today)\n- **FDV** = price × **total** supply (what will exist after unlocks)\n\nIf a project has a `$50M` Market Cap but a `$1B` FDV, that means **95% of the supply is still waiting to unlock and sell** into the market over the coming years. Each unlock adds fresh sell pressure that must be absorbed by new buyers. This is what people mean by a **low float, high FDV** token - a heavily diluted asset dressed up as a small one."
     },
     {
       "id": "b8-under-the-hood",

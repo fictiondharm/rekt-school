@@ -10,18 +10,60 @@ import {
 } from '@solana/web3.js';
 import { Card, Button, Badge } from '@/components/ui';
 import { OfficialFaucetGuide } from '@/components/onchain/OfficialFaucetGuide';
-import { Fuel, RefreshCw, CheckCircle2, ExternalLink, Zap, AlertCircle } from 'lucide-react';
+import { TourWrapper } from '@/components/tour/TourWrapper';
+import {
+  Fuel,
+  RefreshCw,
+  RotateCcw,
+  CheckCircle2,
+  ExternalLink,
+  Zap,
+  AlertCircle,
+  HelpCircle,
+} from 'lucide-react';
 
 export function B4Companion() {
   const { publicKey, sendTransaction, connected } = useWallet();
   const { connection } = useConnection();
 
-  const [mounted, setMounted] = useState(false);
   const [balance, setBalance] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [txSignature, setTxSignature] = useState<string | null>(null);
   const [actualFeePaid, setActualFeePaid] = useState<number | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isTourActive, setIsTourActive] = useState(false);
+
+  const tourSteps = [
+    {
+      target: '[data-tour="b4-metrics"]',
+      title: 'Balance vs Standard Fee',
+      text: 'Your live wallet balance sits next to the fixed Solana fee. Notice how tiny the fee is compared to the funds you hold.',
+      side: 'bottom' as const,
+    },
+    {
+      target: '[data-tour="b4-tx-details"]',
+      title: 'What The Transaction Does',
+      text: 'This self-loop transfer moves a sliver of SOL back to yourself so you can see a real fee get burned without ever risking your principal.',
+      side: 'bottom' as const,
+    },
+    {
+      target: '[data-tour="b4-send-button"]',
+      title: 'Broadcast A Live Devnet Tx',
+      text: 'Sign with your wallet and watch the real fee get deducted. Then open the Solana Explorer link to verify it on-chain.',
+      side: 'top' as const,
+    },
+  ];
+
+  const handleReset = async () => {
+    setTxSignature(null);
+    setErrorMsg(null);
+    setActualFeePaid(null);
+    setLoading(false);
+    if (connected && publicKey) {
+      await fetchBalance();
+    }
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -103,16 +145,50 @@ export function B4Companion() {
 
   return (
     <div className="w-full max-w-xl mx-auto space-y-5">
+      <TourWrapper
+        steps={tourSteps}
+        isActive={isTourActive}
+        onComplete={() => setIsTourActive(false)}
+      />
+
       <div className="space-y-1">
-        <Badge variant="primary" className="mb-1">
-          LIVE ON-CHAIN LAB: B4
-        </Badge>
+        <div className="flex items-start justify-between gap-3">
+          <Badge variant="devnet" className="mb-1">
+            SOLANA DEVNET · B4
+          </Badge>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setIsTourActive(true)}
+              className="gap-1.5 text-xs"
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-accent" /> Spotlight Tour
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleReset}
+              className="gap-1.5 text-xs"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </Button>
+          </div>
+        </div>
         <h3 className="font-heading font-semibold text-xl text-ink">
           Real Devnet Gas & Execution Fee
         </h3>
         <p className="text-xs text-ink-soft">
           Broadcast a live self-transfer transaction on Solana Devnet to measure exact lamport gas fees.
         </p>
+        <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+          <span className="text-[9px] font-mono uppercase tracking-wider text-ink-soft bg-surface border border-border px-2 py-0.5 rounded-full">
+            Solana Devnet
+          </span>
+          <span className="text-[9px] font-mono uppercase tracking-wider text-amber-900 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+            Real testnet tx · Nothing costs money
+          </span>
+        </div>
       </div>
 
       {/* If wallet has 0 balance, provide official faucet guide right here */}
@@ -122,7 +198,7 @@ export function B4Companion() {
 
       <Card className="p-6 space-y-5 bg-surface border border-border shadow-sm">
         {/* Balance & Fee Comparison */}
-        <div className="grid grid-cols-2 gap-3">
+        <div data-tour="b4-metrics" className="grid grid-cols-2 gap-3">
           <div className="p-3 bg-bg rounded-xl border border-border">
             <span className="text-[10px] font-medium uppercase text-ink-soft block">
               Live Devnet Balance
@@ -142,7 +218,7 @@ export function B4Companion() {
           </div>
         </div>
 
-        <div className="space-y-2 text-xs">
+        <div data-tour="b4-tx-details" className="space-y-2 text-xs">
           <div className="flex justify-between items-center p-2.5 rounded-lg bg-bg border border-border">
             <span className="text-ink-soft">Network:</span>
             <span className="font-mono font-semibold text-ink">Solana Devnet</span>
@@ -169,6 +245,7 @@ export function B4Companion() {
         )}
 
         <Button
+          data-tour="b4-send-button"
           variant="primary"
           onClick={handleSendLiveTx}
           disabled={loading || !connected || (balance !== null && balance <= 0.0001)}
@@ -180,7 +257,7 @@ export function B4Companion() {
             : !connected
             ? 'Connect Wallet to Sign'
             : balance !== null && balance <= 0.0001
-            ? 'Claim Devnet SOL from Faucet Above First'
+            ? 'Faucet Devnet SOL First'
             : 'Sign & Broadcast Live Devnet Transaction'}
         </Button>
 

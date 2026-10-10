@@ -18,7 +18,7 @@
       "id": "b9-intro",
       "type": "read",
       "title": "What Total Value Locked (TVL) Means",
-      "body": "**Total Value Locked (TVL)** is the aggregate dollar value of all cryptocurrency assets currently deposited in a decentralized finance protocol's smart contracts.\n\nInvestors track TVL on analytics dashboards like DeFiLlama because it serves as a proxy for market trust, protocol usage, and overall liquidity depth."
+      "body": "**Total Value Locked (TVL)** is the aggregate dollar value of all cryptocurrency assets currently deposited in a decentralized finance protocol's smart contracts. Add up everything sitting in the vaults and you get one headline number.\n\nInvestors track TVL on analytics dashboards like DeFiLlama because it serves as a rough proxy for three things:\n- **Trust:** how much real capital users are willing to park in the protocol.\n- **Usage:** how actively the protocol is actually being used, not just talked about.\n- **Liquidity depth:** how much value is available for trading, lending, or borrowing.\n\nBut a big number is not automatically a healthy one. TVL is easy to inflate, double-count, and misrepresent - which is exactly what the next section covers."
     },
     {
       "id": "b9-misleading",

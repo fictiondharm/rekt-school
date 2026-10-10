@@ -11,7 +11,7 @@ import { ExploreView } from './ExploreView';
 import { MarkdownText } from '@/components/ui/MarkdownText';
 import { TourWrapper } from '../tour/TourWrapper';
 import { getMaxiAdvice } from '@/lib/maxi-advisor';
-import { getNetworkMeta } from '@/lib/tier';
+import { getNetworkMetaByLesson } from '@/lib/tier';
 import {
   getLocalLessonProgress,
   saveLocalLessonProgress,
@@ -47,7 +47,7 @@ export function LessonEngine({
   const [mobileTab, setMobileTab] = useState<'learn' | 'practice'>('learn');
   const [lessonCompleted, setLessonCompleted] = useState(false);
 
-  const net = getNetworkMeta(lesson.tier);
+  const net = getNetworkMetaByLesson(lesson.id);
 
   // Load saved progress
   useEffect(() => {

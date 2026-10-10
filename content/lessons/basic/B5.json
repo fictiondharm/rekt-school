@@ -18,13 +18,13 @@
       "id": "b5-intro",
       "type": "read",
       "title": "How Solana Handles Tokens",
-      "body": "On Ethereum, a smart contract maintains a giant internal ledger of every user's balance. Solana does things differently:\n\n1. **The Mint Account:** This is the master recipe account for the <Term id=\"spl_token\">SPL token</Term>. It defines the token's total supply, decimals, and who holds minting authority.\n2. **Your Token Account:** Your main wallet does not hold tokens directly inside your SOL address. Instead, your wallet owns a separate child account called an Associated <Term id=\"token_account\">Token Account</Term> (ATA) dedicated to holding that specific token."
+      "body": "On Ethereum, a smart contract maintains a giant internal ledger of every user's balance. Solana does things differently - it splits the concept into **two kinds of accounts**:\n\n1. **The Mint Account:** This is the master recipe account for the <Term id=\"spl_token\">SPL token</Term>. It defines the token's total supply, decimals, and who holds minting authority. There is exactly one mint per token.\n2. **Your Token Account:** Your main wallet does not hold tokens directly inside your SOL address. Instead, your wallet owns a separate child account called an Associated <Term id=\"token_account\">Token Account</Term> (ATA) dedicated to holding that specific token.\n\n**Why the split?** A single wallet can hold dozens of different tokens. Rather than stuffing them all into one account, Solana gives each token its own dedicated account that your wallet controls. The mint describes *the asset*; your ATA holds *your slice of it*.\n\nThis is why, the first time you receive a new token, your wallet quietly creates a fresh ATA for it - and why closing empty ATAs returns a little SOL."
     },
     {
       "id": "b5-decimals",
       "type": "read",
       "title": "Decimals: Why Blockchains Store Integers",
-      "body": "Blockchains do not support floating-point decimals (like 1.50) because rounding errors across thousands of validators would break consensus.\n\nInstead, tokens declare a <Term id=\"decimals\">decimals</Term> value (e.g. 6 decimals for USDC, 9 decimals for SOL). When your wallet shows `1.50 USDC`, the blockchain is actually storing the integer `1500000` base units!"
+      "body": "Blockchains do not support floating-point decimals (like 1.50) because rounding errors across thousands of validators would break consensus. Every amount must be an exact, whole integer.\n\nSo tokens declare a <Term id=\"decimals\">decimals</Term> value that sets how many base units make up one whole token:\n\n- **6 decimals** (like USDC): `1.50 USDC` is stored on-chain as the integer `1500000`.\n- **9 decimals** (like SOL): `1 SOL` is stored as `1000000000` lamports.\n\nThe decimals are really just a **display layer**. The blockchain only ever sees integers; your wallet divides by 10^decimals to show you a human-friendly number. This is also why 'amount must be an integer' errors appear when a dapp mishandles decimals - the chain simply refuses fractional base units."
     },
     {
       "id": "b5-under-the-hood",

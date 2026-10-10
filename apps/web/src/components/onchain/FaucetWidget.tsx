@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { PublicKey, Transaction } from '@solana/web3.js';
 import { Card, Button, Badge } from '@/components/ui';
 import {
   Fuel,
   Coins,
-  CheckCircle2,
   AlertCircle,
   ExternalLink,
   Copy,
@@ -17,10 +17,10 @@ import {
 import { COURSE_PROGRAM_IDS } from '@/lib/solana';
 
 export function FaucetWidget() {
-  const { publicKey, connected } = useWallet();
-  const [gasLoading, setGasLoading] = useState(false);
+  const { publicKey, connected, signTransaction, sendTransaction } = useWallet();
+  const { connection } = useConnection();
   const [tokenLoading, setTokenLoading] = useState(false);
-  const [status, setStatus] = useState<{ type: 'gas' | 'token'; message: string; sig?: string } | null>(null);
+  const [status, setStatus] = useState<{ type: 'token'; message: string; sig?: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const [copiedCA, setCopiedCA] = useState(false);
@@ -30,7 +30,7 @@ export function FaucetWidget() {
     setMounted(true);
   }, []);
 
-  const activeWallet = mounted && publicKey ? publicKey.toBase58() : 'Devn4wKQyL7xMop8Z21T9v';
+  const walletAddress = publicKey ? publicKey.toBase58() : null;
   const fusdcCA = COURSE_PROGRAM_IDS.FUSDC_MINT;
 
   const handleCopyCA = () => {
@@ -39,53 +39,69 @@ export function FaucetWidget() {
     setTimeout(() => setCopiedCA(false), 2000);
   };
 
-  const handleClaimGas = async () => {
-    setGasLoading(true);
-    setError(null);
-    setStatus(null);
-
-    try {
-      const res = await fetch('/api/faucet/gas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet: activeWallet }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setStatus({ type: 'gas', message: data.message, sig: data.signature });
-      } else {
-        setError(data.message);
-      }
-    } catch {
-      setError('Network error requesting devnet gas.');
-    } finally {
-      setGasLoading(false);
-    }
-  };
-
   const handleClaimToken = async () => {
+    if (!connected || !walletAddress) {
+      setError('Connect your wallet first to receive fUSDC into your own token account.');
+      return;
+    }
+    if (!signTransaction && !sendTransaction) {
+      setError('Your wallet does not support transaction signing. Try Phantom or Solflare.');
+      return;
+    }
+
     setTokenLoading(true);
     setError(null);
     setStatus(null);
 
     try {
+      // Server prepares a mint tx (creates your ATA if needed) and partial-signs
+      // with the faucet's mint authority. You pay the SOL fee and sign the rest.
       const res = await fetch('/api/faucet/token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet: activeWallet, amount: 10000 }),
+        body: JSON.stringify({ wallet: walletAddress, amount: 10000 }),
       });
       const data = await res.json();
-      if (data.success) {
-        setStatus({
-          type: 'token',
-          message: data.message || 'Successfully minted 10,000 fUSDC to your token account!',
-          sig: data.signature,
-        });
-      } else {
+
+      if (!data.success) {
         setError(data.message);
+        return;
       }
-    } catch {
-      setError('Network error claiming test tokens.');
+
+      const tx = Transaction.from(Buffer.from(data.transaction, 'base64'));
+      const pubkey = new PublicKey(walletAddress);
+
+      let signature: string;
+      if (sendTransaction) {
+        signature = await sendTransaction(tx, connection, {
+          skipPreflight: false,
+          preflightCommitment: 'confirmed',
+        });
+      } else if (signTransaction) {
+        const signedTx = await signTransaction(tx);
+        signature = await connection.sendRawTransaction(signedTx.serialize());
+      } else {
+        throw new Error('Wallet signing unavailable.');
+      }
+
+      const confirmation = await connection.confirmTransaction({
+        signature,
+        blockhash: data.blockhash,
+        lastValidBlockHeight: data.lastValidBlockHeight,
+      });
+
+      if (confirmation.value.err) {
+        throw new Error('Mint transaction failed on devnet.');
+      }
+
+      setStatus({
+        type: 'token',
+        message: `Successfully minted ${Number(data.amount).toLocaleString()} fUSDC to ${pubkey.toBase58().slice(0, 6)}...${pubkey.toBase58().slice(-4)}!`,
+        sig: signature,
+      });
+    } catch (err: any) {
+      console.error(err);
+      setError(err?.message || 'Failed to mint fUSDC. Make sure you have a little Devnet SOL for the fee.');
     } finally {
       setTokenLoading(false);
     }
@@ -99,7 +115,12 @@ export function FaucetWidget() {
             Solana Devnet Faucet Station
           </h3>
           <p className="text-[11px] text-ink-soft">
-            Targeting: <span className="font-mono font-bold text-primary">{connected ? `${activeWallet.slice(0, 4)}...${activeWallet.slice(-4)}` : 'Instant Demo Wallet'}</span>
+            Targeting:{' '}
+            <span className="font-mono font-bold text-primary">
+              {connected && mounted && walletAddress
+                ? `${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}`
+                : 'Connect Wallet First'}
+            </span>
           </p>
         </div>
         <Badge variant="devnet" className="text-[10px]">
@@ -108,29 +129,38 @@ export function FaucetWidget() {
       </div>
 
       <p className="text-xs text-ink-soft leading-relaxed">
-        Claim free Devnet SOL for network fees and <strong>10,000 fUSDC</strong> to test AMM swaps and liquidity pools:
+        Grab free devnet SOL from the <strong>official Solana faucet</strong> for network fees, then{' '}
+        <strong>actually mint 10,000 fUSDC</strong> to your wallet so you can perform real swaps and
+        liquidity tests:
       </p>
 
       {/* Claim Buttons */}
       <div className="grid grid-cols-2 gap-3">
-        <Button
-          variant="secondary"
-          onClick={handleClaimGas}
-          isLoading={gasLoading}
-          className="gap-2 text-xs h-10"
+        <a
+          href="https://faucet.solana.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-ink bg-transparent text-ink font-bold text-xs h-10 hover:bg-tertiary transition-all"
         >
-          <Fuel className="w-4 h-4 text-amber-500" /> +0.5 Devnet SOL
-        </Button>
+          <Fuel className="w-4 h-4 text-amber-500" /> Get Devnet SOL
+        </a>
 
         <Button
           variant="primary"
           onClick={handleClaimToken}
           isLoading={tokenLoading}
+          disabled={!connected}
           className="gap-2 text-xs h-10 shadow-sm"
         >
-          <Coins className="w-4 h-4 text-white" /> +10,000 fUSDC
+          <Coins className="w-4 h-4 text-white" /> Mint 10,000 fUSDC
         </Button>
       </div>
+
+      {!connected && (
+        <p className="text-[10px] text-accent font-semibold -mt-1">
+          Connect your Phantom / Solflare wallet in the top bar to claim funds into your own account.
+        </p>
+      )}
 
       {/* Contract Address (CA) Card */}
       <div className="p-3.5 rounded-xl bg-bg border border-border space-y-2">
@@ -173,7 +203,7 @@ export function FaucetWidget() {
 
         {showImportGuide && (
           <div className="mt-2 p-3 rounded-lg bg-surface border border-border text-[11px] text-ink-soft space-y-2 animate-in fade-in duration-150">
-            <p className="font-bold text-ink">To see your 10,000 fUSDC in your wallet extension:</p>
+            <p className="font-bold text-ink">To see your fUSDC in your wallet extension:</p>
             <ol className="list-decimal pl-4 space-y-1">
               <li>Click <strong>Copy CA</strong> above to copy the token mint address.</li>
               <li>Open your <strong>Phantom</strong> or <strong>Solflare</strong> extension.</li>
@@ -188,12 +218,12 @@ export function FaucetWidget() {
       {status && (
         <div className="p-3.5 rounded-xl bg-accent-light border border-accent/40 space-y-1.5 text-xs animate-in fade-in duration-200">
           <div className="flex items-center gap-1.5 font-bold text-emerald-900">
-            <CheckCircle2 className="w-4 h-4 text-accent shrink-0" />
+            <Sparkles className="w-4 h-4 text-accent shrink-0" />
             {status.message}
           </div>
           {status.sig && (
             <div className="text-[11px] font-mono text-emerald-800 flex justify-between items-center">
-              <span>Receipt: {status.sig.slice(0, 18)}...</span>
+              <span>Tx: {status.sig.slice(0, 18)}...</span>
               <a
                 href={`https://explorer.solana.com/tx/${status.sig}?cluster=devnet`}
                 target="_blank"

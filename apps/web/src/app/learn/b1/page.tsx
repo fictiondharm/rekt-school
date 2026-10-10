@@ -28,6 +28,7 @@ export default function LessonB1Page() {
         aura={aura}
         streak={1}
         showTourButton={true}
+        lessonId={lesson.id}
       />
 
       <div className="flex-1 flex min-h-0">

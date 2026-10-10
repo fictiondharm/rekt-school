@@ -1,9 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PublicKey } from '@solana/web3.js';
+import {
+  PublicKey,
+  Keypair,
+  Transaction,
+  LAMPORTS_PER_SOL,
+} from '@solana/web3.js';
+import {
+  getAssociatedTokenAddressSync,
+  createAssociatedTokenAccountInstruction,
+  createMintToInstruction,
+  TOKEN_PROGRAM_ID,
+} from '@solana/spl-token';
+import bs58 from 'bs58';
+import { getServerSolanaConnection, COURSE_PROGRAM_IDS } from '@/lib/solana';
 import { assertDevnetCluster } from '@/lib/cluster-guard';
-import { COURSE_PROGRAM_IDS } from '@/lib/solana';
 
+// In-memory rate-limiter for the fUSDC faucet
 const lastTokenClaim: Record<string, number> = {};
+
+function loadMintAuthority(): Keypair | null {
+  const raw = process.env.FAUCET_MINT_AUTHORITY_SECRET;
+  if (!raw) return null;
+  try {
+    // Support both base58 secret string and JSON array of numbers
+    if (raw.trim().startsWith('[')) {
+      const arr = JSON.parse(raw);
+      return Keypair.fromSecretKey(Uint8Array.from(arr));
+    }
+    return Keypair.fromSecretKey(bs58.decode(raw));
+  } catch (err) {
+    console.warn('Failed to decode FAUCET_MINT_AUTHORITY_SECRET:', err);
+    return null;
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,17 +46,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const isDemoWallet = wallet.startsWith('Devn') || wallet.includes('mock') || wallet.includes('demo');
+    // Real minting requires a real connected wallet - no demo/mock fallbacks.
+    let userPubkey: PublicKey;
+    try {
+      userPubkey = new PublicKey(wallet);
+    } catch {
+      return NextResponse.json(
+        { success: false, message: 'Invalid Solana devnet address.' },
+        { status: 400 }
+      );
+    }
 
-    if (!isDemoWallet) {
-      try {
-        new PublicKey(wallet);
-      } catch {
-        return NextResponse.json(
-          { success: false, message: 'Invalid Solana devnet address.' },
-          { status: 400 }
-        );
-      }
+    const authority = loadMintAuthority();
+    if (!authority) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            'Faucet mint authority is not configured on the server. Set FAUCET_MINT_AUTHORITY_SECRET in .env to enable real fUSDC minting.',
+        },
+        { status: 503 }
+      );
     }
 
     const now = Date.now();
@@ -37,26 +76,95 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: `Daily limit reached. Please wait ${waitSeconds}s before claiming more fUSDC.`,
+          message: `Please wait ${waitSeconds}s before claiming more fUSDC.`,
         },
         { status: 429 }
       );
     }
-
     lastTokenClaim[wallet] = now;
-    const claimSig = `fusdc_mint_${Date.now()}_${wallet.slice(0, 6)}`;
+
+    const connection = getServerSolanaConnection();
+    const mintPubkey = new PublicKey(COURSE_PROGRAM_IDS.FUSDC_MINT);
+
+    // Resolve token decimals from the on-chain mint account (default 6 for fUSDC/USDC)
+    let decimals = 6;
+    try {
+      const mintInfo = await connection.getParsedAccountInfo(mintPubkey);
+      const parsed = mintInfo?.value?.data as
+        | { parsed?: { info?: { decimals?: number } } }
+        | undefined;
+      if (parsed?.parsed?.info?.decimals != null) {
+        decimals = parsed.parsed.info.decimals;
+      }
+    } catch {
+      // fall back to 6
+    }
+
+    const amountBig = BigInt(Math.round(Number(amount) * 10 ** decimals));
+    const userAta = getAssociatedTokenAddressSync(
+      mintPubkey,
+      userPubkey,
+      false,
+      TOKEN_PROGRAM_ID
+    );
+
+    const tx = new Transaction();
+
+    // Create the user's ATA if it does not exist yet (rent paid via feePayer SOL).
+    const ataInfo = await connection.getAccountInfo(userAta);
+    if (!ataInfo) {
+      tx.add(
+        createAssociatedTokenAccountInstruction(
+          userPubkey, // payer that funds the ATA rent
+          userAta,
+          userPubkey,
+          mintPubkey,
+          TOKEN_PROGRAM_ID
+        )
+      );
+    }
+
+    // Mint fUSDC into the user's ATA. Authority = server-controlled mint authority.
+    tx.add(
+      createMintToInstruction(
+        mintPubkey,
+        userAta,
+        authority.publicKey,
+        amountBig,
+        [],
+        TOKEN_PROGRAM_ID
+      )
+    );
+
+    const latestBlockhash = await connection.getLatestBlockhash('confirmed');
+    tx.recentBlockhash = latestBlockhash.blockhash;
+    tx.feePayer = userPubkey;
+
+    // Server signs ONLY the mint-authority role.
+    tx.partialSign(authority);
+
+    // Serialize without requiring every signature so the user wallet can add its own.
+    const serializedTx = tx.serialize({
+      requireAllSignatures: false,
+      verifySignatures: false,
+    });
 
     return NextResponse.json({
       success: true,
+      transaction: Buffer.from(serializedTx).toString('base64'),
+      blockhash: latestBlockhash.blockhash,
+      lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
       amount: Number(amount),
-      mint: COURSE_PROGRAM_IDS.FUSDC_MINT,
-      ca: COURSE_PROGRAM_IDS.FUSDC_MINT,
-      signature: claimSig,
-      message: `Successfully minted ${Number(amount).toLocaleString()} fUSDC to your token account!`,
+      decimals,
+      mint: mintPubkey.toBase58(),
+      ca: mintPubkey.toBase58(),
+      ata: userAta.toBase58(),
+      feePayer: userPubkey.toBase58(),
     });
-  } catch (err) {
+  } catch (err: unknown) {
+    console.warn('Token faucet error:', err);
     return NextResponse.json(
-      { success: false, message: 'Failed to process token faucet claim.' },
+      { success: false, message: 'Failed to prepare the fUSDC mint. Please try again.' },
       { status: 500 }
     );
   }

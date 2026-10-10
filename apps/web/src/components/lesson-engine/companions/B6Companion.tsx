@@ -20,6 +20,7 @@ import {
 } from '@solana/spl-token';
 import { Card, Button, Badge } from '@/components/ui';
 import { OfficialFaucetGuide } from '@/components/onchain/OfficialFaucetGuide';
+import { TourWrapper } from '@/components/tour/TourWrapper';
 import {
   Rocket,
   ShieldCheck,
@@ -31,6 +32,7 @@ import {
   Coins,
   ArrowRight,
   HelpCircle,
+  RotateCcw,
   Code2,
   Lock,
 } from 'lucide-react';
@@ -53,10 +55,57 @@ export function B6Companion() {
   const [copiedCA, setCopiedCA] = useState(false);
   const [isSimulatedMode, setIsSimulatedMode] = useState(false);
   const [showUnderTheHood, setShowUnderTheHood] = useState(false);
+  const [isTourActive, setIsTourActive] = useState(false);
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
+
+  const tourSteps = [
+    {
+      target: '[data-tour="b6-form"]',
+      title: 'Design Your Token',
+      text: 'Set the name, ticker, and initial supply. This is exactly how a real SPL token is configured on-chain.',
+      side: 'bottom' as const,
+    },
+    {
+      target: '[data-tour="b6-revoke"]',
+      title: 'Revoke Mint Authority',
+      text: 'Leaving this ON permanently locks the supply - no one can ever print more. Turning it off is the #1 rug-pull risk.',
+      side: 'bottom' as const,
+    },
+    {
+      target: '[data-tour="b6-deploy"]',
+      title: 'Deploy & Mint',
+      text: 'Sign the transaction to create the mint, your ATA, and print the supply. Without a wallet it runs in sandbox mode.',
+      side: 'top' as const,
+    },
+    ...(mintedCA
+      ? [
+          {
+            target: '[data-tour="b6-result"]',
+            title: 'Your Contract Address is the "What is What"',
+            text: 'This is the unique CA (Contract Address) your mint just got. The name and ticker can be copied by imposters - the CA is the only thing that proves this token is real. Paste it into Jupiter or DexScreener to verify any token.',
+            side: 'top' as const,
+          },
+        ]
+      : []),
+  ];
+
+  const handleReset = () => {
+    setName('Solana Chad');
+    setSymbol('CHAD');
+    setSupply(10000);
+    setDecimals(6);
+    setRevokeAuthority(true);
+    setLoading(false);
+    setErrorMsg(null);
+    setMintedCA(null);
+    setMintTxSig(null);
+    setCopiedCA(false);
+    setIsSimulatedMode(false);
+    setShowUnderTheHood(false);
+  };
 
   const handleMintRealToken = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -192,16 +241,50 @@ export function B6Companion() {
 
   return (
     <div className="w-full max-w-xl mx-auto space-y-6">
+      <TourWrapper
+        steps={tourSteps}
+        isActive={isTourActive}
+        onComplete={() => setIsTourActive(false)}
+      />
+
       <div className="space-y-1">
-        <Badge variant="primary" className="mb-1">
-          LAB B6 • SPL TOKEN LAUNCHER
-        </Badge>
+        <div className="flex items-start justify-between gap-3">
+          <Badge variant="devnet" className="mb-1">
+            SOLANA DEVNET · B6
+          </Badge>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setIsTourActive(true)}
+              className="gap-1.5 text-xs"
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-accent" /> Spotlight Tour
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleReset}
+              className="gap-1.5 text-xs"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </Button>
+          </div>
+        </div>
         <h3 className="font-heading font-semibold text-xl text-ink">
           Deploy Your SPL Token & Contract Address (CA)
         </h3>
         <p className="text-xs text-ink-soft">
           Configure token parameters, mint supply, and automatically receive your token's unique Contract Address.
         </p>
+        <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+          <span className="text-[9px] font-mono uppercase tracking-wider text-ink-soft bg-surface border border-border px-2 py-0.5 rounded-full">
+            Solana Devnet
+          </span>
+          <span className="text-[9px] font-mono uppercase tracking-wider text-amber-900 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+            Real testnet tx · Nothing costs money
+          </span>
+        </div>
       </div>
 
       {mounted && !connected && (
@@ -209,7 +292,7 @@ export function B6Companion() {
       )}
 
       <Card className="p-6 space-y-5 bg-surface border border-border shadow-sm">
-        <form onSubmit={handleMintRealToken} className="space-y-4 text-xs">
+        <form data-tour="b6-form" onSubmit={handleMintRealToken} className="space-y-4 text-xs">
           <div>
             <label className="font-heading font-semibold text-ink block mb-1">
               Token Name
@@ -253,7 +336,7 @@ export function B6Companion() {
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-bg border border-border flex items-center justify-between">
+          <div data-tour="b6-revoke" className="p-3.5 rounded-xl bg-bg border border-border flex items-center justify-between">
             <div className="space-y-0.5">
               <span className="font-heading font-semibold text-ink flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5 text-primary" /> Revoke Mint Authority (Fixed Supply)
@@ -280,6 +363,7 @@ export function B6Companion() {
           <Button
             type="submit"
             variant="primary"
+            data-tour="b6-deploy"
             disabled={loading}
             className="w-full gap-2 text-xs py-3 shadow-sm"
           >
@@ -294,7 +378,7 @@ export function B6Companion() {
 
         {/* REAL MINTED CONTRACT ADDRESS (CA) RESULT CARD */}
         {mintedCA && (
-          <div className="p-5 rounded-xl bg-accent-light border border-accent/40 space-y-4 animate-in fade-in duration-300">
+          <div data-tour="b6-result" className="p-5 rounded-xl bg-accent-light border border-accent/40 space-y-4 animate-in fade-in duration-300">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 font-heading font-semibold text-sm text-emerald-950">
                 <CheckCircle2 className="w-5 h-5 text-accent" />

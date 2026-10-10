@@ -12,7 +12,8 @@ import {
 import { Buffer } from 'buffer';
 import { Card, Button, Badge } from '@/components/ui';
 import { OfficialFaucetGuide } from '@/components/onchain/OfficialFaucetGuide';
-import { ArrowDownUp, ArrowRightLeft, RefreshCw, CheckCircle2, ExternalLink, AlertCircle } from 'lucide-react';
+import { TourWrapper } from '@/components/tour/TourWrapper';
+import { ArrowDownUp, ArrowRightLeft, RefreshCw, CheckCircle2, ExternalLink, AlertCircle, HelpCircle, RotateCcw } from 'lucide-react';
 import { simulateSwap } from '@defi-mommy/sim-core';
 
 export function B7Companion() {
@@ -26,10 +27,45 @@ export function B7Companion() {
   const [realTxSignature, setRealTxSignature] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [solBalance, setSolBalance] = useState<number | null>(null);
+  const [isTourActive, setIsTourActive] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const tourSteps = [
+    {
+      target: '[data-tour="b7-pay"]',
+      title: 'What You Pay',
+      text: 'Set the amount of fUSDC you want to swap. In this pool 1 SOL trades around 200 fUSDC.',
+      side: 'bottom' as const,
+    },
+    {
+      target: '[data-tour="b7-receive"]',
+      title: 'What You Receive',
+      text: 'The AMM calculates your output from the pool reserves. Bigger trades move the price more - that is price impact.',
+      side: 'bottom' as const,
+    },
+    {
+      target: '[data-tour="b7-slippage"]',
+      title: 'Slippage & Minimum',
+      text: 'Slippage tolerance sets the worst rate you will accept. If the pool moves past it, the swap safely cancels and refunds you.',
+      side: 'top' as const,
+    },
+    {
+      target: '[data-tour="b7-swap"]',
+      title: 'Execute The Swap',
+      text: 'Sign to broadcast a real Solana Devnet transaction, then verify it on the Solana Explorer.',
+      side: 'top' as const,
+    },
+  ];
+
+  const handleReset = () => {
+    setAmountIn(20);
+    setSlippage(0.5);
+    setRealTxSignature(null);
+    setErrorMsg(null);
+  };
 
   // Pool: 1,000 SOL / 200,000 fUSDC ($200/SOL)
   const result = simulateSwap(amountIn, 1000, 200000, false, 0.003);
@@ -120,16 +156,50 @@ export function B7Companion() {
 
   return (
     <div className="w-full max-w-xl mx-auto space-y-5">
+      <TourWrapper
+        steps={tourSteps}
+        isActive={isTourActive}
+        onComplete={() => setIsTourActive(false)}
+      />
+
       <div className="space-y-1">
-        <Badge variant="primary" className="mb-1">
-          LIVE ON-CHAIN LAB: B7
-        </Badge>
+        <div className="flex items-start justify-between gap-3">
+          <Badge variant="devnet" className="mb-1">
+            SOLANA DEVNET · B7
+          </Badge>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setIsTourActive(true)}
+              className="gap-1.5 text-xs"
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-accent" /> Spotlight Tour
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleReset}
+              className="gap-1.5 text-xs"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Reset
+            </Button>
+          </div>
+        </div>
         <h3 className="font-heading font-semibold text-xl text-ink">
           Real Devnet AMM Swap
         </h3>
         <p className="text-xs text-ink-soft">
           Test quotes, price impact, and execute an immutable on-chain trade on Solana Devnet.
         </p>
+        <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+          <span className="text-[9px] font-mono uppercase tracking-wider text-ink-soft bg-surface border border-border px-2 py-0.5 rounded-full">
+            Solana Devnet
+          </span>
+          <span className="text-[9px] font-mono uppercase tracking-wider text-amber-900 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+            Real testnet tx · Nothing costs money
+          </span>
+        </div>
       </div>
 
       {/* Official Faucet Guide when wallet lacks Devnet gas */}
@@ -139,7 +209,7 @@ export function B7Companion() {
 
       <Card className="p-6 space-y-5 bg-surface border border-border shadow-sm">
         <form onSubmit={handleExecuteSwap} className="space-y-4">
-          <div className="p-3.5 bg-bg rounded-xl border border-border space-y-2">
+          <div data-tour="b7-pay" className="p-3.5 bg-bg rounded-xl border border-border space-y-2">
             <div className="flex justify-between text-xs text-ink-soft">
               <span>You Pay</span>
               <span>Balance: 500 fUSDC</span>
@@ -166,7 +236,7 @@ export function B7Companion() {
             </div>
           </div>
 
-          <div className="p-3.5 bg-bg rounded-xl border border-border space-y-2">
+          <div data-tour="b7-receive" className="p-3.5 bg-bg rounded-xl border border-border space-y-2">
             <div className="flex justify-between text-xs text-ink-soft">
               <span>You Receive (Estimated)</span>
               <span>1 SOL = $200.00</span>
@@ -182,7 +252,7 @@ export function B7Companion() {
           </div>
 
           {/* Slippage & Route Details */}
-          <div className="space-y-2 text-xs pt-2">
+          <div data-tour="b7-slippage" className="space-y-2 text-xs pt-2">
             <div className="flex justify-between items-center text-ink-soft">
               <span>Slippage Tolerance:</span>
               <div className="flex gap-1.5">
@@ -228,6 +298,7 @@ export function B7Companion() {
           <Button
             type="submit"
             variant="primary"
+            data-tour="b7-swap"
             disabled={loading || !connected || (solBalance !== null && solBalance <= 0)}
             className="w-full gap-2 text-xs py-3"
           >
