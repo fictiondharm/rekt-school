@@ -22,7 +22,7 @@ export function Disclaimer({ className }: DisclaimerProps) {
       </div>
       <div>
         <span className="font-bold text-ink">Educational purposes only. Not financial advice.</span>{' '}
-        Everything here uses Solana devnet play money. Never risk real funds.
+        Tier 1 runs on Solana Devnet and Tier 2 in a sandbox — both use fake money. Never risk real funds.
       </div>
     </div>
   );

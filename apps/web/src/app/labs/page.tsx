@@ -67,13 +67,15 @@ export default function LabsHubPage() {
         <div className="space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border-2 border-ink text-accent text-xs font-bold">
                 <Star className="w-3.5 h-3.5 fill-accent" />
-                <span>Interactive Protocol Playgrounds</span>
+                <span>Sandbox Protocol Playgrounds</span>
               </div>
           <h1 className="text-3xl sm:text-4xl font-heading font-bold tracking-tight text-ink">
             Rekt School Interactive Labs
           </h1>
           <p className="text-sm sm:text-base text-ink-soft max-w-2xl leading-relaxed">
-            Hands-on institutional-grade sandboxes. Manipulate interest rate curves, stress-test collateral health factors, trigger MEV arbitrage bots, and inspect pool slippage.
+            Hands-on institutional-grade <strong className="text-ink">sandboxes</strong> — no wallet, no real
+            chain, no real funds. Manipulate interest rate curves, stress-test collateral health factors,
+            trigger MEV arbitrage bots, and inspect pool slippage.
           </p>
         </div>
 
@@ -127,10 +129,12 @@ export default function LabsHubPage() {
           <div className="space-y-1">
             <h4 className="font-heading font-bold text-ink flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-accent" />
-              Looking for Real Solana Devnet Protocols?
+              These labs are simulations — want the real thing?
             </h4>
             <p className="text-xs text-ink-soft leading-relaxed max-w-xl">
-              Ready to take the training wheels off? Practice on live Solana Devnet deployments on Raydium, Kamino Finance, and Jupiter with your faucet SOL and fUSDC.
+              Everything above is a zero-risk sandbox. Ready to take the training wheels off? Practice on
+              live Solana <strong className="text-ink">Devnet</strong> deployments on Raydium, Kamino Finance,
+              and Jupiter with your faucet SOL and fUSDC.
             </p>
           </div>
           <div className="flex items-center gap-3">

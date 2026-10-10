@@ -123,7 +123,7 @@ export function I13Companion() {
         decimals: mintInfo.decimals,
       });
     } catch (err: any) {
-      setRpcError(err.message || 'Failed to fetch mint data from Solana Devnet RPC.');
+      setRpcError(err.message || 'Failed to fetch mint data from the sandbox RPC.');
     } finally {
       setIsQueryingOnChain(false);
     }
@@ -324,15 +324,15 @@ export function I13Companion() {
         </div>
       </div>
 
-      {/* Live Devnet RPC Query Sandbox */}
+      {/* Live Read-Only RPC Query (Sandbox) */}
       <div className="p-4 rounded-xl border border-primary/20 bg-primary-light/10 space-y-3">
         <div className="flex items-center justify-between">
           <div className="text-xs font-medium text-ink flex items-center gap-1.5">
             <Terminal className="w-4 h-4 text-primary" />
-            <span>Live Solana Devnet Query (Try Any Mint Address)</span>
+            <span>Live Read-Only RPC Query · Sandbox (Try Any Mint Address)</span>
           </div>
           <Badge variant="outline" className="text-[10px] font-mono">
-            Direct JSON-RPC
+            Read-only · No wallet
           </Badge>
         </div>
 

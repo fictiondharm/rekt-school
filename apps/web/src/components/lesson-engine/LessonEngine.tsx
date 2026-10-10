@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Lesson, Step, TourStepDefSchema } from '@defi-mommy/content-schema';
-import { Button, Card, Disclaimer } from '@/components/ui';
+import { Button, Card, Disclaimer, Badge } from '@/components/ui';
 import { ReadStep } from './ReadStep';
 import { QuizView } from './QuizView';
 import { UnderTheHood } from './UnderTheHood';
@@ -11,6 +11,7 @@ import { ExploreView } from './ExploreView';
 import { MarkdownText } from '@/components/ui/MarkdownText';
 import { TourWrapper } from '../tour/TourWrapper';
 import { getMaxiAdvice } from '@/lib/maxi-advisor';
+import { getNetworkMeta } from '@/lib/tier';
 import {
   getLocalLessonProgress,
   saveLocalLessonProgress,
@@ -45,6 +46,8 @@ export function LessonEngine({
   const [isTourActive, setIsTourActive] = useState(false);
   const [mobileTab, setMobileTab] = useState<'learn' | 'practice'>('learn');
   const [lessonCompleted, setLessonCompleted] = useState(false);
+
+  const net = getNetworkMeta(lesson.tier);
 
   // Load saved progress
   useEffect(() => {
@@ -165,7 +168,7 @@ export function LessonEngine({
               : 'border-transparent text-ink-soft'
           }`}
         >
-          2. Practice & Sandbox
+          2. Practice Lab
         </button>
       </div>
 
@@ -443,6 +446,10 @@ export function LessonEngine({
             mobileTab === 'learn' ? 'hidden lg:flex' : 'flex'
           }`}
         >
+          <div className="w-full flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-border">
+            <Badge variant={net.badgeVariant}>{net.badgeLabel}</Badge>
+            <span className="text-[10px] font-mono text-ink-soft text-right">{net.clusterLine}</span>
+          </div>
           {practiceSlot || (
             <Card className="max-w-md w-full p-8 space-y-5 border-2 border-dashed border-ink rounded-xl">
               <div className="w-14 h-14 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
@@ -450,7 +457,7 @@ export function LessonEngine({
               </div>
               <div className="space-y-1">
                 <h3 className="font-heading font-bold text-lg text-ink">
-                  Practice Sandbox
+                  Practice Lab
                 </h3>
                 <p className="text-xs text-ink-soft leading-relaxed">
                   Interactive simulators, liquidity curves, and on-chain verified
@@ -458,7 +465,7 @@ export function LessonEngine({
                 </p>
               </div>
               <div className="p-3 bg-surface rounded-lg border border-border text-xs font-mono text-ink-soft">
-                Cluster: Solana Devnet • Gas: Free
+                {net.clusterLine}
               </div>
             </Card>
           )}

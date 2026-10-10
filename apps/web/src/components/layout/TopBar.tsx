@@ -2,16 +2,20 @@
 
 import Link from 'next/link';
 import { WalletChip } from '@/components/onchain/WalletChip';
+import { Badge } from '@/components/ui';
+import { getNetworkMeta } from '@/lib/tier';
 import { Sparkles } from 'lucide-react';
+import type { Tier } from '@defi-mommy/content-schema';
 
 interface TopBarProps {
   lessonTitle?: string;
   aura?: number;
   streak?: number;
   showTourButton?: boolean;
+  tier?: Tier;
 }
 
-export function TopBar({ lessonTitle, aura = 0, streak = 0, showTourButton = false }: TopBarProps) {
+export function TopBar({ lessonTitle, aura = 0, streak = 0, showTourButton = false, tier }: TopBarProps) {
   return (
     <header className="sticky top-0 z-30 bg-white border-b-2 border-ink">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -25,6 +29,14 @@ export function TopBar({ lessonTitle, aura = 0, streak = 0, showTourButton = fal
               <span className="font-heading font-bold text-lg leading-none tracking-tight">Rekt School</span>
               {lessonTitle && (
                 <span className="font-medium text-xs tracking-wider text-ink-faint mt-1">{lessonTitle}</span>
+              )}
+              {tier && (
+                <Badge
+                  variant={getNetworkMeta(tier).badgeVariant}
+                  className="mt-1 w-fit text-[9px] px-2 py-0.5"
+                >
+                  {getNetworkMeta(tier).badgeLabel}
+                </Badge>
               )}
             </div>
           </Link>

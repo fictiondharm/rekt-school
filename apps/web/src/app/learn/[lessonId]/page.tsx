@@ -204,6 +204,7 @@ export default function DynamicLessonPage({ params }: PageProps) {
         aura={aura}
         streak={1}
         showTourButton={lesson.id === 'B1'}
+        tier={lesson.tier}
       />
 
       <div className="flex-1 flex min-h-0">

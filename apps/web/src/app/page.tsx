@@ -112,9 +112,11 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
               </h1>
 
               <p className="text-base sm:text-lg text-ink-soft leading-relaxed max-w-2xl">
-                Maxi walks you through live Solana Devnet contracts: constant-product AMMs,
-                liquidation stress tests, token minting and wallet security. Break protocols
-                safely with play money before you ever risk real cash.
+                Two tiers, two networks. <strong className="text-ink">Tier 1 (Basic)</strong> runs live on
+                Solana Devnet with a real wallet and free faucet money, while{' '}
+                <strong className="text-ink">Tier 2 (Intermediate)</strong> drops you into pure simulation
+                labs. Break constant-product AMMs, liquidation stress tests, token minting and wallet
+                security — all with zero real cash at risk.
               </p>
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
@@ -141,7 +143,7 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
 
               <div className="flex flex-wrap items-center gap-3 pt-3">
                 {[
-                  { icon: ShieldCheck, text: '100% Devnet, zero real funds', color: 'text-quaternary' },
+                  { icon: ShieldCheck, text: 'Tier 1 Devnet · Tier 2 Sandbox', color: 'text-quaternary' },
                   { icon: Coins, text: '10,000 fUSDC faucet included', color: 'text-tertiary' },
                   { icon: KeyRound, text: 'Aura progress tracking', color: 'text-secondary' },
                 ].map(({ icon: Icon, text, color }) => (
@@ -183,7 +185,7 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
                 <span className="text-ink font-bold">
                   do it, see what happened, break it safely.
                 </span>{' '}
-                Every token, swap and margin call runs in a free Devnet sandbox.
+                Tier 1 runs live on free Solana Devnet; Tier 2 runs in a pure sandbox. Either way: zero real funds.
               </p>
             </div>
             {/* Speech bubble tail */}
@@ -216,8 +218,8 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
               },
               {
                 n: '03',
-                title: 'Real Devnet mastery',
-                body: 'Real transactions on Solana Devnet. Connect Solflare or Phantom, mint authentic tokens, and verify signatures on a block explorer.',
+                title: 'Devnet + Sandbox mastery',
+                body: 'Tier 1 fires real transactions on Solana Devnet (connect Solflare or Phantom, mint tokens, verify on a block explorer). Tier 2 stress-tests protocols in a safe sandbox.',
                 color: 'bg-tertiary',
                 iconBg: 'bg-tertiary',
               },
@@ -254,7 +256,10 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
             <Card className="p-6 flex flex-col justify-between gap-6 hover:rotate-[-1deg] hover:scale-[1.02] transition-all duration-300 ease-bounce">
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="px-3 py-1 bg-accent text-white text-xs font-bold rounded-full border-2 border-ink">B1</span>
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 bg-accent text-white text-xs font-bold rounded-full border-2 border-ink">B1</span>
+                    <Badge variant="devnet" className="text-[9px] px-2 py-0.5">Devnet</Badge>
+                  </div>
                   <span className="text-xs text-ink-faint font-mono">~5 min</span>
                 </div>
                 <h3 className="text-lg font-heading font-bold text-ink">
@@ -275,7 +280,10 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
             <Card className="p-6 flex flex-col justify-between gap-6 hover:rotate-[-1deg] hover:scale-[1.02] transition-all duration-300 ease-bounce shadow-pop-pink">
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="px-3 py-1 bg-secondary text-white text-xs font-bold rounded-full border-2 border-ink">I1</span>
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 bg-secondary text-white text-xs font-bold rounded-full border-2 border-ink">I1</span>
+                    <Badge variant="sandbox" className="text-[9px] px-2 py-0.5">Sandbox</Badge>
+                  </div>
                   <span className="text-xs text-ink-faint font-mono">~8 min</span>
                 </div>
                 <h3 className="text-lg font-heading font-bold text-ink">
@@ -369,6 +377,41 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
                 <p className="text-sm text-ink-soft leading-relaxed">{step.body}</p>
               </Card>
             ))}
+          </div>
+        </section>
+
+        {/* TWO NETWORKS */}
+        <section className="py-16 border-t-2 border-ink">
+          <div className="max-w-2xl space-y-3 mb-8">
+            <span className="inline-flex px-4 py-1.5 bg-secondary text-white text-[11px] font-bold uppercase tracking-widest border-2 border-ink rounded-full shadow-pop-sm">
+              Two tiers, two networks
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-heading font-extrabold text-ink">
+              One course, two ways to practice
+            </h2>
+            <p className="text-sm text-ink-soft">
+              Every lesson shows a badge telling you exactly which environment you are in.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="p-6 space-y-3">
+              <Badge variant="devnet">SOLANA DEVNET</Badge>
+              <h3 className="font-heading font-bold text-lg text-ink">Tier 1 · Basic</h3>
+              <p className="text-sm text-ink-soft leading-relaxed">
+                Live on the real <strong className="text-ink">Solana Devnet</strong> testnet. Connect Solflare or
+                Phantom, claim free faucet SOL and 10,000 fUSDC, and broadcast real (but free) transactions you
+                can verify on a block explorer.
+              </p>
+            </Card>
+            <Card className="p-6 space-y-3">
+              <Badge variant="sandbox">SANDBOX</Badge>
+              <h3 className="font-heading font-bold text-lg text-ink">Tier 2 · Intermediate</h3>
+              <p className="text-sm text-ink-soft leading-relaxed">
+                A pure in-browser <strong className="text-ink">sandbox</strong>. No wallet and no real chain —
+                manipulate AMM curves, interest rates, liquidations and tokenomics with instant, zero-risk
+                results.
+              </p>
+            </Card>
           </div>
         </section>
 
@@ -542,7 +585,7 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
           <Disclaimer />
           <div className="text-xs text-ink-faint flex flex-wrap gap-x-4 gap-y-1">
             <span className="font-bold text-ink">Rekt School</span>
-            <span>Solana Devnet educational academy</span>
+            <span>Solana Devnet &amp; Sandbox educational academy</span>
             <span>Non-custodial, zero financial advice</span>
             <span>Built for Solana Hackathon 2026</span>
           </div>

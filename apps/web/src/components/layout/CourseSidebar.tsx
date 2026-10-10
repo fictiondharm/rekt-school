@@ -80,7 +80,7 @@ export function CourseSidebar({
           <h3 className="font-heading font-bold text-sm text-ink flex items-center gap-1.5">
             Rekt School Curriculum
           </h3>
-          <p className="text-xs text-ink-soft">Tier 1: Basic & Tier 2: Labs</p>
+          <p className="text-xs text-ink-soft">Tier 1: Basic (Devnet) · Tier 2: Labs (Sandbox)</p>
         </div>
         <button
           onClick={onToggleCollapse}
@@ -142,7 +142,7 @@ export function CourseSidebar({
         <div>
           <div className="flex items-center justify-between mb-2.5">
             <span className="font-heading font-semibold text-xs uppercase tracking-wider text-ink-soft">
-              Intermediate Tier
+              Intermediate Tier (Sandbox)
             </span>
           </div>
 
