@@ -15,7 +15,7 @@ function jwtPayload(token: string): any {
 export async function GET() {
   const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-  const url = rawUrl.trim().replace(/\/+$/, '');
+  const url = rawUrl.trim().replace(/\/rest\/v1\/?$/i, '').replace(/\/+$/, '');
   const host = url ? url.replace(/^https?:\/\//, '').replace(/\/.*$/, '') : null;
   const urlRef = host ? host.split('.')[0] : null;
   const payload = key ? jwtPayload(key) : null;
@@ -25,6 +25,7 @@ export async function GET() {
     urlRaw: rawUrl,
     urlEndsWithSlash: rawUrl.trim().endsWith('/'),
     urlHasExtraPath: /supabase\.co\/.+/i.test(rawUrl.trim()),
+    urlHasRestV1: /\/rest\/v1\/?$/i.test(rawUrl.trim()),
     urlHost: host,
     urlProjectRef: urlRef,
     keyRole: payload?.role ?? null,
