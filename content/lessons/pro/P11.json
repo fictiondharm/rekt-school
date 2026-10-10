@@ -1,0 +1,121 @@
+{
+  "id": "P11",
+  "tier": "pro",
+  "order": 11,
+  "title": "Risk Management & Drawdown Math",
+  "estMinutes": 18,
+  "objectives": [
+    "Internalize why losses and gains are asymmetric - a 50% loss needs a 100% gain to recover",
+    "Use the Kelly criterion to size positions for long-run growth instead of ruin",
+    "See how many small bets a fixed fraction of capital can survive versus being wiped out",
+    "Build a personal risk framework: max position size, max drawdown, and taking profits"
+  ],
+  "requires": ["P10"],
+  "freePreview": false,
+  "glossaryTerms": ["position_sizing", "drawdown", "leverage", "liquidation", "impermanent_loss"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "p11-intro",
+      "type": "read",
+      "title": "The Brutal Asymmetry of Losses",
+      "body": "The single most important fact in trading has nothing to do with picking winners. It is arithmetic.\n\n**The recovery math:**\n\n- Lose 10% → need +11.1% to break even.\n- Lose 25% → need +33.3%.\n- Lose 50% → need +100%.\n- Lose 90% → need +900%.\n- Lose 100% → you are done. No gain exists.\n\nThis is not linear. Each additional loss requires a *super*-proportional gain to recover, and at 100% the game ends permanently. A <Term id=\"drawdown\">drawdown</Term> - the distance from your peak to your current value - is the variable that really determines survival. Professionals obsess over it. Amateurs obsess over the size of their wins.\n\n**Why it compounds against you:** two traders can have the same win rate and the same average win size, yet one compounds to wealth while the other goes to zero - because the loser sizes so big that a single bad streak takes them out. The difference is not prediction. It is <Term id=\"position_sizing\">position sizing</Term>: how much you risk per bet. Sizing is the only variable fully in your control, and it is the one that most people leave to a gut feeling.",
+      "hints": [
+        "A loss of L needs a gain of L/(1-L) to recover. 50% loss → 100% gain.",
+        "At 100% loss, no recovery is mathematically possible. Ruin is absorbing."
+      ]
+    },
+    {
+      "id": "p11-kelly",
+      "type": "read",
+      "title": "The Kelly Criterion: Sizing for Growth, Not Ruin",
+      "body": "The Kelly criterion answers: for a bet with a known edge, what fraction of your capital should you risk to maximize long-run growth *without* risking ruin?\n\n**The formula:**\n\n`Kelly fraction = W - (1 - W) / R`\n\nwhere `W` is your win probability and `R` is your win/loss ratio (how much you win per unit risked, on a win).\n\n**Example:** you win 60% of the time and win twice what you risk (`W = 0.6, R = 2`):\n\n`0.6 - (0.4 / 2) = 0.6 - 0.2 = 0.40`\n\nKelly says risk 40% of capital per bet. Notice what happens with a thin edge: `W = 0.55, R = 1` gives `0.55 - 0.45 = 0.10` - only 10%. And if `W = 0.5, R = 1` you get `0 - 0.5 = -0.5`, a *negative* number, which means **do not bet at all** - you have no edge and any bet is a slow leak.\n\nThe key insight is **over-betting destroys growth**. Risk *more* than Kelly and your variance explodes until a normal losing streak wipes you out; risk *less* and you grow slower but far more safely. Practitioners almost always bet **half-Kelly** or less, trading some growth for a big reduction in drawdown. Kelly is not a way to get rich fast. It is a way to avoid the one outcome - ruin - from which there is no return.",
+      "hints": [
+        "Kelly = W - (1-W)/R. Negative result means no edge → do not bet.",
+        "People bet half-Kelly because full-Kelly drawdowns are psychologically brutal."
+      ]
+    },
+    {
+      "id": "p11-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: Ruin, Survival, and the Risk Framework",
+      "body": "Why does over-betting kill an account even when the *average* bet is positive? Because losses compound multiplicatively, and the order of outcomes matters. A 50% gain followed by a 50% loss leaves you at `1.5 * 0.5 = 0.75` - down 25%, not flat. The multiplication is not commutative in the way people expect: big swings drag the geometric mean below the arithmetic mean, and enough big swings push the geometric mean toward zero. This is **volatility drag**, and it is why leverage and oversized bets destroy even profitable strategies.\n\n**A practical risk framework:**\n\n- **Max position size** - cap any single bet at a small fraction (e.g. 1-5%) so no single loss is career-ending.\n- **Max drawdown rule** - define a loss threshold that forces you to stop and reassess, before emotion takes over.\n- **Fractional Kelly** - size at half-Kelly or less; accept slower growth for survivable drawdowns.\n- **Take profits** - realized gains cannot be lost; unrealized winners can round-trip to zero.\n- **Correlation awareness** - ten 'different' bets in the same asset are one big bet. Diversification only helps across genuinely independent risks.\n\n**On leverage specifically (P3):** leverage is borrowing to oversize a position, so it multiplies your effective bet size past Kelly almost immediately. This is the mathematical reason high leverage blows up: it converts a survivable edge into an unsurvivable variance. The trader who risks 2% per idea can be wrong many times and live to iterate. The trader who risks 50% is one normal streak away from a permanent zero. In this game the goal is not the biggest win - it is to still be playing.",
+      "hints": [
+        "Volatility drag: +50% then -50% = 0.75x. Big swings lower your geometric growth.",
+        "Leverage is just oversizing your bet - which pushes you past Kelly into ruin territory."
+      ]
+    },
+    {
+      "id": "p11-quiz",
+      "type": "quiz",
+      "title": "Risk & Drawdown Quiz",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "You lose 50% of your portfolio. What gain do you now need just to break even?",
+          "options": [
+            "50%",
+            "100%",
+            "75%",
+            "It is impossible to recover"
+          ],
+          "correct": 1,
+          "difficulty": "basic",
+          "explainRight": "Correct. From 100 to 50, you need to double - a +100% gain - to return to 100. Losses and gains are asymmetric: the needed gain is L/(1-L). At a 50% loss that is exactly 100%.",
+          "explainWrong": "After dropping to 50, recovering to 100 requires a 100% gain, not 50%. The recovery multiple is L/(1-L): 0.5/0.5 = 1.0, i.e. +100%. This asymmetry is why drawdowns are so dangerous."
+        },
+        {
+          "id": "q2",
+          "prompt": "Using Kelly, you have a 55% win rate and a 1:1 payoff (R = 1). What does the criterion recommend?",
+          "options": [
+            "Risk 55% of capital",
+            "Risk about 10% of capital",
+            "Risk 45% of capital",
+            "Do not bet - no edge"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. Kelly = W - (1-W)/R = 0.55 - 0.45/1 = 0.10, so risk ~10%. A thin edge means a small bet. Size grows with edge, not with confidence.",
+          "explainWrong": "Plug into Kelly: 0.55 - (1-0.55)/1 = 0.55 - 0.45 = 0.10. That is ~10% of capital. With a 1:1 payoff you need a meaningful win rate before the edge - and the bet size that follows - gets large."
+        },
+        {
+          "id": "q3",
+          "prompt": "You have a 50% win rate with a 1:1 payoff. What is the Kelly fraction and what should you do?",
+          "options": [
+            "0.5 - bet half your capital",
+            "0 - you have no edge, so do not bet at all",
+            "1.0 - bet everything",
+            "-1 - bet double"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. Kelly = 0.5 - (0.5)/1 = 0. A zero or negative Kelly means no positive edge: betting is a slow leak that only adds variance. The right size is zero.",
+          "explainWrong": "With W = 0.5 and R = 1, Kelly = 0.5 - 0.5 = 0. That signals no edge. Betting anyway just adds risk without expected growth, which guarantees eventual decay. The answer is not to bet."
+        },
+        {
+          "id": "q4",
+          "prompt": "Why does betting MORE than the Kelly fraction typically destroy an account, even if the bet has a positive edge?",
+          "options": [
+            "Because exchanges ban big bettors",
+            "Because over-betting inflates variance and volatility drag - big swings drag the geometric growth rate down, so a normal losing streak wipes you out despite the positive edge",
+            "Because the win rate secretly drops when you bet more",
+            "It does not - bigger bets always grow faster"
+          ],
+          "correct": 1,
+          "difficulty": "thinking",
+          "explainRight": "Correct. Returns compound multiplicatively, so oversized positions create big swings that lower the geometric mean (volatility drag). Past full Kelly, expected growth DECLINES and ruin risk rises - a positive-edge bet can still bankrupt you if sized too large. This is the mathematical reason leverage kills.",
+          "explainWrong": "A positive edge is not enough - sizing decides survival. Over-betting amplifies variance and volatility drag, dragging geometric growth down until ordinary losing streaks produce ruin. The edge stays positive while the account still goes to zero."
+        }
+      ],
+      "passScore": 3
+    },
+    {
+      "id": "p11-explore",
+      "type": "explore",
+      "title": "Explore Positioning Tools",
+      "cardIds": ["dexscreener", "jupiter"]
+    }
+  ],
+  "explore": ["dexscreener", "jupiter"],
+  "lastVerified": "2026-10-01"
+}

@@ -1,0 +1,121 @@
+{
+  "id": "P1",
+  "tier": "pro",
+  "order": 1,
+  "title": "Order Types (Market, Limit, Stops)",
+  "estMinutes": 16,
+  "objectives": [
+    "Tell the difference between market, limit, and stop orders - and when each one gets you rekt",
+    "Understand why a market order pays a taker fee while a resting limit order earns a maker fee",
+    "See how order type choice changes your fill price, slippage, and total cost",
+    "Read a live order book well enough to place an order with intent instead of vibes"
+  ],
+  "requires": [],
+  "freePreview": false,
+  "glossaryTerms": ["order_book", "bid_ask", "spread", "market_order", "limit_order", "stop_loss", "slippage"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "p1-intro",
+      "type": "read",
+      "title": "Three Ways to Enter a Trade",
+      "body": "Every trade you ever make is one of three instructions: \"get me in **now**\" (<Term id=\"market_order\">market order</Term>), \"get me in **only at my price**\" (<Term id=\"limit_order\">limit order</Term>), or \"get me out **if it breaks this level**\" (<Term id=\"stop_loss\">stop-loss</Term>).\n\nThe same swap can cost you wildly different amounts depending on which one you pick. This is one of the biggest hidden edges in trading - and one of the fastest ways beginners get bled.\n\n**Your decision in one glance:**\n\n- **Market order** - Execute immediately against whatever is available. Guaranteed to fill, never guaranteed at a good price. You are the impatient **taker**.\n- **Limit order** - \"I will only buy at $X or lower / sell at $Y or higher.\" You may wait forever, but you never pay more than you chose. You are the patient maker.\n- **Stop order** - A trigger. It sleeps until price hits your level, then fires a market (or limit) order. It is your seatbelt out of a losing position.\n\nThe trap: people use **market orders in thin markets** and get filled far from the price they saw on screen. That silent gap is <Term id=\"slippage\">slippage</Term>, and it is the #1 tax on impatient traders.",
+      "hints": [
+        "Think of it as a restaurant: a market order is 'bring me whatever is fastest', a limit order is 'I'll wait for the exact dish I ordered'.",
+        "Pros almost never market-buy illiquid tokens. They post a limit and let the market come to them."
+      ]
+    },
+    {
+      "id": "p1-fees",
+      "type": "read",
+      "title": "Maker vs Taker: The Fee That Rewards Patience",
+      "body": "Order books pay two different fees, and the difference is the whole game.\n\n- A **market order** crosses the <Term id=\"spread\">spread</Term> and removes liquidity. You are a *taker*, so you pay the **taker fee** (on major venues 0.05% - 0.10%).\n- A **limit order** that sits in the book and waits *provides* liquidity. You are a *maker*, so you often pay a **lower fee**, or even receive a tiny **maker rebate**.\n\n**Run the numbers on a $10,000 trade:**\n\n1. Market order at 0.10% taker = **$10** in fees.\n2. Resting limit order at 0.02% maker = **$2** in fees.\n3. On top of that, the market order also eats the <Term id=\"bid_ask\">bid/ask</Term> spread on every fill.\n\nOver 100 trades, the patient trader quietly keeps an extra few hundred dollars - not by predicting price, but by choosing the right order type. That is why market makers exist: they get paid to *be* the limit orders everyone else trades against.",
+      "hints": [
+        "Rule of thumb: if you are not in a hurry, you pay 2x-10x less by posting a limit order.",
+        "Stop-losses typically fire as market orders, so they pay the taker fee at the worst possible moment. Size them so the cost is acceptable."
+      ]
+    },
+    {
+      "id": "p1-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: How an Order Actually Fills",
+      "body": "An <Term id=\"order_book\">order book</Term> is just two sorted lists. **Bids** (buyers) sit stacked below the price; **asks** (sellers) sit stacked above it. The gap between the best bid and best ask is the spread.\n\nWhen you send a market order, the matching engine walks the book level by level:\n\n- It fills your first units at the **best** price.\n- If your size exceeds that level, it keeps eating deeper levels at **worse** prices.\n- Your *average* fill = total cost / total units. That average is where slippage shows up.\n\nA limit order behaves differently: if it cannot fill immediately at your price, it **rests on the book** until someone crosses into it. At that moment you become the maker and earn the better fee.\n\n**Stop orders are just triggers, not magic.** The engine watches the market; when the trigger price prints, it submits a live order. In a fast crash, price can gap *through* your stop and fill much lower - the famous \"stop-loss hunting\" everyone complains about. A stop guarantees you *try* to exit, not the price you exit at. This single distinction has saved and ruined more accounts than any indicator.",
+      "hints": [
+        "Deeper liquidity = less slippage on a market order. Check depth before you size up.",
+        "Stops are not free insurance. They cost the taker fee and can slip in volatile moves."
+      ]
+    },
+    {
+      "id": "p1-quiz",
+      "type": "quiz",
+      "title": "Order Types Quiz",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "You need to be in a token RIGHT NOW and the book is thin. You hit 'market buy'. What are you actually guaranteed?",
+          "options": [
+            "A guaranteed fill, but not a guaranteed price",
+            "A guaranteed price, but not a guaranteed fill",
+            "Both price and fill are guaranteed by the exchange",
+            "Neither price nor fill is guaranteed"
+          ],
+          "correct": 0,
+          "difficulty": "basic",
+          "explainRight": "Correct. A market order always fills because it takes whatever liquidity exists - but in a thin book it walks down through worse and worse levels, so your average price can be far from the quote you saw. Fill is certain; price is not.",
+          "explainWrong": "Flip it: a market order sacrifices price to guarantee execution. You WILL get filled, but the price is whatever the book offers at that instant. If you want price certainty, you need a limit order - and then you accept that you might not fill at all."
+        },
+        {
+          "id": "q2",
+          "prompt": "Why can posting a limit order cost you LESS in fees than a market order?",
+          "options": [
+            "Limit orders are always hidden from the fee system",
+            "A resting limit order adds liquidity (maker), so venues charge a lower maker fee or pay a rebate",
+            "The exchange refunds limit orders because they are riskier",
+            "Limit orders do not pay any fee on any venue"
+          ],
+          "correct": 1,
+          "difficulty": "basic",
+          "explainRight": "Exactly. Exchanges pay for liquidity. If your order sits in the book and someone else trades against it, you PROVIDED liquidity - you are a maker and get the cheaper (or rebated) fee. A market order TAKES liquidity and pays the taker fee.",
+          "explainWrong": "It is about who provides liquidity. A resting limit order supplies the book (maker, cheaper or rebated fee). A market order consumes the book (taker, more expensive fee). Limit orders definitely still pay fees on real venues - they are just cheaper."
+        },
+        {
+          "id": "q3",
+          "prompt": "Price is crashing hard. You had a stop-loss set 3% below entry, but it filled 9% below entry. What most likely happened?",
+          "options": [
+            "The exchange stole the difference",
+            "A stop is only a TRIGGER; once fired it becomes a market order that can slip badly through levels in a fast move",
+            "Stops always fill exactly at the trigger price, so this is impossible",
+            "Limit orders are faster than market orders in a crash"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. Your stop woke up the moment price touched -3%, then submitted a live (usually market) order. In a violent candle the book can gap past your level, so you fill wherever liquidity actually sits. The stop guaranteed an attempt to exit, not the price - that is 'slippage through the stop'.",
+          "explainWrong": "A stop-loss is a trigger, not a price guarantee. In a fast crash, price can gap through your level and your stop converts into a market order that slips. This is exactly why traders also use stop-limits and size positions so a bad fill is survivable."
+        },
+        {
+          "id": "q4",
+          "prompt": "You want to buy a low-liquidity meme coin without moving the price against yourself. Which approach best matches the lesson?",
+          "options": [
+            "Fire a large market order and accept whatever you get - speed is everything",
+            "Post a limit order inside the spread and let sellers come to you, plus split the size over time",
+            "Set a stop-loss above the current price so it buys on the way up",
+            "Always use market orders because they have lower fees"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. In a thin market, a big market order is how you get sandwiched and slip. Posting a limit order makes you the maker (better fee), avoids crossing deep levels, and splitting the size hides your intent. Patience is the edge.",
+          "explainWrong": "In thin markets, big market orders slip and get front-run (sandwiched). The patient play is a resting limit order inside the spread, often broken into smaller clips - you provide liquidity and pay the maker fee instead of bleeding the taker fee and spread."
+        }
+      ],
+      "passScore": 3
+    },
+    {
+      "id": "p1-explore",
+      "type": "explore",
+      "title": "Explore Real Order Flow",
+      "cardIds": ["jupiter", "drift"]
+    }
+  ],
+  "explore": ["jupiter", "drift"],
+  "lastVerified": "2026-10-01"
+}

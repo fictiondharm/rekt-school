@@ -1,0 +1,121 @@
+{
+  "id": "P10",
+  "tier": "pro",
+  "order": 10,
+  "title": "Smart Contract Security Auditing",
+  "estMinutes": 19,
+  "objectives": [
+    "Read a protocol's trust surface: who can mint, pause, upgrade, or drain funds",
+    "Recognize the recurring vulnerability classes behind most DeFi exploits",
+    "Use a practical red-flag checklist before depositing into any protocol",
+    "Understand why an audit is a snapshot, not a guarantee - and what to check beyond it"
+  ],
+  "requires": ["P9"],
+  "freePreview": false,
+  "glossaryTerms": ["audit", "upgrade_authority", "oracle", "flash_loan", "reentrancy", "honeypot", "tvl"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "p10-intro",
+      "type": "read",
+      "title": "Auditing Is Reading Trust, Not Code",
+      "body": "You will probably never read a protocol's 4,000 lines of code. But you can - and should - read its **trust surface**: the small list of powers that, if abused, let someone take everyone's money.\n\nAn <Term id=\"audit\">audit</Term> is a trained review that says: at the moment we looked, we did not find these known classes of bug. That is valuable, but it is a **snapshot**, not a guarantee. Code changes after the audit. Upgrades can introduce new bugs. And an audit does not inspect the *intent* of the team or the security of their keys.\n\n**The questions that matter, in order:**\n\n1. **Who can mint?** Unlimited mint = unlimited dilution or drain.\n2. **Who can pause, freeze, or block transfers?** That is a honeypot switch.\n3. **Who holds the <Term id=\"upgrade_authority\">upgrade authority</Term>?** Whoever can upgrade the contract can change the rules *after* you deposit - including to a malicious version.\n4. **Who can move the funds?** Is there a withdraw path guarded by a single key, or a multisig with a timelock?\n5. **Where does the price come from?** A single manipulable oracle means the whole protocol is only as safe as that price.\n\nIf any of these resolves to 'one anonymous wallet, controlled by the team,' you are not using a trustless protocol - you are lending the team money and hoping. Most DeFi disasters were not exotic zero-days. They were people ignoring that the keys were held by someone who turned out to be careless or malicious.",
+      "hints": [
+        "Start with powers, not code: mint, pause, upgrade, withdraw, price source.",
+        "An audit is a point-in-time snapshot. Code and keys can change the day after."
+      ]
+    },
+    {
+      "id": "p10-vulns",
+      "type": "read",
+      "title": "The Recurring Vulnerability Classes",
+      "body": "Roughly all major DeFi exploits fall into a handful of buckets. Learn them and you can smell trouble in a project's docs.\n\n- **Reentrancy** - a contract calls out to another before finishing its own state update, and the caller re-enters to drain funds. The <Term id=\"reentrancy\">reentrancy</Term> bug that hit The DAO is the ancestor of a whole family still occurring today.\n- **Oracle manipulation** - the protocol trusts a price an attacker can move (see P5). Still one of the most profitable bug classes in existence.\n- **Flash-loan-amplified logic errors** - a check that is wrong, but only exploitable with temporary millions. The flash loan (P5) turns a minor bug into a nine-figure drain.\n- **Access control mistakes** - a function that should be admin-only is public, or an initializer can be called by anyone, letting an attacker seize control.\n- **Unbounded loops / gas griefing** - a function that fails or gets stuck when a list grows, freezing user withdrawals.\n- **Rounding and precision** - tiny math errors that, multiplied across millions of operations, let an attacker extract value slowly.\n- **Logic vs. intent mismatches** - the code does exactly what it says, but 'what it says' was never what the team meant.\n\nThe pattern across all of them: **the code trusted something it should not have** - a caller, a price, a key, or a computation. Auditing is really the discipline of asking, for every input, 'what if this is hostile?' When you evaluate a protocol, look for explicit defenses against each bucket above. Silence on a category is not safety - it is an unanswered question.",
+      "hints": [
+        "Most exploits are one of: reentrancy, oracle manipulation, access control, or logic error.",
+        "The common thread is misplaced trust in a caller, price, or key. Ask 'what if this input is hostile?'"
+      ]
+    },
+    {
+      "id": "p10-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: A Practical Red-Flag Checklist",
+      "body": "Here is a checklist you can actually run before depositing. None of these is proof of safety - but each red flag is a reason to walk away.\n\n**Token / contract flags:**\n\n- Mint authority NOT revoked → dilution risk.\n- Pause / freeze / blacklist functions present → exit can be blocked.\n- Arbitrary transfer taxes → hidden fee or honeypot switch.\n- Ownership not renounced, or renouncement cosmetic while a proxy admin keeps power.\n\n**Upgrade + key flags:**\n\n- Upgradeable proxy controlled by a single EOA (externally owned account) key.\n- Multisig with a low threshold (e.g. 2-of-9 with 2 signers on one machine).\n- No timelock on upgrades or withdrawals → instant drain if a key falls.\n- Team anonymous AND holding upgrade/mint/withdraw powers.\n\n**Economic + design flags:**\n\n- TVL dominated by one asset or one depositor → a single exit craters it.\n- Oracle from a single thin pool (P5) → manipulation.\n- Yields that are impossibly high with no explained source.\n\n**Process flags:**\n\n- Audit is old, or the code changed materially after it.\n- 'Audited' as a marketing badge with no report link.\n- No bug bounty, no incident history, no transparency on keys.\n\nThe mature move is not to *find* the one fatal bug - it is to recognize when you cannot get comfortable with the trust surface, and to size accordingly or stay out. Protocols are not safe or unsafe in the abstract; they are trustworthy along the specific dimensions above, and those dimensions are usually visible long before the exploit headline. The <Term id=\"tvl\">TVL</Term> number tells you how big the prize is. The trust surface tells you how well it is guarded.",
+      "hints": [
+        "Run the checklist by category: token powers, upgrade/keys, economics, process.",
+        "A red flag is not proof of guilt - it is a reason to demand more, or to leave."
+      ]
+    },
+    {
+      "id": "p10-quiz",
+      "type": "quiz",
+      "title": "Smart Contract Auditing Quiz",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "What does a security audit actually guarantee?",
+          "options": [
+            "That the protocol can never be hacked",
+            "That at the moment of review, the auditors did not find a specific class of known bugs - a point-in-time snapshot, not a permanent guarantee",
+            "That the team is honest",
+            "That all future upgrades will be safe"
+          ],
+          "correct": 1,
+          "difficulty": "basic",
+          "explainRight": "Correct. An audit is a snapshot of a specific code version against known bug classes. It does not cover later changes, guarantee team intent, or make a protocol permanently safe. 'Audited' reduces risk; it does not remove it.",
+          "explainWrong": "An audit says 'at this time, on this code, we found no such bugs.' Code can change post-audit, upgrades can add new flaws, and audits do not judge the team's honesty or the safety of their keys. It is one input, not a guarantee."
+        },
+        {
+          "id": "q2",
+          "prompt": "A protocol lets one anonymous wallet upgrade the contract at any time. Why is that a serious red flag?",
+          "options": [
+            "Anonymous teams always steal",
+            "Whoever can upgrade can change the rules after you deposit - including pointing the contract at a malicious version that drains funds",
+            "Upgrades always cost too much gas",
+            "It slows the protocol down"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. Upgradeability is a live backdoor. If a single key can swap the logic, the code you audited is not the code you will be trusting tomorrow. A timelock + multisig makes this survivable; a lone EOA makes it a standing invitation.",
+          "explainWrong": "It is not about anonymity per se - it is the POWER. An unbounded upgrade function means the contract's behavior can be replaced at will. Your deposit is only as safe as that key. Timelocks and multisigs exist precisely to defang this."
+        },
+        {
+          "id": "q3",
+          "prompt": "Which class of bug is a contract most likely exposing if it sends funds out BEFORE updating its internal balances?",
+          "options": [
+            "Rounding error",
+            "Reentrancy - the external call can re-enter the function before the balance update, draining funds repeatedly",
+            "Gas griefing",
+            "Oracle manipulation"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. Calling out before finishing state changes opens the door to reentrancy: the callee re-enters and re-executes against stale balances. The fix is the checks-effects-interactions pattern - update state before any external call.",
+          "explainWrong": "Sending value/control out before updating state is the classic reentrancy setup. The recipient re-enters and acts on balances that have not yet been reduced, extracting funds repeatedly. Rounding and oracle issues are different bug families."
+        },
+        {
+          "id": "q4",
+          "prompt": "You cannot audit code, but you want to reduce protocol risk. What is the most effective practical approach?",
+          "options": [
+            "Deposit a small test amount and assume that proves safety",
+            "Inspect the trust surface - mint, pause, upgrade, withdraw, and price-source powers - and check multisig thresholds, timelocks, and whether LP is burned or locked",
+            "Only use protocols with the biggest TVL",
+            "Rely entirely on the audit badge on the website"
+          ],
+          "correct": 1,
+          "difficulty": "thinking",
+          "explainRight": "Correct. You do not need to read every line to assess the powers that can take your money. Mint authority, pause/freeze, upgrade control, withdraw paths, oracle source, multisig thresholds, timelocks, and LP locks are all checkable - and they determine most catastrophic outcomes. TVL is the size of the prize, not the strength of the guard.",
+          "explainWrong": "The high-leverage move is auditing the trust surface, not the code: who can mint, pause, upgrade, withdraw, and where the price comes from. Pair that with multisig/timelock and LP-lock checks. Big TVL only means more to lose, and a test deposit proves nothing about long-term safety."
+        }
+      ],
+      "passScore": 3
+    },
+    {
+      "id": "p10-explore",
+      "type": "explore",
+      "title": "Explore Security Tooling",
+      "cardIds": ["solscan", "kamino"]
+    }
+  ],
+  "explore": ["solscan", "kamino"],
+  "lastVerified": "2026-10-01"
+}

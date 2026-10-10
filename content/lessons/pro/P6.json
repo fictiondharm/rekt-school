@@ -1,0 +1,121 @@
+{
+  "id": "P6",
+  "tier": "pro",
+  "order": 6,
+  "title": "MEV, Sandwiches & Priority Fees",
+  "estMinutes": 17,
+  "objectives": [
+    "Define MEV and understand why block producers can profit from ordering transactions",
+    "Trace a sandwich attack on your own swap, from front-run to back-run",
+    "Calculate how much slippage tolerance increases or decreases your exposure to being sandwiched",
+    "Use priority fees and protected routing to defend your trades"
+  ],
+  "requires": ["P5"],
+  "freePreview": false,
+  "glossaryTerms": ["mev", "sandwich_attack", "priority_fee", "slippage", "price_impact"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "p6-intro",
+      "type": "read",
+      "title": "MEV: The Money in Choosing Order",
+      "body": "Every block is a *sequence* of transactions, and sequence matters. <Term id=\"mev\">MEV</Term> (Maximal Extractable Value) is the profit that comes purely from controlling **which order** transactions execute in.\n\nHere is the intuition. Imagine you publicly announce: 'I will buy 100,000 tokens at market price, no matter the cost.' Everyone who sees that message before it lands knows the price is about to jump. Whoever gets to trade *just before* you can buy cheap and sell back to you at your inflated price. Same trades, same tokens - the only difference is **ordering**.\n\nMEV searchers are bots that scan the pending transaction pool (mempool) 24/7, looking for exactly this. On Solana the mempool is different (leaders batch transactions), but the principle is identical: the block builder decides order, and order is worth money.\n\n**The forms MEV takes:**\n\n- **Arbitrage** - the 'good' kind; it keeps prices consistent across venues.\n- **Liquidations** - bots race to close bad loans for the bonus.\n- **Sandwiches** - the 'hostile' kind; the bots extract value directly from *your* trade.\n\nYou cannot opt out of MEV by ignoring it. You can only choose how much you expose.",
+      "hints": [
+        "MEV is about ORDER, not about the trade itself. Front-running is profitable because of sequencing.",
+        "Arbitrage and liquidation MEV are relatively benign. Sandwiches attack YOU directly."
+      ]
+    },
+    {
+      "id": "p6-sandwich",
+      "type": "read",
+      "title": "The Sandwich: Front-Run, You, Back-Run",
+      "body": "A <Term id=\"sandwich_attack\">sandwich attack</Term> wraps your swap in two bot trades and squeezes the profit out of the middle - which is you.\n\n**Step by step, all around your single swap:**\n\n1. **Front-run** - The bot sees your pending buy and buys the same token *first*, pushing the price up.\n2. **Your trade** - Your swap executes at the now-higher price. You get fewer tokens than you expected.\n3. **Back-run** - The bot sells everything it just bought into your buying pressure, pocketing the difference.\n\nYou did nothing wrong. Your transaction succeeded. You just got a worse price - and the bot captured the gap. It works because your trade tells the world your intent AND your limit.\n\n**The critical variable is your slippage tolerance.** The bot wants to push the price exactly to the edge of what you will accept, then let you fill. Set your tolerance to 5% and you are literally advertising 'you may move my price up to 5% and I will still execute.' Set it to 0.5% and there is almost nothing to steal - the bot cannot profit after fees.\n\n`slippage tolerance is not a convenience setting - it is the size of the door you are leaving open.`\n\nThe trade-off: too tight, and a perfectly normal volatility spike makes your own swap fail. The art is setting it just wide enough to land your trade but too narrow to be worth attacking.",
+      "hints": [
+        "Front-run pushes price up, you fill high, back-run dumps - the bot's profit is bounded by your slippage setting.",
+        "Tight slippage can make YOUR swap revert. There is no free lunch - balance landing the trade against being a juicy target."
+      ]
+    },
+    {
+      "id": "p6-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: Priority Fees and Private Routing",
+      "body": "A <Term id=\"priority_fee\">priority fee</Term> is an extra tip you attach to a transaction to convince the block producer to include it sooner. In a congested block, these tips effectively bid for position - and that is exactly the same lever MEV searchers use. There is a dark symmetry here: the mechanism that lets you get included faster is the same one bots use to get in front of you, so simply 'paying more priority' can sometimes make you a bigger target rather than safer.\n\n**The real defenses are structural:**\n\n- **Tight slippage tolerance** - shrink the profit available to front/rear-run you.\n- **Private / protected routing** - send your transaction straight to block producers instead of a public mempool, so searchers never see your intent to sandwich it. Services like this exist precisely to hide the order.\n- **Break large trades into small clips** - each clip is less attractive to attack and moves the price less.\n- **Limit orders over market orders** - a resting limit does not broadcast 'take any price'; it waits quietly.\n- **Slippage-aware execution** - some venues simulate the fill and revert if the executed price is worse than a threshold.\n\nMEV is a tax on transparency. The more of your intent the market can see - size, direction, and your acceptable price - the more extractable you are. Defending is not about one setting; it is about leaking less information and leaving less profit on the table.",
+      "hints": [
+        "Private routing hides your intent so bots cannot sandwich it. Public mempool = public target.",
+        "Priority fee helps inclusion; it does not inherently protect you from being sandwiched."
+      ]
+    },
+    {
+      "id": "p6-quiz",
+      "type": "quiz",
+      "title": "MEV & Sandwiches Quiz",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "What is MEV, in one sentence?",
+          "options": [
+            "A fee the exchange charges for every swap",
+            "Profit extracted by controlling the ORDER in which transactions execute",
+            "The interest earned on staking",
+            "A type of flash loan"
+          ],
+          "correct": 1,
+          "difficulty": "basic",
+          "explainRight": "Correct. MEV comes from sequencing. Whoever controls order can place profitable trades around others. The transactions themselves may be identical - the only edge is where they sit in the block.",
+          "explainWrong": "MEV is about transaction ORDER, not about a specific trade. A searcher profits by arranging trades - front-running, back-running, liquidating - so that ordering alone creates value. It is not an exchange fee or a loan."
+        },
+        {
+          "id": "q2",
+          "prompt": "Describe the three moves of a sandwich attack on your buy order.",
+          "options": [
+            "Bot sells, you buy, bot buys",
+            "Bot buys before you (front-run), your buy fills at a higher price, bot sells after you (back-run) for profit",
+            "Bot cancels your order, then re-submits it",
+            "Bot liquidates your position and repays itself"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. Front-run buys ahead of you, pushing price up. Your buy fills high. Back-run sells into your pressure. The bot's profit is the gap your own order created - bounded by your slippage tolerance.",
+          "explainWrong": "The pattern is front-run → you → back-run. The bot buys first to lift the price, lets your trade fill at the inflated level, then sells behind you. Cancelling or liquidating is not a sandwich."
+        },
+        {
+          "id": "q3",
+          "prompt": "How does lowering your slippage tolerance reduce sandwich exposure?",
+          "options": [
+            "It makes your transaction faster so bots cannot catch it",
+            "It caps the profit a bot can extract, because it can only push your price by your tolerance before your order would revert",
+            "It hides your transaction from the mempool",
+            "It refunds the fees charged by the bot"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. Your tolerance is the maximum the bot can steal while still filling you. A 5% tolerance is a 5% invitation. A tight tolerance shrinks the prize - often below the bot's cost of attacking, so it skips you entirely.",
+          "explainWrong": "Slippage tolerance is the door you leave open. The bot can only move your price up to that limit before your swap reverts. Tighten it and the extractable profit shrinks. It does not change speed or hide your intent - those are separate defenses."
+        },
+        {
+          "id": "q4",
+          "prompt": "Which combination best protects a large swap from MEV extraction?",
+          "options": [
+            "Maximum slippage tolerance and a public mempool broadcast",
+            "Tight slippage, private/protected routing, and splitting the size into smaller clips",
+            "A single huge market order with a very high priority fee",
+            "Using a stop-loss after the trade"
+          ],
+          "correct": 1,
+          "difficulty": "thinking",
+          "explainRight": "Correct. Tight slippage caps the prize, private routing hides your intent so bots cannot see and sandwich it, and splitting reduces both price impact and per-clip attractiveness. Together they shrink extractable value below the cost to attack.",
+          "explainWrong": "You want to leak less information and leave less profit. That means tight slippage (small prize), private routing (hidden intent), and smaller clips (less impact). High tolerance and public broadcast do the opposite - they advertise a fat, easy target."
+        }
+      ],
+      "passScore": 3
+    },
+    {
+      "id": "p6-explore",
+      "type": "explore",
+      "title": "Explore MEV-Resistant Tooling",
+      "cardIds": ["jupiter", "jito"]
+    }
+  ],
+  "explore": ["jupiter", "jito"],
+  "lastVerified": "2026-10-01"
+}

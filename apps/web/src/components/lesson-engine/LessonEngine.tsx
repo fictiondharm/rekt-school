@@ -431,6 +431,24 @@ export function LessonEngine({
                       </Button>
                     </Link>
                   )
+                ) : lesson.id.startsWith('P') ? (
+                  parseInt(lesson.id.replace('P', ''), 10) < 12 ? (
+                    <Link
+                      href={`/learn/p${parseInt(lesson.id.replace('P', ''), 10) + 1}`}
+                      className="block pt-1"
+                    >
+                      <Button variant="primary" className="w-full gap-2 text-xs font-bold">
+                        Continue to Next Pro Module (P{parseInt(lesson.id.replace('P', ''), 10) + 1}){' '}
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Link href="/pro" className="block pt-1">
+                      <Button variant="accent" className="w-full gap-2 text-xs font-bold">
+                        You finished the Pro tier - View the Pro Hub <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </Link>
+                  )
                 ) : null}
               </div>
             )}

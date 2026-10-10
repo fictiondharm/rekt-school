@@ -269,6 +269,78 @@ const LESSON_ADVICE: LessonAdviceMap = {
       ],
     },
   },
+  P1: {
+    defaultHints: [
+      'Market orders guarantee a fill, never a good price. Limit orders guarantee the price, never a fill - you become the patient maker.',
+      'On a real desk, the maker fee is often 5x cheaper than the taker fee. Over hundreds of trades that gap is the edge.',
+    ],
+  },
+  P2: {
+    defaultHints: [
+      'An order book punishes size in steps; an AMM punishes it in a smooth curve. Both are governed by depth.',
+      'Spread (best ask − best bid) is a hidden cost you pay on entry AND exit even if price never moves.',
+    ],
+  },
+  P3: {
+    defaultHints: [
+      'Liquidation distance is roughly 1/leverage from entry. At 10x that is 10%; at 20x only 5%.',
+      'Leverage multiplies the percentage move applied to YOUR equity, not the position - that is why ordinary wiggle becomes ruin.',
+    ],
+  },
+  P4: {
+    defaultHints: [
+      'Positive funding = longs pay shorts. Delta-neutral desks are short the perp to collect it.',
+      'Mark price blends the perp with a spot index and is smoothed - liquidations use mark, not the last wild candle.',
+    ],
+  },
+  P5: {
+    defaultHints: [
+      'A flash loan needs no collateral because it must be repaid in the same transaction - it amplifies whatever weakness already exists.',
+      'The whole attack dies if manipulating the price costs more than the exploit yields. Robust oracles make lying expensive.',
+    ],
+  },
+  P6: {
+    defaultHints: [
+      'Your slippage tolerance is literally the maximum a sandwich bot can steal while you still fill. Tighten it.',
+      'Private routing hides your intent; splitting size and using limit orders leaks less information to MEV searchers.',
+    ],
+  },
+  P7: {
+    defaultHints: [
+      'Concentration multiplies fee share AND impermanent loss. Out of range = zero fees and ~100% one token.',
+      'Headline TVL includes out-of-range capital that is earning nothing right now.',
+    ],
+  },
+  P8: {
+    defaultHints: [
+      'Lock-and-mint reduces to two questions: who can mint, and who holds the locked pool?',
+      'Rate limits and timelocks turn a catastrophic instant drain into a survivable slow bleed.',
+    ],
+  },
+  P9: {
+    defaultHints: [
+      'A bonding curve is a pricing machine, not a store of value - one trader\'s gain is literally another\'s deposit.',
+      'A rug or honeypot makes your downside 100% while your upside still depends on later buyers arriving.',
+    ],
+  },
+  P10: {
+    defaultHints: [
+      'Audit the trust surface, not the code: mint, pause, upgrade, withdraw, and the price source.',
+      'One fatal lever (lone upgrade key, mint authority, manipulable oracle) caps the whole protocol - real failures are the weakest link, not the average.',
+    ],
+  },
+  P11: {
+    defaultHints: [
+      'A 50% loss needs a +100% gain to recover. The needed gain is loss/(1−loss). At 100% loss, recovery is impossible.',
+      'Kelly = W − (1−W)/R. Bet half-Kelly or less; over-betting turns a positive edge into ruin through volatility drag.',
+    ],
+  },
+  P12: {
+    defaultHints: [
+      'Every design choice is a trade-off. Ask which lever can take all the money, and who controls it.',
+      'A self-consistent protocol beats a clever one: conservative defaults that survive even when one assumption breaks.',
+    ],
+  },
 };
 
 /**

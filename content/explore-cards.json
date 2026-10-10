@@ -52,5 +52,50 @@
     "watchOutFor": "Never share your 12-word seed phrase or click unknown dapp links.",
     "url": "https://phantom.app",
     "lastVerified": "2026-10-01"
+  },
+  {
+    "id": "drift",
+    "name": "Drift Protocol",
+    "category": "Perpetuals / Derivatives",
+    "whatItDoes": "A decentralized perpetual futures exchange on Solana offering leverage, funding rates, and cross-margin trading.",
+    "watchOutFor": "Leverage and liquidation risk - a small adverse move can wipe an over-leveraged position.",
+    "url": "https://drift.trade",
+    "lastVerified": "2026-10-01"
+  },
+  {
+    "id": "wormhole",
+    "name": "Wormhole",
+    "category": "Bridges",
+    "whatItDoes": "A cross-chain messaging and asset-transfer bridge connecting Solana to many other chains.",
+    "watchOutFor": "Bridges are the most-exploited category in DeFi; a compromised mint can depeg the wrapped asset.",
+    "url": "https://wormhole.com",
+    "lastVerified": "2026-10-01"
+  },
+  {
+    "id": "pumpfun",
+    "name": "Pump.fun",
+    "category": "Launchpads / Memecoins",
+    "whatItDoes": "A fair-launch platform where anyone can create a memecoin that trades on a bonding curve and graduates to a DEX.",
+    "watchOutFor": "Almost all launches go to zero; snipers and rugs take retail's money. Assume any deposit is fully at risk.",
+    "url": "https://pump.fun",
+    "lastVerified": "2026-10-01"
+  },
+  {
+    "id": "jito",
+    "name": "Jito",
+    "category": "MEV / Liquid Staking",
+    "whatItDoes": "Provides liquid staking plus a block-engine and tips system on Solana, giving traders a way to route and prioritize transactions.",
+    "watchOutFor": "Priority tips cost real SOL; paying more for inclusion does not by itself protect you from being sandwiched.",
+    "url": "https://jito.network",
+    "lastVerified": "2026-10-01"
+  },
+  {
+    "id": "dexscreener",
+    "name": "DexScreener",
+    "category": "Analytics / Charts",
+    "whatItDoes": "A multi-chain DEX charting tool showing price, liquidity, volume, and transaction activity for thousands of token pairs.",
+    "watchOutFor": "Liquidity can be pulled at any moment; a good chart does not mean a safe token.",
+    "url": "https://dexscreener.com",
+    "lastVerified": "2026-10-01"
   }
 ]

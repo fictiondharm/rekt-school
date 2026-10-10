@@ -38,15 +38,23 @@ function baseMeta(tier: Tier, isDevnet: boolean): NetworkMeta {
 /**
  * Tier 1 (basic) runs on real Solana Devnet for the on-chain lessons
  * (B2, B4, B5, B6, B7). Every other basic lesson (B1, B3, B8, B9, B10) is a
- * pure browser sandbox. Tier 2 (intermediate) runs entirely in a pure browser sandbox.
+ * pure browser sandbox. Tier 2 (intermediate) and Tier 3 (pro) run entirely
+ * in a pure browser sandbox.
  */
 export function getNetworkMeta(tier: Tier): NetworkMeta {
-  return baseMeta(tier, tier !== 'intermediate');
+  return baseMeta(tier, tier === 'basic');
+}
+
+export function tierFromLessonId(lessonId: string): Tier {
+  const id = lessonId.trim().toUpperCase();
+  if (id.startsWith('P')) return 'pro';
+  if (id.startsWith('I')) return 'intermediate';
+  return 'basic';
 }
 
 export function getNetworkMetaByLesson(lessonId: string): NetworkMeta {
   const id = lessonId.trim().toUpperCase();
-  const tier: Tier = id.startsWith('I') ? 'intermediate' : 'basic';
-  const isSandbox = tier === 'intermediate' || SANDBOX_BASIC_IDS.has(id);
+  const tier = tierFromLessonId(id);
+  const isSandbox = tier !== 'basic' || SANDBOX_BASIC_IDS.has(id);
   return baseMeta(tier, !isSandbox);
 }

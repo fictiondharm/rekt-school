@@ -1,0 +1,121 @@
+{
+  "id": "P3",
+  "tier": "pro",
+  "order": 3,
+  "title": "Leverage & Perpetuals (Margin & PnL)",
+  "estMinutes": 18,
+  "objectives": [
+    "Understand how a perpetual futures contract lets you trade with leverage and no expiry",
+    "Calculate PnL, Return on Equity (ROE), and the exact liquidation price of a position",
+    "See why leverage multiplies losses just as fast as gains - and how margin calls wipe accounts",
+    "Feel the difference between 2x and 20x by watching a position survive or die as price moves"
+  ],
+  "requires": ["P2"],
+  "freePreview": false,
+  "glossaryTerms": ["perpetual", "leverage", "margin", "liquidation", "health_factor"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "p3-intro",
+      "type": "read",
+      "title": "Leverage: A Loan That Trades For You",
+      "body": "A <Term id=\"perpetual\">perpetual</Term> ('perp') is a contract that lets you bet on a price with no expiry date. You post a small amount of <Term id=\"margin\">margin</Term> (your own money), and the venue lets you control a much larger position through <Term id=\"leverage\">leverage</Term>.\n\n**The core mechanic:**\n\n- You deposit $100 of margin.\n- You choose 10x leverage.\n- You now control a $1,000 position.\n- Every 1% the price moves, your *equity* moves ~10%.\n\nThat cuts both ways. A 1% move in your favor = +10% on your money. A 1% move against you = -10% on your money. At 10x, a ~10% adverse move erases your entire margin and you get liquidated.\n\n**Why anyone uses this:** capital efficiency. Instead of tying up $1,000 to trade $1,000, you tie up $100 and keep the other $900 working elsewhere. **Why it destroys people:** the same efficiency means a normal, boring market wiggle becomes a total wipeout. Leverage does not change your win rate - it changes how fast you find out if you were wrong.",
+      "hints": [
+        "Leverage amplifies percentage moves on your EQUITY, not on the position size.",
+        "The higher the leverage, the closer your liquidation price sits to entry. 20x can liquidate on a 5% wiggle."
+      ]
+    },
+    {
+      "id": "p3-math",
+      "type": "read",
+      "title": "PnL, ROE, and the Liquidation Price",
+      "body": "Three numbers run every leveraged position:\n\n- **Position size** = margin x leverage. With $100 at 10x, size = $1,000.\n- **PnL** = (exit price - entry price) x units held. Long profits when price rises; short profits when it falls.\n- **ROE (Return on Equity)** = PnL / margin. This is the number that feels huge at high leverage.\n\n**Liquidation** happens when your losses eat your margin. For a long with maintenance margin, roughly:\n\n`Liquidation Price ≈ Entry x (1 - 1/leverage)`\n\nRun it at different leverage with a $100 margin long entered at $100:\n\n- **2x** → liquidated near $50. Price must halve to kill you.\n- **10x** → liquidated near $90. A 10% dip ends you.\n- **20x** → liquidated near $95. A 5% dip ends you.\n\nThe seductive part: at 20x, a 5% up-move gives you +100% ROE. The lethal part: a 5% down-move gives you -100% and it is over. Same math, opposite mood. Most perp traders do not blow up because they were wrong about direction - they blow up because they were right *eventually* but got <Term id=\"liquidation\">liquidated</Term> before the market agreed.",
+      "hints": [
+        "Memorize the shape: liquidation distance ≈ 1/leverage away from entry.",
+        "ROE is PnL over margin. +25% ROE at 5x is just a 5% price move - leverage is doing all the work."
+      ]
+    },
+    {
+      "id": "p3-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: Margin, Maintenance, and the Liquidation Engine",
+      "body": "Your collateral is split conceptually into **initial margin** (needed to open) and **maintenance margin** (the floor you must keep). When your equity drops to the maintenance requirement, the liquidation engine fires.\n\nFor a long, equity = margin + PnL. As price falls, PnL turns negative and equity shrinks. The instant equity <= maintenance margin, the venue force-closes your position at market - often with a liquidation penalty on top. You do not get liquidated at exactly zero equity; you get liquidated *early*, leaving a buffer to protect the venue from slippage.\n\n**A concrete 10x long, $100 margin, entry $100:**\n\n1. Position size $1,000 (10 SOL-equivalent units).\n2. Price drops to $92: PnL = -$80, equity = $20. Danger zone.\n3. Price drops to $90: PnL = -$100, equity = $0 - engine liquidates you.\n\nNotice you lost 100% of your money on a mere 10% price drop - a move that a spot holder could shrug off. This is why perps feel like a different sport: the *liquidation engine*, not the market, is your real opponent. Positions are marked against the <Term id=\"health_factor\">health factor</Term> of your margin in real time, and the moment it breaches the floor, discretion disappears and the bot takes over.",
+      "hints": [
+        "You are liquidated at maintenance margin, not at zero. Bankruptcy is early and automatic.",
+        "Liquidation penalty fees mean you often lose more than 'all your margin' on paper versus what you deposited."
+      ]
+    },
+    {
+      "id": "p3-quiz",
+      "type": "quiz",
+      "title": "Leverage & Perpetuals Quiz",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "You post $100 margin at 10x leverage. What is your position size and what does a 1% favorable price move do to your equity?",
+          "options": [
+            "$1,000 position; +1% to your equity",
+            "$1,000 position; roughly +10% to your equity",
+            "$100 position; +10% to your equity",
+            "$1,000 position; +100% to your equity"
+          ],
+          "correct": 1,
+          "difficulty": "basic",
+          "explainRight": "Correct. Size = margin x leverage = $100 x 10 = $1,000. A 1% price move on a $1,000 position is $10 of PnL, which is +10% on your $100 equity. Leverage scales moves on your margin, not on the position.",
+          "explainWrong": "Size = margin x leverage = $1,000. A 1% move on $1,000 is $10 PnL, and $10 / $100 equity = +10%. That is the whole point of leverage: it multiplies the percentage move applied to your own capital."
+        },
+        {
+          "id": "q2",
+          "prompt": "Using the rule of thumb, roughly where does a 20x LONG entered at $100 get liquidated?",
+          "options": [
+            "Near $95 - about a 5% drop",
+            "Near $80 - about a 20% drop",
+            "Near $50 - about a 50% drop",
+            "Only at $0"
+          ],
+          "correct": 0,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. Liquidation distance ≈ 1/leverage = 1/20 = 5%. A long at $100 with 20x leverage is wiped by a move to around $95. At high leverage, terrifyingly small wiggles end positions.",
+          "explainWrong": "The liquidation distance is roughly 1/leverage from entry. At 20x that is 5%, so a long at $100 dies near $95. Higher leverage means closer liquidation - this is why 20x feels like a coin flip on noise."
+        },
+        {
+          "id": "q3",
+          "prompt": "You are 10x long and the price drops 10%. Why are you liquidated even though 10% is a normal market day?",
+          "options": [
+            "Because the exchange decides to liquidate profitable traders",
+            "Because a 10% adverse move equals -100% ROE at 10x, wiping your entire margin down to the maintenance floor",
+            "Because liquidations only happen on weekends",
+            "Because leverage protects you from 10% moves"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. 10x leverage turns a 10% price move into a 100% move on your equity. Your margin is gone and equity hits the maintenance floor, so the engine liquidates. Leverage does not make you safer - it converts ordinary volatility into account-ending events.",
+          "explainWrong": "At 10x, a 10% adverse move = -100% ROE. Your equity collapses to the maintenance requirement and the engine force-closes. A 10% day is normal for the market but *fatal* for a 10x position."
+        },
+        {
+          "id": "q4",
+          "prompt": "What is the most accurate statement about why leveraged traders blow up?",
+          "options": [
+            "They are always wrong about direction",
+            "Leverage does not change your win rate - it changes how much adverse noise you can survive before liquidation, so they die on moves their thesis would eventually have survived",
+            "Perps have no liquidation mechanism, so losses are unlimited but reversible",
+            "High leverage makes the market move against you more often"
+          ],
+          "correct": 1,
+          "difficulty": "thinking",
+          "explainRight": "Correct. Leverage is a survival constraint, not a prediction tool. Many blown accounts were ultimately 'right' - but they were liquidated by normal volatility before the market caught up. Managing liquidation distance matters more than being clever.",
+          "explainWrong": "Most liquidations are not about being wrong forever - they are about not surviving the journey. Leverage shrinks the noise you can absorb, so ordinary wiggles liquidate positions that a spot holder (or a lower-leverage trader) would have ridden out."
+        }
+      ],
+      "passScore": 3
+    },
+    {
+      "id": "p3-explore",
+      "type": "explore",
+      "title": "Explore Live Perp Markets",
+      "cardIds": ["drift", "jupiter"]
+    }
+  ],
+  "explore": ["drift", "jupiter"],
+  "lastVerified": "2026-10-01"
+}

@@ -1,0 +1,121 @@
+{
+  "id": "P12",
+  "tier": "pro",
+  "order": 12,
+  "title": "Capstone: Protocol Architect",
+  "estMinutes": 24,
+  "objectives": [
+    "Combine every prior Pro lesson into a single protocol design exercise",
+    "Choose oracle, liquidity, risk, and security parameters with real trade-offs",
+    "Stress-test your protocol against the attacks you learned in P3-P11",
+    "Score your build and identify which design decision is your weakest link"
+  ],
+  "requires": ["P11"],
+  "freePreview": false,
+  "glossaryTerms": ["oracle", "twap", "amm", "leverage", "funding_rate", "mev", "bridge", "bonding_curve", "position_sizing", "audit", "upgrade_authority", "tvl", "liquidation"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "p12-intro",
+      "type": "read",
+      "title": "You Are the Architect Now",
+      "body": "Everything up to here taught you to *survive* other people's protocols. The capstone flips it: **you design one.** This is the final Pro exercise, and it pulls together every module you have completed.\n\n**Your protocol must make five decisions, and each one echoes a lesson:**\n\n1. **Price source** - a single AMM spot price, or a multi-source <Term id=\"twap\">TWAP</Term>? (Lesson P5: oracle manipulation.)\n2. **Liquidity model** - a full-range <Term id=\"amm\">AMM</Term>, concentrated liquidity with narrow ranges, or a bonding curve for launch? (Lessons P7, P9.)\n3. **Leverage policy** - do you even offer perps, and at what maximum? (Lessons P3, P4, P11: liquidation and ruin.)\n4. **Security posture** - who holds the <Term id=\"upgrade_authority\">upgrade authority</Term>, is there a timelock, is the code <Term id=\"audit\">audited</Term>? (Lesson P10.)\n5. **Growth mechanism** - incentives, incentives, and how you avoid a mercenary <Term id=\"tvl\">TVL</Term> that flees the moment emissions stop.\n\nThere is no universally correct answer - that is the point. Every choice buys you something and costs you something. The architect's skill is knowing *which* trade-offs they are making and whether the resulting protocol is self-consistent. A protocol that offers 20x leverage on a manipulable oracle and an unbounded upgrade key is not brave - it is a headline waiting to be written.",
+      "hints": [
+        "Every protocol decision is a trade-off: efficiency vs safety, growth vs durability.",
+        "Self-consistency matters. A clearing-free oracle + high leverage + open admin = a known disaster."
+      ]
+    },
+    {
+      "id": "p12-build",
+      "type": "read",
+      "title": "Designing for the Attacks You Know",
+      "body": "A real architect does not design for the average day. They design for the **worst attacker** who read the same lessons you did. Walk your own protocol through the gauntlet:\n\n- **Oracle attack (P5):** Can someone flash-borrow and move your price? If your oracle is a single pool ratio - yes. Defense: multi-source, TWAP, caps.\n- **Sandwich / MEV (P6):** Do your users leak their intent to a public mempool with loose slippage? Defense: protected routing, tight slippage defaults, limit orders.\n- **Liquidation cascade (P3, P11):** If too many users run 20x, one 10% candle triggers a cascade that dumps the asset further, triggering more liquidations. Defense: lower max leverage, tiered maintenance margin, insurance fund.\n- **Funding inversion (P4):** If your funding is unbounded, a squeeze can force shorts to pay ruinously. Defense: capped funding, index-based mark.\n- **Out-of-range liquidity (P7):** If you push users into razor ranges, they get liquidated by impermanent loss. Defense: sensible range presets, education, wide-base vaults.\n- **Bridge trust (P8):** If you bridge in an asset, an upstream bridge hack depegs your collateral. Defense: limit bridge-asset exposure, prefer native assets, monitor.\n- **Rug / honeypot (P9):** If you let anyone launch, you inherit launchpad scams. Defense: mint revocation, LP locks, listing checks.\n- **Ruin (P11):** None of it matters if the whole system can blow up at once. Defense: caps, circuit breakers, and a treasury that is not fully at risk.\n\nNotice the recurrence: **every single attack comes back to a trust or sizing decision made early.** Good architecture is not cleverness. It is a chain of conservative, defensible defaults that hold even when one assumption breaks. In the companion, you will set these dials and watch your score respond - and you will likely find that the safest protocol is not the most exciting one to launch. That tension is the entire job.",
+      "hints": [
+        "Design against the worst attacker who read the same playbook you did.",
+        "Every attack reduces to a trust or sizing call made early - fix it at the design level."
+      ]
+    },
+    {
+      "id": "p12-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: Scoring Your Architecture",
+      "body": "Your capstone is scored across five dimensions, each mapping to a Pro lesson. A single fatal flaw caps your overall score regardless of how good the others are - because that is exactly how real protocols fail.\n\n- **Oracle safety (P5):** multi-source + TWAP + caps = strong. Single-pool spot = fatal.\n- **Liquidity design (P7, P9):** sensible ranges, locked LP, fair launch = strong. Razor ranges and open launch = fragile.\n- **Leverage discipline (P3, P4, P11):** modest max leverage, capped funding, insurance fund = strong. 100x with unbounded funding = fatal.\n- **Security posture (P10):** timelocked multisig upgrades, audited, no mint/pause backdoor = strong. Single EOA upgrade key = fatal.\n- **Economics (P11):** sustainable incentives, unrealized gains managed, no mercenary dependency = strong. Ponzi emissions = fragile.\n\nThe final takeaway is not that you built 'the best protocol.' It is that you *saw the trade-offs clearly* and can explain why each dial sits where it does. The most important skill from this entire Pro tier is not any single formula - it is the habit of asking, for any protocol, **what could take all the money, and who controls that lever?** That instinct protects you in a market full of people who have not read this far. When you are ready, you can take the deploy-your-own-protocol challenge below - explore it carefully, because now you understand what is actually at stake.",
+      "hints": [
+        "One fatal flaw caps your score - real protocols die of their weakest link, not their average.",
+        "The real output is not a score. It is the habit of finding the one lever that can take everything."
+      ]
+    },
+    {
+      "id": "p12-quiz",
+      "type": "quiz",
+      "title": "Protocol Architect Final Quiz",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "You offer 20x leverage while sourcing your price from a single AMM pool. What is the most likely disaster?",
+          "options": [
+            "Users get bored and leave",
+            "A flash-loan oracle attack moves the pool price, triggering mass forced liquidations (and letting the attacker profit) - high leverage amplifies the damage from a manipulable price",
+            "The protocol earns too many fees",
+            "Nothing - 20x is standard and safe"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. A manipulable oracle plus high leverage is a compounding failure: the attacker can nudge price past thin liquidation thresholds, and 20x positions die on tiny moves. You have combined the P5 oracle weakness with the P3 leverage multiplier.",
+          "explainWrong": "The danger is the combination. A single-pool oracle can be moved (P5), and at 20x, tiny price moves liquidate everyone (P3). That synthesis is a mass-liquidation engine - exactly the design flaw this capstone is meant to surface."
+        },
+        {
+          "id": "q2",
+          "prompt": "What single change most reduces the risk of a liquidation cascade during a sharp market move?",
+          "options": [
+            "Increasing maximum leverage so users can recover faster",
+            "Lowering maximum leverage and adding tiered maintenance margins plus an insurance fund to absorb forced-sale pressure",
+            "Removing all liquidations",
+            "Charging no trading fees"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. Lower max leverage reduces the number of positions near the liquidation line, tiered maintenance spreads out the trigger prices, and an insurance fund absorbs losses so the protocol does not have to dump collateral into an already-falling market. Cascades are dampened by design, not luck.",
+          "explainWrong": "Cascades happen when many high-leverage positions liquidate together and their forced selling pushes price further down. The fix is to reduce leverage extremes, stagger liquidation thresholds, and buffer with an insurance fund. More leverage makes it far worse."
+        },
+        {
+          "id": "q3",
+          "prompt": "Your protocol has one anonymous admin key that can upgrade the contract at any time. Why is this fatal to your security score?",
+          "options": [
+            "Anonymous admins always steal immediately",
+            "An unbounded, instant upgrade path means the audited code can be replaced at will - so the trust surface collapses to a single key that can drain everything",
+            "It costs too much gas",
+            "Upgrades are illegal"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. Upgradeability is power. A lone, timelock-free admin key means your 'audited' protocol can become a drain contract in one transaction. Timelocks and multisig thresholds are what make upgrades survivable. One key = one point of total failure.",
+          "explainWrong": "The flaw is that a single instant upgrade path reduces the security of the entire system to one key. Even an honest operator is a liability when compromise or coercion is one transaction away from draining the vault. The audit is irrelevant if the code can be swapped."
+        },
+        {
+          "id": "q4",
+          "prompt": "Across all twelve Pro lessons, what is the unifying habit of a good protocol architect?",
+          "options": [
+            "Maximizing yields and leverage to attract the most users",
+            "For any design, asking 'what could take all the money, and who controls that lever?' - then choosing conservative, defensible defaults that survive when one assumption breaks",
+            "Copying the largest competitor exactly",
+            "Avoiding audits to move faster"
+          ],
+          "correct": 1,
+          "difficulty": "thinking",
+          "explainRight": "Correct. Oracle attacks, MEV, cascades, depegs, rugs, and ruin all reduce to a trust or sizing decision made early. The architect's core skill is locating the one lever that can take everything, controlling it, and choosing defaults that hold up under stress - not chasing maximum excitement.",
+          "explainWrong": "The throughline of the whole tier is where the fatal lever sits and who holds it. Maximum yield and leverage attract users and attract attackers. The durable approach is conservative defaults and clear-eyes trade-off reasoning - design that survives a broken assumption, because assumptions always break."
+        }
+      ],
+      "passScore": 3
+    },
+    {
+      "id": "p12-explore",
+      "type": "explore",
+      "title": "Deploy Your Own Protocol (Explore Carefully)",
+      "cardIds": ["solscan", "wormhole"]
+    }
+  ],
+  "explore": ["solscan", "wormhole"],
+  "lastVerified": "2026-10-01"
+}

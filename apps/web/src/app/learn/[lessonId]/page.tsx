@@ -30,6 +30,18 @@ import { I11Companion } from '@/components/lesson-engine/companions/I11Companion
 import { I12Companion } from '@/components/lesson-engine/companions/I12Companion';
 import { I13Companion } from '@/components/lesson-engine/companions/I13Companion';
 import { I14Companion } from '@/components/lesson-engine/companions/I14Companion';
+import { P1Companion } from '@/components/lesson-engine/companions/pro/P1Companion';
+import { P2Companion } from '@/components/lesson-engine/companions/pro/P2Companion';
+import { P3Companion } from '@/components/lesson-engine/companions/pro/P3Companion';
+import { P4Companion } from '@/components/lesson-engine/companions/pro/P4Companion';
+import { P5Companion } from '@/components/lesson-engine/companions/pro/P5Companion';
+import { P6Companion } from '@/components/lesson-engine/companions/pro/P6Companion';
+import { P7Companion } from '@/components/lesson-engine/companions/pro/P7Companion';
+import { P8Companion } from '@/components/lesson-engine/companions/pro/P8Companion';
+import { P9Companion } from '@/components/lesson-engine/companions/pro/P9Companion';
+import { P10Companion } from '@/components/lesson-engine/companions/pro/P10Companion';
+import { P11Companion } from '@/components/lesson-engine/companions/pro/P11Companion';
+import { P12Companion } from '@/components/lesson-engine/companions/pro/P12Companion';
 import { FaucetWidget, PaymentModal, StuckChecklistCard, RaydiumSwapCard } from '@/components/onchain';
 import { canAccess, isAccessGateEnabled } from '@/lib/access';
 import { getLocalAura } from '@/lib/progress';
@@ -181,6 +193,30 @@ export default function DynamicLessonPage({ params }: PageProps) {
         return <I13Companion />;
       case 'I14':
         return <I14Companion />;
+      case 'P1':
+        return <P1Companion />;
+      case 'P2':
+        return <P2Companion />;
+      case 'P3':
+        return <P3Companion />;
+      case 'P4':
+        return <P4Companion />;
+      case 'P5':
+        return <P5Companion />;
+      case 'P6':
+        return <P6Companion />;
+      case 'P7':
+        return <P7Companion />;
+      case 'P8':
+        return <P8Companion />;
+      case 'P9':
+        return <P9Companion />;
+      case 'P10':
+        return <P10Companion />;
+      case 'P11':
+        return <P11Companion />;
+      case 'P12':
+        return <P12Companion />;
       default:
         return null;
     }

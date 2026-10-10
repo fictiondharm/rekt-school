@@ -1,0 +1,121 @@
+{
+  "id": "P5",
+  "tier": "pro",
+  "order": 5,
+  "title": "Oracles & Flash Loan Attacks",
+  "estMinutes": 18,
+  "objectives": [
+    "Understand what an oracle does and why every DeFi protocol blindly trusts it",
+    "See the difference between a manipulable spot-price oracle and a robust TWAP oracle",
+    "Walk through a full flash-loan oracle attack step by step and find where it turns profitable",
+    "Learn the concrete defenses protocols use to make oracle manipulation unprofitable"
+  ],
+  "requires": ["P4"],
+  "freePreview": false,
+  "glossaryTerms": ["oracle", "twap", "flash_loan", "price_impact", "collateral", "liquidation"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "p5-intro",
+      "type": "read",
+      "title": "The Oracle: The Blind Spot Every Protocol Trusts",
+      "body": "A blockchain cannot see the outside world. It does not know that SOL costs $150. Something has to *tell* it - and that something is an <Term id=\"oracle\">oracle</Term>.\n\nThis is a terrifying amount of trust. A lending protocol decides how much you can borrow, and when to liquidate you, based entirely on a price the oracle reports. If an attacker can lie to the oracle for even one transaction, they can make the protocol believe a worthless asset is worth a fortune - or a valuable one is worthless.\n\nThe naive mistake many protocols make: reading the price straight from a single AMM pool. The formula says price = `reserveB / reserveA`. So if an attacker **dumps a huge amount into that pool**, the ratio moves, the 'price' prints, and the oracle happily reports it.\n\n**That is the entire seed of the attack.** No hack, no stolen key - just a protocol that trusted a number that anyone with capital could move. The next step is borrowing the capital without actually having it. Enter the <Term id=\"flash_loan\">flash loan</Term>.",
+      "hints": [
+        "An oracle is only as trustworthy as the source it reads. Single-pool spot price = attacker-controlled.",
+        "You do not need to own money to move a pool - you need to CONTROL money for one transaction. That is a flash loan."
+      ]
+    },
+    {
+      "id": "p5-attack",
+      "type": "read",
+      "title": "Anatomy of a Flash-Loan Oracle Attack",
+      "body": "A <Term id=\"flash_loan\">flash loan</Term> lets you borrow millions with **no collateral**, on one condition: you must repay it within the *same transaction*. If you cannot, the whole thing reverts as if it never happened. It is not a loophole - it is a tool, and it weaponizes protocols that trust manipulable prices.\n\n**The classic attack, in five moves, all in one transaction:**\n\n1. **Flash-borrow** $10M from a lender. (No collateral needed.)\n2. **Dump** it into a thin DEX pool holding the victim token, crashing the pool's price ratio.\n3. The protocol's **spot oracle** reads that crashed price - or, in the mirror version, the attacker pumps the pool to inflate a collateral asset the oracle relies on.\n4. **Exploit**: borrow against the now-inflated collateral (or trigger liquidations of everyone else using the manipulated price), draining the protocol.\n5. **Reverse the dump** to recover most of the borrowed funds (round-trip slippage is the attacker's only cost), **repay the flash loan**, and walk away with the difference.\n\nThe attack costs only gas plus the price impact of moving the pool twice. Whenever that cost is smaller than the profit from the smashed oracle, the chain is profitable and bots will run it. This is not theory - it has drained hundreds of millions from real protocols, and it almost always traces back to one lazy line of code: `price = pool.reserveB / pool.reserveA`.",
+      "hints": [
+        "The whole attack lives in ONE transaction. If profit > (gas + round-trip price impact), it executes.",
+        "Flash loans are not illegal and not a bug. They simply amplify whatever weakness the protocol already has."
+      ]
+    },
+    {
+      "id": "p5-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: TWAP and the Defenses",
+      "body": "The fix centers on a <Term id=\"twap\">TWAP</Term> (Time-Weighted Average Price). Instead of reading one instantaneous ratio, a TWAP averages the pool's price over a window (say 30 minutes). To manipulate it, an attacker would have to hold the pool at a distorted price across many blocks - expensive, slow, and exposed to arbitrage that keeps snapping the price back.\n\n**The defense stack, from weakest to strongest:**\n\n- **Multiple independent oracles** - read several sources and take a median, so one poisoned source cannot swing the result.\n- **TWAP windows** - average over time so a one-block spike barely registers.\n- **Chainlink / Pyth-style feeds** - aggregate many venues and push a robust reference price.\n- **Circuit breakers & caps** - reject a price that jumps beyond a sane band in one block.\n- **Borrow caps and LTV haircuts** - limit damage even if the price is briefly wrong.\n\nThe economics are the real battlefield. A robust oracle makes the attack *unprofitable* rather than impossible: if manipulating the price for long enough costs more than the exploit yields, no rational bot bothers. Security here is not about being unlucky-proof - it is about making the price of lying exceed the prize. Read any protocol's docs and the very first question to ask is: **where does your price come from, and who can move it?**",
+      "hints": [
+        "TWAP = average over time. One-block spikes get diluted, so manipulation gets expensive.",
+        "The strongest oracle is boring: multiple sources, medianized, time-averaged, with caps."
+      ]
+    },
+    {
+      "id": "p5-quiz",
+      "type": "quiz",
+      "title": "Oracles & Flash Loans Quiz",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "What exactly is an oracle in DeFi?",
+          "options": [
+            "A smart contract that stores user balances",
+            "A service that feeds external data - like real token prices - onto the blockchain",
+            "A wallet that holds your private keys",
+            "A type of flash loan"
+          ],
+          "correct": 1,
+          "difficulty": "basic",
+          "explainRight": "Correct. Blockchains are blind to the outside world. An oracle delivers off-chain data (most critically, prices) on-chain. Lending protocols trust it completely to size loans and trigger liquidations - which is why a manipulable oracle is so dangerous.",
+          "explainWrong": "An oracle is an on-chain data feed for the outside world. Most importantly, it reports prices that protocols rely on to value collateral and liquidate loans. Corrupting that feed lets an attacker control the entire protocol's decisions."
+        },
+        {
+          "id": "q2",
+          "prompt": "Why is a flash loan useful to an attacker who owns almost no capital?",
+          "options": [
+            "It permanently gives them free money",
+            "It lets them borrow millions with no collateral for the duration of one transaction, as long as it is repaid in the same transaction",
+            "It hides their identity from the blockchain",
+            "It only works if you already have collateral"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. A flash loan requires repayment within the same transaction - so if you cannot repay, everything reverts and it never happened. That trustless instant capital is exactly what lets an attacker move a pool and smash an oracle without owning the funds.",
+          "explainWrong": "Flash loans are uncollateralized because they must be repaid atomically in one transaction. If they are not repaid, the whole transaction reverts. This gives an attacker temporary control of millions - which is just the tool needed to distort a price the protocol trusts."
+        },
+        {
+          "id": "q3",
+          "prompt": "Which single design choice most enables a flash-loan oracle attack?",
+          "options": [
+            "Using a robust multi-source oracle",
+            "Reading the price directly from a single AMM pool's current reserve ratio",
+            "Having a TWAP over 30 minutes",
+            "Setting a low maximum LTV"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. A single-pool instantaneous price is trivially moved by dumping into the pool. The attacker distorts the ratio for one transaction, the protocol reads the poisoned number, and the exploit fires. Everything else on this list is a defense.",
+          "explainWrong": "The vulnerability is a manipulable price source - specifically a single AMM's spot ratio that anyone with flash capital can move. TWAPs, multi-source feeds, and low LTV are all remedies, not causes."
+        },
+        {
+          "id": "q4",
+          "prompt": "How does a TWAP oracle make flash-loan attacks much harder?",
+          "options": [
+            "It makes loans free for honest users",
+            "It averages price over a time window, so a one-transaction spike barely moves it - the attacker must hold a distorted price across many blocks, which is expensive and gets arbitraged back",
+            "It removes the need for collateral entirely",
+            "It warns the protocol before every attack"
+          ],
+          "correct": 1,
+          "difficulty": "thinking",
+          "explainRight": "Correct. TWAP dilutes short-lived manipulation. To affect the average, the attacker has to keep the pool distorted over time - costing far more and giving arbitrageurs a chance to profit off the mispricing. The attack stops being profitable, so it stops happening.",
+          "explainWrong": "TWAP averages price over a window. A single flash spike contributes almost nothing, so the attacker would have to sustain the distortion for many blocks - prohibitively expensive and self-defeating since arbitrage bots keep pulling the price back toward fair value."
+        }
+      ],
+      "passScore": 3
+    },
+    {
+      "id": "p5-explore",
+      "type": "explore",
+      "title": "Explore Oracles in Production",
+      "cardIds": ["kamino", "solscan"]
+    }
+  ],
+  "explore": ["kamino", "solscan"],
+  "lastVerified": "2026-10-01"
+}

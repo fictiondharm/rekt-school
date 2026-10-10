@@ -51,6 +51,21 @@ export function CourseSidebar({
     { id: 'B10', title: 'Scam Awareness 101', free: false },
   ];
 
+  const proLessons = [
+    { id: 'P1', title: 'Order Types (Market/Limit/Stop)', free: false },
+    { id: 'P2', title: 'Order Books vs AMMs', free: false },
+    { id: 'P3', title: 'Leverage & Perpetuals', free: false },
+    { id: 'P4', title: 'Funding Rates & Mark Price', free: false },
+    { id: 'P5', title: 'Oracles & Flash Loans', free: false },
+    { id: 'P6', title: 'MEV & Sandwiches', free: false },
+    { id: 'P7', title: 'Concentrated Liquidity', free: false },
+    { id: 'P8', title: 'Cross-Chain Bridges', free: false },
+    { id: 'P9', title: 'Memecoins & Bonding Curves', free: false },
+    { id: 'P10', title: 'Smart Contract Auditing', free: false },
+    { id: 'P11', title: 'Risk & Drawdown Math', free: false },
+    { id: 'P12', title: 'Capstone: Protocol Architect', free: false },
+  ];
+
   const intermediateLessons = [
     { id: 'I1', title: 'Liquidity Lab (AMM)', free: true, active: true },
     { id: 'I2', title: 'Be the Liquidity Provider', free: false },
@@ -88,7 +103,7 @@ export function CourseSidebar({
           <h3 className="font-heading font-bold text-sm text-ink flex items-center gap-1.5">
             Rekt School Curriculum
           </h3>
-          <p className="text-xs text-ink-soft">Tier 1: Basic (Devnet) · Tier 2: Labs (Sandbox)</p>
+          <p className="text-xs text-ink-soft">Tier 1: Basic · Tier 2: Labs · Tier 3: Pro (Sandbox)</p>
         </div>
         <button
           onClick={onToggleCollapse}
@@ -180,6 +195,48 @@ export function CourseSidebar({
                   {item.free && (
                     <Badge variant="accent" className="text-[10px] px-1.5 py-0 shrink-0">
                       Free Lab
+                    </Badge>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Pro Tier */}
+        <div>
+          <div className="flex items-center justify-between mb-2.5">
+            <span className="font-heading font-semibold text-xs uppercase tracking-wider text-ink-soft">
+              Pro Tier (Sandbox)
+            </span>
+          </div>
+
+          <div className="space-y-1">
+            {proLessons.map((item) => {
+              const isSelected = item.id === currentLessonId;
+              return (
+                <Link
+                  key={item.id}
+                  href={`/learn/${item.id.toLowerCase()}`}
+                  className={`flex items-center justify-between p-2.5 rounded-lg text-xs transition-all duration-300 ease-bounce ${
+                    isSelected
+                      ? 'bg-accent/10 text-accent font-bold border-2 border-ink shadow-pop-sm'
+                      : 'hover:bg-accent/10 text-ink border-2 border-transparent'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 truncate">
+                    {item.free || unlocked ? (
+                      <Play className="w-3.5 h-3.5 text-accent shrink-0" />
+                    ) : (
+                      <Lock className="w-3.5 h-3.5 text-ink-soft/60 shrink-0" />
+                    )}
+                    <span className="truncate">
+                      {item.id}: {item.title}
+                    </span>
+                  </div>
+                  {item.id === 'P12' && (
+                    <Badge variant="yellow" className="text-[10px] px-1.5 py-0 shrink-0">
+                      Finals
                     </Badge>
                   )}
                 </Link>

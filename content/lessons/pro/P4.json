@@ -1,0 +1,121 @@
+{
+  "id": "P4",
+  "tier": "pro",
+  "order": 4,
+  "title": "Funding Rates & Mark Price",
+  "estMinutes": 17,
+  "objectives": [
+    "Explain why perpetual contracts need a funding rate to stay glued to spot price",
+    "Read a funding rate and predict who pays whom - longs or shorts",
+    "Compute the funding cost of a position over a day, a month, and a year",
+    "See how a delta-neutral trader farms funding by pairing a perp short with a spot long"
+  ],
+  "requires": ["P3"],
+  "freePreview": false,
+  "glossaryTerms": ["perpetual", "funding_rate", "mark_price", "leverage", "liquidation"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "p4-intro",
+      "type": "read",
+      "title": "Why Perps Need a Funding Rate",
+      "body": "A <Term id=\"perpetual\">perpetual</Term> never expires. That is convenient - but it creates a problem. A regular future converges to spot as it approaches expiry. A perp has no expiry, so nothing forces its price to match spot. If traders get euphoric, the perp price can drift permanently above the real token price.\n\nThe fix is the <Term id=\"funding_rate\">funding rate</Term>: a small periodic payment (usually every 8 hours) exchanged **directly between longs and shorts**. It is the invisible hand that keeps the perp tethered to spot.\n\n**The rule, memorized in one line:**\n\n- Perp trades **above** spot → funding is **positive** → **longs pay shorts**.\n- Perp trades **below** spot → funding is **negative** → **shorts pay longs**.\n\nWhy? If the perp is expensive, too many people are long - make being long costly so those positions cool off and price comes back down. The funding rate is not a fee the exchange keeps; it is a payment from one side of the market to the other, punishing the crowded side. Understanding who is crowded is half of reading a perp market.",
+      "hints": [
+        "Positive funding = longs pay. It is a signal that the crowd is long and paying to stay long.",
+        "The exchange does not pocket funding - it transfers it between traders."
+      ]
+    },
+    {
+      "id": "p4-arb",
+      "type": "read",
+      "title": "The Delta-Neutral Funding Trade",
+      "body": "Here is a trade professional desks run constantly, and it is beautiful because it barely cares about which way price goes.\n\n**The setup:**\n\n1. Buy the token on **spot** (a long).\n2. Simultaneously **short** the same notional on the perp.\n\nYour spot gains and perp losses cancel out - you are **delta-neutral**, meaning price direction no longer moves your net value. So why do it? **Because you collect the funding.**\n\nWhen funding is positive, your short perp position *receives* payment every 8 hours, while your spot leg just sits there. You are getting paid to hold a position that does not care about direction.\n\n**Run the numbers:** funding of 0.03% per 8h on a $100,000 position:\n\n- Per 8h: $30\n- Per day (3 payments): $90\n- Per month (~30 days): $2,700\n- Annualized: ~32%\n\nThat is a real yield - but read the risk column. If funding flips negative, you now *pay* every period. If the venue liquidates your short during a violent squeeze, your 'neutral' trade blows up on the perp leg. And you are locking capital, paying fees twice, and trusting two venues at once. Positive funding is free money *only* until the crowd flips - then it is a slow bleed against you.",
+      "hints": [
+        "Delta-neutral means spot profit offsets perp loss. You keep only the funding.",
+        "If funding flips negative while you are short the perp, you are now the payer. Watch the sign."
+      ]
+    },
+    {
+      "id": "p4-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: Mark Price, Index, and Liquidation",
+      "body": "The <Term id=\"mark_price\">mark price</Term> is the 'fair' price used to compute your PnL and liquidations. It is deliberately **not** just the perp's last traded price. If it were, an attacker could spike the perp for one second and trigger a wave of liquidations. Instead, the mark price blends the perp with the **index price** (a basket of real spot venues) and applies smoothing.\n\nThat distinction saves you and also tricks you:\n\n- You might see the perp 'touch' your liquidation price on a chart, yet you survive - because the engine liquidated against the *smooth mark*, not the wild candle.\n- You might get liquidated while your screen shows a price you never hit - because the index (spot) moved, dragging the mark with it even though the perp lagged.\n\n**Funding itself** is usually computed from the perp-index premium and clamped (capped) so it cannot spike absurdly in one period. Every 8 hours, the engine nets all longs against all shorts, transfers funding, and moves on. Delta-neutral desks live in this logic: they are long the index via spot and short the premium via perp, harvesting the clamp in their favor. It is not free - it is *engineered*, and the fee + liquidation + negative-funding risks are the price of admission.",
+      "hints": [
+        "Mark price is a smoothed blend of perp + index. It, not the last tick, decides liquidation.",
+        "Funding is derived from the perp-index premium and capped per period."
+      ]
+    },
+    {
+      "id": "p4-quiz",
+      "type": "quiz",
+      "title": "Funding & Mark Price Quiz",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "If the perp is trading ABOVE spot, why does funding become positive and make longs pay shorts?",
+          "options": [
+            "The exchange wants to reward longs for being bullish",
+            "An expensive perp means longs are crowded; charging them makes holding long costly so price cools back toward spot",
+            "Because spot buyers always pay perp sellers a tax",
+            "Funding direction is random and has no relationship to price"
+          ],
+          "correct": 1,
+          "difficulty": "basic",
+          "explainRight": "Correct. Funding is the tether. A perp above spot signals an overcrowded long side, so the rate turns positive to make longs pay - discouraging the crowd and pulling the perp back down toward the index.",
+          "explainWrong": "Funding exists to pull the perp back to spot. When the perp trades rich (above spot), the long side is crowded, so funding turns positive and longs pay shorts. It is a corrective payment, not a reward."
+        },
+        {
+          "id": "q2",
+          "prompt": "You are SHORT a perp and funding is POSITIVE (0.03% per 8h). What happens to your money?",
+          "options": [
+            "You pay funding to the longs",
+            "You receive funding from the longs",
+            "You pay the exchange, which keeps it",
+            "Nothing - funding only affects longs"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. Positive funding always flows from longs to shorts. As a short, you are on the receiving end every 8 hours. This is exactly why delta-neutral desks are short the perp - they collect positive funding.",
+          "explainWrong": "Positive funding = longs pay shorts. If you are short, you RECEIVE. The exchange does not keep it - it transfers between traders. This flow is the whole basis of the funding arbitrage trade."
+        },
+        {
+          "id": "q3",
+          "prompt": "A delta-neutral desk is long spot and short perp. Price drops 20%. What is the most accurate outcome if funding stayed positive?",
+          "options": [
+            "They lose 20% overall because price fell",
+            "The spot leg loses and the perp leg gains roughly the same amount, so net price PnL ~0; they keep the funding they collected (minus fees and liquidation risk)",
+            "They double their money because shorts profit in a crash",
+            "The two legs cancel into a guaranteed profit with zero risk"
+          ],
+          "correct": 1,
+          "difficulty": "thinking",
+          "explainRight": "Correct. Delta-neutral means the spot loss and perp gain offset, so the directional move is neutral. Their return comes from funding collected over time - not from the price move. But it is not 'zero risk': fees, negative funding, and perp liquidation are real.",
+          "explainWrong": "Long spot + short perp = near-zero net price exposure. A 20% drop hurts spot but helps the short by about the same, netting ~0. The edge is the funding stream, and it is only profitable if funding stays favorable and the short never gets liquidated."
+        },
+        {
+          "id": "q4",
+          "prompt": "Why is your liquidation based on MARK price instead of the perp's last traded price?",
+          "options": [
+            "To make liquidations faster and more aggressive",
+            "Because mark price blends the perp with a spot index and is smoothed, so a one-second manipulation candle cannot trigger mass liquidations",
+            "Because the last price is not displayed anywhere",
+            "Mark price always equals spot exactly, so it is simpler"
+          ],
+          "correct": 1,
+          "difficulty": "thinking",
+          "explainRight": "Correct. Using a smoothed blend of perp and index prevents a flash spike from liquidating everyone. It also means you can be liquidated by the index moving even if the perp lagged - the mark follows the fair value, not the wick.",
+          "explainWrong": "Mark price is deliberately robust: it merges the perp with a spot index and smooths it, so a momentary manipulation spike cannot nuke positions. That robustness also means the index (spot) can drag your mark and liquidate you when the perp itself looked calm."
+        }
+      ],
+      "passScore": 3
+    },
+    {
+      "id": "p4-explore",
+      "type": "explore",
+      "title": "Explore Funding in the Wild",
+      "cardIds": ["drift", "jupiter"]
+    }
+  ],
+  "explore": ["drift", "jupiter"],
+  "lastVerified": "2026-10-01"
+}

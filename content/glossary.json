@@ -556,5 +556,23 @@
     "term": "WAGMI (We're All Gonna Make It)",
     "definition": "An optimistic crypto mantra celebrating camaraderie, collective success, and resilience through brutal market cycles.",
     "category": "trenches"
+  },
+  {
+    "id": "wrapped_asset",
+    "term": "Wrapped Asset",
+    "definition": "A token on one chain that represents a token locked on another chain, usually minted 1:1 by a bridge. It is only as valuable as the bridge's locked reserves.",
+    "category": "pro"
+  },
+  {
+    "id": "drawdown",
+    "term": "Drawdown",
+    "definition": "The percentage drop from a portfolio's peak value to its current value. Large drawdowns require ever-larger gains to recover, which is why managing them matters more than maximizing wins.",
+    "category": "safety"
+  },
+  {
+    "id": "reentrancy",
+    "term": "Reentrancy",
+    "definition": "A smart-contract vulnerability where a contract calls out to another before finishing its own state update, letting the callee re-enter and drain funds. Fixed by updating state before external calls.",
+    "category": "safety"
   }
 ]

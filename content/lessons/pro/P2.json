@@ -1,0 +1,121 @@
+{
+  "id": "P2",
+  "tier": "pro",
+  "order": 2,
+  "title": "Order Books vs AMMs (CLOB Depth)",
+  "estMinutes": 16,
+  "objectives": [
+    "Understand how a Central Limit Order Book (CLOB) matches buyers and sellers at discrete price levels",
+    "Read market depth and see why the same trade slips more in a thin book than a deep one",
+    "Compare a CLOB fill against a constant-product AMM fill for the identical trade size",
+    "Recognize why serious traders care about depth, not just the headline price"
+  ],
+  "requires": ["P1"],
+  "freePreview": false,
+  "glossaryTerms": ["order_book", "bid_ask", "spread", "price_impact", "amm", "liquidity_pool"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "p2-intro",
+      "type": "read",
+      "title": "Two Machines That Quote a Price",
+      "body": "There are two ways a market can tell you 'what a token costs':\n\n1. An <Term id=\"order_book\">order book</Term> (CLOB) - a live stack of human and bot orders. Price exists only where someone chose to post.\n2. An <Term id=\"amm\">AMM</Term> - a math formula (`x * y = k`) sitting on a <Term id=\"liquidity_pool\">liquidity pool</Term>. Price is *computed* from the ratio of the two reserves, never negotiated.\n\nThey feel similar on a chart and behave completely differently when you trade.\n\n**In a CLOB**, liquidity is *discrete*. There is a pile of SOL for sale at $200.00, another at $200.10, another at $200.25. Buy more than one pile's worth and you eat the next - your average price climbs step by step.\n\n**In an AMM**, liquidity is *continuous*. There is no stack of orders, just one giant pool. Your trade slides you up a smooth curve. Small trades barely move it; large trades bend it hard.\n\nBoth models punish size. The punishment just has a different shape - stepped in a book, curved in a pool.",
+      "hints": [
+        "A CLOB shows you exactly where liquidity sits. An AMM hides it inside one formula.",
+        "If you can read depth, you can estimate your slippage BEFORE you click. That is a real edge."
+      ]
+    },
+    {
+      "id": "p2-depth",
+      "type": "read",
+      "title": "Depth, Not Price, Is What Kills You",
+      "body": "The price shown at the top of the book is the price for the **first tiny unit** - not for your order.\n\n**Walking a thin book for 10,000 tokens:**\n\n- Level 1: 3,000 tokens at $1.00\n- Level 2: 3,000 tokens at $1.02\n- Level 3: 4,000 tokens at $1.07\n- Your average fill: about $1.03 - a 3% <Term id=\"price_impact\">price impact</Term> before fees.\n\n**Walking a deep book for the same 10,000 tokens:**\n\n- Level 1: 50,000 tokens at $1.00\n- Your entire order fills at $1.00 - roughly zero impact.\n\nSame token, same size, radically different outcome. Depth is the invisible cushion under every fill.\n\nThe <Term id=\"spread\">spread</Term> (best ask minus best bid) is the other half of the story. A tight spread on a deep book means cheap round trips. A wide spread on a thin book means you lose money the instant you buy and sell, even if the price never moves. Professional traders obsess over depth and spread because those two numbers decide whether a strategy is even profitable after costs.",
+      "hints": [
+        "Rule: never size a trade larger than a meaningful fraction of the first few levels of depth.",
+        "The bid/ask spread is a guaranteed round-trip cost. Wide spread = stay away unless the edge is huge."
+      ]
+    },
+    {
+      "id": "p2-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: Stepped Fills vs the Curve",
+      "body": "A CLOB fill is a **weighted average across discrete levels**. If you buy `q1` at `p1` and `q2` at `p2`, your average is `(q1*p1 + q2*p2) / (q1 + q2)`. Each level consumed is a step up in cost, so CLOB slippage looks like a staircase.\n\nAn AMM fill follows the constant-product curve: `amountOut = (reserveOut * dxEff) / (reserveIn + dxEff)`. Because it is continuous, even a large trade is priced as one smooth average - but the further along the curve you push, the steeper the price becomes. The bigger your `dx` relative to `reserveIn`, the worse your execution.\n\n**The elegant link between the two:** both systems are really pricing *liquidity access*. In a deep book you barely tap the first level, so your average ~= the top of book. In a deep pool `reserveIn` is huge, so `dx / (reserveIn + dx)` is tiny and impact is near zero. Depth, whether stepped or curved, is just the size of the cushion between you and the rest of the market. Traders who understand this stop chasing 'the price' and start measuring 'the depth'.",
+      "hints": [
+        "CLOB impact = staircase average. AMM impact = smooth curve average.",
+        "Estimate AMM impact fast: impact ≈ size / (reserveIn + size). Bigger reserve, smaller impact."
+      ]
+    },
+    {
+      "id": "p2-quiz",
+      "type": "quiz",
+      "title": "Order Books vs AMMs Quiz",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "What is the core structural difference between a CLOB and an AMM?",
+          "options": [
+            "CLOBs use discrete posted orders at price levels; AMMs price trades continuously from a reserve ratio formula",
+            "CLOBs only work for stocks and AMMs only work for crypto",
+            "AMMs have order books but hide them from users",
+            "There is no real difference, just different user interfaces"
+          ],
+          "correct": 0,
+          "difficulty": "basic",
+          "explainRight": "Correct. A CLOB matches against a stack of discrete, human/bot-posted levels - a staircase. An AMM has no orders at all; price comes from `x * y = k` against two reserves - a smooth curve. Same job, completely different mechanism.",
+          "explainWrong": "Focus on the mechanism. A CLOB is a book of discrete posted orders (stairs). An AMM is a formula over pooled reserves (curve). One is people placing orders; the other is math reacting to a ratio."
+        },
+        {
+          "id": "q2",
+          "prompt": "You buy 10,000 tokens in a thin book with 3,000 available at each of three climbing levels. What is true?",
+          "options": [
+            "The entire order fills at the top-of-book price",
+            "Your average price is higher than the top of book because you consume progressively worse levels",
+            "You get rejected if the top level is smaller than your order",
+            "The book automatically creates new levels at the best price for you"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. You eat level 1, then level 2, then level 3, paying more each time. The fill is a weighted average that lands above the headline price. That gap is slippage in staircase form.",
+          "explainWrong": "A book does not give you unlimited size at the best price. Once a level is exhausted, the engine walks to the next (worse) level, so your average rises. The bigger your order relative to depth, the worse the average."
+        },
+        {
+          "id": "q3",
+          "prompt": "Comparing identical 10,000-token buys: one in a shallow AMM pool, one in a deep AMM pool. Which slips more and why?",
+          "options": [
+            "Deep pool slips more because it has more tokens to move around",
+            "Shallow pool slips more because your size is large relative to its reserves",
+            "Both slip exactly the same because the formula is identical",
+            "Slippage only depends on the fee, not the reserves"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. Impact ≈ size / (reserveIn + size). In a shallow pool, the denominator is small relative to your size, so the ratio - and the price damage - is large. Deep reserves absorb the same trade with a tiny dent.",
+          "explainWrong": "Impact depends on your size RELATIVE to the reserves. A shallow pool has small reserves, so the same trade is a big fraction of the pool and moves price hard. A deep pool dwarfs your size, so impact is negligible."
+        },
+        {
+          "id": "q4",
+          "prompt": "A token on a DEX shows a tempting price but the bid/ask spread is very wide. What is the most accurate takeaway?",
+          "options": [
+            "You can round-trip in and out for free because the price never moved",
+            "You lose the spread the instant you buy and again when you sell - a guaranteed round-trip cost even if price is flat",
+            "A wide spread means deep liquidity, so slippage will be low",
+            "Spread does not matter as long as you use market orders"
+          ],
+          "correct": 1,
+          "difficulty": "thinking",
+          "explainRight": "Correct. Buy at the ask, sell at the bid, and that spread is gone immediately - before price even moves. A wide spread is a double tax on any round trip and a sign of thin liquidity, which usually means slippage on top.",
+          "explainWrong": "Spread is not free money you dodge - it is a guaranteed loss on every round trip. Buy at ask, sell at bid, and you are down the spread regardless of direction. Wide spreads signal thin, dangerous liquidity, not depth."
+        }
+      ],
+      "passScore": 3
+    },
+    {
+      "id": "p2-explore",
+      "type": "explore",
+      "title": "Explore Depth in the Wild",
+      "cardIds": ["jupiter", "drift"]
+    }
+  ],
+  "explore": ["jupiter", "drift"],
+  "lastVerified": "2026-10-01"
+}

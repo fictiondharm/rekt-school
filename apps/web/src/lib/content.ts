@@ -20,6 +20,18 @@ import i7Data from '../../../../content/lessons/intermediate/I7.json';
 import i8Data from '../../../../content/lessons/intermediate/I8.json';
 import i9Data from '../../../../content/lessons/intermediate/I9.json';
 import i10Data from '../../../../content/lessons/intermediate/I10.json';
+import p1Data from '../../../../content/lessons/pro/P1.json';
+import p2Data from '../../../../content/lessons/pro/P2.json';
+import p3Data from '../../../../content/lessons/pro/P3.json';
+import p4Data from '../../../../content/lessons/pro/P4.json';
+import p5Data from '../../../../content/lessons/pro/P5.json';
+import p6Data from '../../../../content/lessons/pro/P6.json';
+import p7Data from '../../../../content/lessons/pro/P7.json';
+import p8Data from '../../../../content/lessons/pro/P8.json';
+import p9Data from '../../../../content/lessons/pro/P9.json';
+import p10Data from '../../../../content/lessons/pro/P10.json';
+import p11Data from '../../../../content/lessons/pro/P11.json';
+import p12Data from '../../../../content/lessons/pro/P12.json';
 import { Lesson, GlossaryTerm, ExploreCard } from '@defi-mommy/content-schema';
 
 export const GLOSSARY_MAP: Record<string, GlossaryTerm> = {};
@@ -53,6 +65,18 @@ export const LESSONS_MAP: Record<string, Lesson> = {
   I8: i8Data as unknown as Lesson,
   I9: i9Data as unknown as Lesson,
   I10: i10Data as unknown as Lesson,
+  P1: p1Data as unknown as Lesson,
+  P2: p2Data as unknown as Lesson,
+  P3: p3Data as unknown as Lesson,
+  P4: p4Data as unknown as Lesson,
+  P5: p5Data as unknown as Lesson,
+  P6: p6Data as unknown as Lesson,
+  P7: p7Data as unknown as Lesson,
+  P8: p8Data as unknown as Lesson,
+  P9: p9Data as unknown as Lesson,
+  P10: p10Data as unknown as Lesson,
+  P11: p11Data as unknown as Lesson,
+  P12: p12Data as unknown as Lesson,
 };
 
 export function getGlossaryTerm(id: string): GlossaryTerm | undefined {
