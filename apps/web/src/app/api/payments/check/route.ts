@@ -97,13 +97,12 @@ export async function POST(req: NextRequest) {
     // receiving their unlock code once the payment is verified on-chain.
     try {
       const { error } = await supabase.from('payments').insert({
-        chain,
-        tx_hash: txHash,
-        from_wallet: from,
-        to_wallet: chain === 'base' ? BASE_TREASURY : TREASURY_SOLANA,
-        amount: 1,
-        currency: asset,
-        status: 'confirmed',
+        reference: txHash,
+        signature: txHash,
+        payer_wallet: from,
+        amount_usdc: 1,
+        status: 'paid',
+        paid_at: new Date().toISOString(),
       });
       if (error && error.code !== '23505') {
         console.warn('[payments/check] payment insert failed:', error.message);

@@ -52,8 +52,8 @@ export async function checkPaymentByWallet(wallet: string): Promise<boolean> {
   const { data } = await supabase
     .from('payments')
     .select('id')
-    .eq('from_wallet', wallet)
-    .eq('status', 'confirmed')
+    .eq('payer_wallet', wallet)
+    .eq('status', 'paid')
     .limit(1);
   return (data?.length ?? 0) > 0;
 }
