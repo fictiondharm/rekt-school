@@ -8,9 +8,11 @@
     "test": "pnpm -r run test",
     "lint": "pnpm --filter web lint",
     "typecheck": "pnpm -r run typecheck",
-    "validate-content": "pnpm --filter content-schema run validate"
+    "validate-content": "pnpm --filter content-schema run validate",
+    "seed:invites": "node --experimental-strip-types scripts/seed-invites.ts"
   },
   "devDependencies": {
+    "@types/node": "^22.13.4",
     "typescript": "^5.7.2"
   },
   "pnpm": {
