@@ -1,0 +1,77 @@
+{
+  "id": "B2",
+  "tier": "basic",
+  "order": 2,
+  "title": "Your Wallet: Keys and Addresses",
+  "estMinutes": 8,
+  "objectives": [
+    "Understand the difference between public keys and private keys",
+    "Learn why a seed phrase can recreate your entire wallet",
+    "Discover how digital signatures prove ownership without revealing secrets"
+  ],
+  "requires": ["B1"],
+  "freePreview": false,
+  "glossaryTerms": ["wallet", "address", "public_key", "private_key", "seed_phrase", "signature"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "b2-intro",
+      "type": "read",
+      "title": "Public vs Private: The Postbox Analogy",
+      "body": "Think of a crypto <Term id=\"wallet\">wallet</Term> like a high-security postbox.\n\nYour <Term id=\"public_key\">public key</Term> (or <Term id=\"address\">address</Term>) is like the slot on the front of the box. Anyone in the world can drop letters or tokens through the slot. It is completely safe to share with friends, exchanges, or websites.\n\nYour <Term id=\"private_key\">private key</Term> is the only physical key that unlocks the back door to take things out. If someone copies your private key, they can empty your box in seconds."
+    },
+    {
+      "id": "b2-seed-phrase",
+      "type": "read",
+      "title": "The Master Key: Your Seed Phrase",
+      "body": "When you install Phantom or Solflare, you are given a 12 or 24-word <Term id=\"seed_phrase\">seed phrase</Term>.\n\nThis sequence of words is not a random password. It is a mathematical seed that generates all of your private keys and addresses. **Never type your seed phrase into any website, Discord form, or Google Doc.** Real wallet popups will NEVER ask you to re-enter your seed phrase to approve a transaction!"
+    },
+    {
+      "id": "b2-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: How Signing Works",
+      "body": "When you approve an action, your wallet uses the Ed25519 elliptic-curve algorithm to combine your private key with the transaction message. This produces a unique 64-byte cryptographic <Term id=\"signature\">signature</Term>. Anyone on the network can mathematically verify using your public key that the signature was created by your private key, without ever seeing or deducing the private key itself."
+    },
+    {
+      "id": "b2-quiz",
+      "type": "quiz",
+      "title": "Wallet Security Quiz",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "Which of these is safe to share publicly with someone sending you tokens?",
+          "options": [
+            "Your 12-word seed phrase",
+            "Your private key string",
+            "Your public key (wallet address)",
+            "Your browser password"
+          ],
+          "correct": 2,
+          "explainRight": "Correct! Your public key / address is meant to be shared so people can send you tokens.",
+          "explainWrong": "Incorrect. Only your public key (address) can be shared. Private keys and seed phrases must stay 100% secret."
+        },
+        {
+          "id": "q2",
+          "prompt": "If a website asks you to enter your seed phrase to 'verify your wallet' or 'claim an airdrop', what should you do?",
+          "options": [
+            "Enter it quickly before the airdrop expires",
+            "Close the tab immediately. It is a scam drainer trying to steal your funds",
+            "Type only the first 6 words",
+            "Send it to a support agent on Telegram"
+          ],
+          "correct": 1,
+          "explainRight": "100% right! Legitimate Web3 dapps never ask for your seed phrase. That is always a phishing drainer.",
+          "explainWrong": "Never enter your seed phrase! Any site asking for your seed words is trying to steal your wallet."
+        }
+      ],
+      "passScore": 2
+    },
+    {
+      "id": "b2-explore",
+      "type": "explore",
+      "title": "Explore Top Solana Wallets",
+      "cardIds": ["phantom", "solscan"]
+    }
+  ],
+  "explore": ["phantom", "solscan"]
+}

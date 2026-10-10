@@ -1,0 +1,77 @@
+{
+  "id": "B10",
+  "tier": "basic",
+  "order": 10,
+  "title": "Scam Awareness 101 & Basic Review",
+  "estMinutes": 10,
+  "objectives": [
+    "Spot the top 4 token scam vectors on Solana: Honeypots, Freeze Authority, Mint Traps, and Liquidity Pulls",
+    "Inspect on-chain token authorities before swapping",
+    "Consolidate core Tier 1 skills before advancing to intermediate liquidity labs"
+  ],
+  "requires": ["B9"],
+  "freePreview": false,
+  "glossaryTerms": ["rug_pull", "honeypot", "mint_authority", "freeze_authority"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "b10-intro",
+      "type": "read",
+      "title": "The Dark Side of Permissionless Finance",
+      "body": "Because anyone can deploy a token and pool on Solana in seconds, scammers exploit beginners who don't know how to read on-chain parameters.\n\nLearning how to identify malicious token contracts is the single most valuable protective skill in Web3."
+    },
+    {
+      "id": "b10-red-flags",
+      "type": "read",
+      "title": "The 4 Essential Solana Red Flags",
+      "body": "Before buying any newly launched token, verify these 4 parameters on a block explorer:\n\n1. **Freeze Authority:** If not revoked (`None`), the creator can freeze your token account so you can never sell or transfer!\n2. **Mint Authority:** If not revoked (`None`), the creator can print billions of new tokens at zero cost and dump them into the pool.\n3. **LP Token Burn / Lock:** If the creator still owns 100% of the pool's LP tokens, they can withdraw all SOL at any moment (Classic Rug Pull).\n4. **Holder Concentration:** If the top 5 non-pool wallets hold 70%+ of the supply, insider dumping is inevitable."
+    },
+    {
+      "id": "b10-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: Checking Authorities in Solana CLI",
+      "body": "In the SPL Token standard, authorities are stored in the token Mint account state: `spl-token authorize <MINT_ADDRESS> mint --disable` and `spl-token authorize <MINT_ADDRESS> freeze --disable`. A legitimate token project explicitly executes these two commands upon launch to cryptographically guarantee no more tokens can be minted or frozen."
+    },
+    {
+      "id": "b10-quiz",
+      "type": "quiz",
+      "title": "Scam Detection Certification",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "You inspect a new token on Solana Explorer and see 'Freeze Authority: Active (Creator Wallet)'. What does this mean?",
+          "options": [
+            "Your funds earn daily staking yield",
+            "The token is federally insured",
+            "The creator has the cryptographic power to block your wallet from selling or transferring tokens",
+            "The transaction fee is locked at 0.000005 SOL"
+          ],
+          "correct": 2,
+          "explainRight": "Spot on! An active freeze authority allows the creator to blacklist wallets at will, a massive scam indicator.",
+          "explainWrong": "Incorrect. Active Freeze Authority gives the creator permission to freeze token accounts, preventing sales."
+        },
+        {
+          "id": "q2",
+          "prompt": "What must a creator do to prove they cannot mint infinite new tokens and dilute holders?",
+          "options": [
+            "Post a verification badge on X / Twitter",
+            "Permanently revoke (set to None) the Mint Authority on-chain",
+            "Stake 1 SOL in a validator",
+            "Transfer tokens to an exchange"
+          ],
+          "correct": 1,
+          "explainRight": "Correct! Setting the Mint Authority to null/None cryptographically locks the maximum supply forever.",
+          "explainWrong": "Incorrect. Only revoking the on-chain Mint Authority guarantees supply cannot be inflated."
+        }
+      ],
+      "passScore": 2
+    },
+    {
+      "id": "b10-explore",
+      "type": "explore",
+      "title": "Token Safety Tools",
+      "cardIds": ["solana-explorer", "rugcheck"]
+    }
+  ],
+  "explore": ["solana-explorer", "rugcheck"]
+}

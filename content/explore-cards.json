@@ -1,0 +1,56 @@
+[
+  {
+    "id": "jupiter",
+    "name": "Jupiter",
+    "category": "Swaps / Aggregators",
+    "whatItDoes": "Solana's premier swap aggregator that routes trades across multiple DEXs to find the best execution price.",
+    "watchOutFor": "High slippage on low-liquidity pairs or volatile meme coins.",
+    "url": "https://jup.ag",
+    "lastVerified": "2026-10-01"
+  },
+  {
+    "id": "raydium",
+    "name": "Raydium",
+    "category": "AMM / DEX",
+    "whatItDoes": "An on-chain AMM and liquidity provider integrated with the Solana ecosystem.",
+    "watchOutFor": "Impermanent loss when providing liquidity in high-volatility pairs.",
+    "url": "https://raydium.io",
+    "lastVerified": "2026-10-01"
+  },
+  {
+    "id": "orca",
+    "name": "Orca",
+    "category": "Concentrated Liquidity (CLMM)",
+    "whatItDoes": "A leading user-friendly DEX specializing in concentrated liquidity Whirlpools.",
+    "watchOutFor": "Positions going out of range and stopping fee accrual.",
+    "url": "https://orca.so",
+    "lastVerified": "2026-10-01"
+  },
+  {
+    "id": "kamino",
+    "name": "Kamino Finance",
+    "category": "Lending & Liquidity",
+    "whatItDoes": "A unified DeFi platform offering lending, borrowing, and automated vault liquidity management.",
+    "watchOutFor": "Liquidation risk if collateral value drops below liquidation thresholds.",
+    "url": "https://kamino.finance",
+    "lastVerified": "2026-10-01"
+  },
+  {
+    "id": "solscan",
+    "name": "Solscan",
+    "category": "Explorers",
+    "whatItDoes": "A block explorer providing transparent analytics, transaction histories, and token holder details on Solana.",
+    "watchOutFor": "Fake mimic tokens with identical symbols; always verify the mint address.",
+    "url": "https://solscan.io",
+    "lastVerified": "2026-10-01"
+  },
+  {
+    "id": "phantom",
+    "name": "Phantom",
+    "category": "Wallets",
+    "whatItDoes": "A popular self-custody crypto wallet available as a browser extension and mobile app.",
+    "watchOutFor": "Never share your 12-word seed phrase or click unknown dapp links.",
+    "url": "https://phantom.app",
+    "lastVerified": "2026-10-01"
+  }
+]

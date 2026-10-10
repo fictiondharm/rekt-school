@@ -1,0 +1,155 @@
+{
+  "id": "I8",
+  "tier": "intermediate",
+  "order": 8,
+  "title": "Staking and Liquid Staking (LSTs)",
+  "estMinutes": 12,
+  "objectives": [
+    "Understand Solana Proof of Stake (PoS) inflation rewards and validator commission",
+    "Master the auto-compounding LST exchange rate model: 1 LST = (1 + yield) SOL",
+    "Identify why LSTs can temporarily trade at a discount during liquidity panics",
+    "Learn the mechanics of risk-free unbonding arbitrage"
+  ],
+  "requires": ["I6"],
+  "freePreview": false,
+  "glossaryTerms": ["staking", "validator", "liquid_staking", "apr", "apy"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "i8-pos-intro",
+      "type": "read",
+      "title": "Proof of Stake: Where Does Solana Yield Come From?",
+      "body": "Every yield has a source, and in Solana that source is the network's own monetary policy plus a slice of transaction-ordering profit. None of it is free money - it is <Term id=\"staking\">staking</Term> rewards the protocol pays in exchange for security.\n\n**The security-guard analogy:** imagine a bank that pays its guards not in cash but in newly printed bank shares. Honest guards keep earning; a guard who lets robbers in gets nothing and is fired. Solana works like that - <Term id=\"validator\">validators</Term> run servers that order transactions and vote on blocks, locking SOL as a bond to prove they are honest.\n\nWhere the yield actually comes from:\n\n- **Protocol inflation:** the network mints roughly **6%-7%** of total SOL supply as new tokens each year and hands them to stakers in proportion to their stake weight.\n- **MEV tips:** validators also capture fees and ordering value from the transactions they process, and a share flows back to the people staking with them.\n- **Commission:** every validator takes a small cut (typically **0%-8%**) to cover expensive servers and voting costs, then passes the remainder to you.\n\nSo the headline rate you see is *gross* inflation, and your real return is that number minus the validator's commission. Staking is not lending and not gambling - it is renting your SOL out to secure the chain, and getting paid in freshly issued SOL for doing so."
+    },
+    {
+      "id": "i8-native-vs-lst",
+      "type": "read",
+      "title": "Native Staking vs. Liquid Staking Tokens (LST)",
+      "body": "When you <Term id=\"staking\">stake</Term> SOL natively, the network moves your tokens into a **Stake Account** and effectively freezes them. Your balance still exists, but the SOL is committed to a <Term id=\"validator\">validator</Term> and cannot be spent or swapped. Want it back? You must deactivate the stake and wait through a **cooldown** (about one epoch, roughly 2-3 days) before the SOL becomes liquid again.\n\n**The hotel-safe analogy:** native staking is like locking your savings in the hotel safe - very secure, but you cannot buy dinner with it. <Term id=\"liquid_staking\">Liquid staking</Term> hands you a keycard you can spend while the deposit stays locked.\n\nHow liquid staking solves the capital lockup:\n\n- You deposit SOL into a liquid staking protocol such as Jito, Marinade, or Sanctum.\n- The pool delegates your SOL across many top validators and keeps earning rewards on your behalf.\n- In return you receive a yield-bearing receipt token called an **LST** - for example JitoSOL or mSOL.\n\nYou can now do everything locked stake cannot: provide liquidity on Orca, post the LST as collateral on Kamino, or simply sell it on Jupiter in seconds. Same underlying stake, same rewards - but the value stays liquid and composable across DeFi. That is the entire meaning of the word *liquid* in liquid staking."
+    },
+    {
+      "id": "i8-exchange-rate",
+      "type": "read",
+      "title": "The Up-Only Exchange Rate Myth vs. Reality",
+      "body": "There are two ways staking rewards can reach your wallet, and LSTs use the less flashy one. Some tokens are **rebasing** - your balance simply grows, so 100 tokens quietly becomes 102. Solana LSTs instead use an **appreciating exchange rate**: your token count never changes, but each token becomes redeemable for more SOL over time.\n\n`1 LST = (1 + accrued yield) SOL`\n\n**The collectible-card analogy:** a rebasing token prints you extra copies of the card; an LST keeps your single card and slowly raises its book value. Same value, different feel.\n\nWatching JitoSOL grow at a 7% rate:\n\n- At launch: 1 JitoSOL = 1.000 SOL\n- After 1 year: 1 JitoSOL = 1.070 SOL\n- After 2 years: 1 JitoSOL = 1.145 SOL - compounding, not a flat 7% per year\n\nThat difference between a flat <Term id=\"apr\">APR</Term> and a compounding <Term id=\"apy\">APY</Term> is exactly why long-term staking estimates quote APY: rewards are themselves restaked and earn rewards on top, so the curve bends upward. Because each epoch's rewards are swept into the pool's reserves, the ratio `sol_reserves / lst_supply` ticks up automatically - no claim transaction, no daily rebase, just a rate that quietly climbs."
+    },
+    {
+      "id": "i8-depeg-risk",
+      "type": "read",
+      "title": "Why Can LSTs 'Depeg' on Secondary Markets?",
+      "body": "Here is the most important distinction in this lesson, and the one that trips people up: an LST has **two different prices**.\n\n- **Protocol redemption rate:** what the on-chain stake pool contract will actually pay you per LST, guaranteed at epoch boundaries. This is the true value, backed by the SOL in the pool.\n- **DEX market price:** what buyers and sellers will trade an LST for right now on an AMM such as Raydium or Orca. Supply and demand set this, minute to minute.\n\n**The pawn-shop analogy:** your gold ring is genuinely worth $500, but a frantic seller accepts $475 because they need cash *today*. The ring never changed - the buyer's urgency did.\n\nDuring extreme market crashes - the FTX collapse is the classic example - leveraged traders holding <Term id=\"liquid_staking\">liquid staking</Term> tokens need cash immediately. They cannot wait 2-3 days to <Term id=\"staking\">unstake</Term> natively through the protocol, so they dump millions of dollars of LST straight into AMM pools. That flood of sell pressure crashes the DEX price below the protocol rate, and the token appears to *depeg*.\n\n**The opportunity:** that discount is payment for patience. A patient arbitrageur buys the LST at, say, 0.95 SOL on the DEX, starts an official native unstake, and when the epoch ends redeems each token for the full ~1.00 SOL protocol rate. The spread is the reward for absorbing the seller's time pressure."
+    },
+    {
+      "id": "i8-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: Solana Epoch Rewards & Slashing",
+      "body": "A Solana epoch is **432,000 slots**, which works out to roughly 2.5 days. At each epoch boundary the runtime sweeps through every stake account and pays inflation rewards based on how diligently its <Term id=\"validator\">validator</Term> voted on blocks that epoch.\n\n**Reading the reward machine:**\n\n- Validators that vote reliably on the right fork receive the full reward allocation for the stake delegated to them; a validator that misses votes earns less, and one that goes offline earns nothing at all.\n- Unlike Ethereum, Solana does **not** currently slash (burn) a validator's stake automatically for downtime. The punishment is economic and social instead: poor validators simply earn zero <Term id=\"staking\">staking</Term> rewards and delegation bots move stake away from them.\n- When you hold an LST, all of this happens behind the scenes. The pool's total stake reserves grow by the SOL earned, which automatically updates the global `sol_reserves / lst_supply` exchange rate you read about earlier.\n\nThat is why an LST's value drifts upward without any action from you: rewards land in the pool's reserves, the denominator (`lst_supply`) stays fixed, so each unit's claim on SOL rises. The <Term id=\"apr\">APR</Term> you see advertised is really a forecast of how fast that ratio is expected to climb - and because the pool restakes the rewards, that rate compounds into an <Term id=\"apy\">APY</Term> over time."
+    },
+    {
+      "id": "i8-quiz",
+      "type": "quiz",
+      "title": "Staking & LST Mastery Check",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "You hold 100 JitoSOL and the official protocol exchange rate is 1 JitoSOL = 1.10 SOL. How much SOL can you redeem by unstaking through the pool?",
+          "options": [
+            "100 SOL",
+            "90 SOL",
+            "100 SOL minus a 10% commission penalty",
+            "110 SOL"
+          ],
+          "correct": 3,
+          "difficulty": "basic",
+          "explainRight": "Correct. The appreciating exchange rate means each token is worth more than one SOL, so 100 JitoSOL × 1.10 = 110 SOL. Your token count never grew - only the value per token did, which is exactly how LSTs deliver auto-compounding rewards. Redeeming through the protocol pool honors that rate at the epoch boundary.",
+          "explainWrong": "Multiply, do not subtract: 100 tokens × 1.10 SOL/token = 110 SOL. There is no exit penalty in the official pool - the additional 10% is accumulated staking yield baked into the exchange rate, not a fee. If you got 90 or 100, you may be thinking in a rebasing frame or applying a commission that is already accounted for before the rate is published."
+        },
+        {
+          "id": "q2",
+          "prompt": "Why do many Solana users choose liquid staking (an LST) over native staking?",
+          "options": [
+            "LSTs pay measurably higher inflation rewards than native staking on the same validator",
+            "LSTs are the only way to avoid paying any validator commission",
+            "An LST stays liquid, so it can be traded or used as collateral while the underlying stake keeps earning, avoiding the multi-day unstaking cooldown",
+            "Native staking permanently destroys your SOL, so it can never be recovered"
+          ],
+          "correct": 2,
+          "difficulty": "basic",
+          "explainRight": "Correct. The rewards are the same underlying staking yield; the difference is liquidity. An LST lets you trade, lend, or post collateral while your SOL keeps staking, so your capital is never idle for the 2-3 day epoch cooldown. That composability, not a higher yield, is the reason liquid staking exists.",
+          "explainWrong": "The headline yield is essentially the same - the real gain is liquidity. Native staking does not destroy your SOL and does not always avoid commission; it simply locks the tokens for a cooldown. An LST wraps the same stake in a transferable receipt token so you can keep using the value elsewhere instead of waiting days to exit."
+        },
+        {
+          "id": "q3",
+          "prompt": "One staking protocol advertises 7% APY while another shows 7% APR. What is the key difference between these two numbers?",
+          "options": [
+            "APY includes the effect of compounding rewards, so the APY figure reflects a higher effective annual return than the same APR",
+            "APR is the rate you pay to borrow and APY is the rate you earn, so only one applies to stakers",
+            "They are identical, and the second label is just a marketing typo",
+            "APY is always exactly double APR because it is computed twice a year"
+          ],
+          "correct": 0,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. APR is the raw rate before compounding; APY folds in the fact that earned rewards are restaked and then earn rewards themselves. Because Solana LST pools auto-restake each epoch's rewards, the effective return is higher than the flat rate - so 7% APR produces an APY above 7%. When you compare yield products, always check which of the two you are looking at.",
+          "explainWrong": "Both describe returns here; the difference is compounding. APR ignores it, while APY assumes rewards are reinvested and therefore come out higher for the same underlying rate. There is no fixed 2x relationship, and it is not a typo. Since LST pools auto-compound each epoch, the APY is the figure that matches what your position actually earns."
+        },
+        {
+          "id": "q4",
+          "prompt": "An LST trades at a 5% discount on an AMM even though the underlying stake is completely safe and the protocol redemption rate is unchanged. What best explains the discount?",
+          "options": [
+            "The validator backing the pool was hacked and its stake was burned",
+            "AMMs are required to charge a 5% exit fee on all staking derivatives",
+            "Impatient sellers dump LST into AMM pools during a crash because they need liquidity now and refuse to wait 2-3 days through the native unstaking cooldown",
+            "The discount is the protocol's inflation tax withheld at each epoch"
+          ],
+          "correct": 2,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. The stake is fine; the sellers are desperate. During a crash, leveraged holders need cash immediately and cannot wait through the epoch unbonding queue, so they sell into AMM pools at whatever price clears - pushing the DEX price below the protocol rate. The discount is the price of instant liquidity, not a sign of insolvency.",
+          "explainWrong": "The gap has nothing to do with a hack, an AMM fee, or inflation. It appears when desperate sellers accept a lower DEX price to get liquidity now rather than wait days to unstake natively. That time-value penalty is why the market price can diverge from the guaranteed protocol redemption rate at any given moment."
+        },
+        {
+          "id": "q5",
+          "prompt": "An arbitrageur buys JitoSOL on a DEX at 0.95 SOL while the protocol redemption rate is 1.00 SOL, then immediately starts a native unstake. Why is this described as a 'near risk-free' trade?",
+          "options": [
+            "Because AMMs automatically refund the discount to anyone who initiates an unstake",
+            "Because the protocol fixes how many SOL are redeemed per token, so the 0.95 to 1.00 spread is locked in once the unstake completes",
+            "Because the arbitrageur also shorts SOL, which removes all price exposure from the position",
+            "Because staking protocols pay a guaranteed bonus for every native unstake request"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. The arbitrageur is not betting on SOL's direction - the protocol guarantees a fixed number of SOL per token at redemption. So buying at 0.95 and later redeeming at 1.00 locks in a ~5% spread regardless of where SOL's price moves in the meantime. The only cost is waiting through the epoch, which is exactly the liquidity the impatient seller paid to skip.",
+          "explainWrong": "The edge comes from a guaranteed redemption quantity, not from refunds, grants, or a hedge. Because the pool pays a set SOL amount per LST, an arb can buy cheap on the DEX and redeem at the protocol rate to lock the spread. Shorting SOL is an extra step not required for this trade, and no protocol pays a bonus - the profit is simply the gap between the two prices."
+        },
+        {
+          "id": "q6",
+          "prompt": "A Solana validator goes offline for three consecutive epochs. Based on this lesson, what is the most accurate outcome for the people staking with it?",
+          "options": [
+            "The validator's entire locked stake is slashed and burned, wiping out stakers' principal",
+            "The validator earns zero staking rewards for those epochs and delegation bots redirect stake away, but its staked principal is not automatically slashed",
+            "Stakers keep earning full rewards because the network guarantees a minimum payout regardless of validator performance",
+            "The protocol confiscates the validator's server hardware as compensation to stakers"
+          ],
+          "correct": 1,
+          "difficulty": "thinking",
+          "explainRight": "Correct. On Solana today, downtime is punished economically rather than by burning stake: an offline validator forfeits its rewards for those epochs, and delegation bots move stake to better-behaved validators. Crucially, the staked principal is not automatically slashed, which is a key difference from Ethereum's automatic slashing. Stakers lose the yield they would have earned, not necessarily their SOL.",
+          "explainWrong": "The distinction that matters here is lost rewards versus lost principal. Solana does not currently auto-slash stake for downtime, so stakers are not wiped out - but they earn nothing for those epochs and the validator bleeds delegations. There is no minimum reward guarantee and no hardware confiscation; the system uses economic pressure, not burn, in this scenario."
+        },
+        {
+          "id": "q7",
+          "prompt": "Which statement best captures the difference between an LST's protocol redemption rate and its DEX market price?",
+          "options": [
+            "The two are always equal, which is why arbitrage is unnecessary in liquid staking",
+            "The protocol rate is set once at launch and never changes, so the DEX price is the only real measure of value",
+            "The DEX price is fixed to the protocol rate by the issuer, so a genuine discount is impossible",
+            "The protocol rate is the value backed by on-chain SOL that the pool guarantees to redeem at epoch boundaries, while the DEX price floats with supply and demand and can temporarily sit above or below it"
+          ],
+          "correct": 3,
+          "difficulty": "thinking",
+          "explainRight": "Correct. The protocol rate is the fundamental, SOL-backed value the stake pool will honor when you redeem at an epoch boundary. The DEX price is a live market quote driven by supply and demand, so it can trade at a premium or discount for stretches of time. Arbitrage links the two - it is the mechanism that pulls them back together, not proof that they are always identical.",
+          "explainWrong": "The protocol rate does change over time (it rises with accrued rewards), and the DEX price is not legally pinned to it. The two can diverge whenever liquidity or urgency imbalances the AMM, which is exactly what makes the arbitrage opportunity exist. Treating the pair as always equal ignores the very mechanism that makes liquid staking interesting during panics."
+        }
+      ],
+      "passScore": 5
+    }
+  ]
+}

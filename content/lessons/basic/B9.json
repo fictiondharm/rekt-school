@@ -1,0 +1,77 @@
+{
+  "id": "B9",
+  "tier": "basic",
+  "order": 9,
+  "title": "Meet TVL (Total Value Locked)",
+  "estMinutes": 8,
+  "objectives": [
+    "Understand what Total Value Locked (TVL) measures across pools and protocols",
+    "Identify why TVL can mislead users through double counting and circular backing",
+    "Evaluate real protocol liquidity depth vs superficial headline TVL"
+  ],
+  "requires": ["B8"],
+  "freePreview": false,
+  "glossaryTerms": ["tvl", "liquidity_pool", "spl_token"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "b9-intro",
+      "type": "read",
+      "title": "What Total Value Locked (TVL) Means",
+      "body": "**Total Value Locked (TVL)** is the aggregate dollar value of all cryptocurrency assets currently deposited in a decentralized finance protocol's smart contracts.\n\nInvestors track TVL on analytics dashboards like DeFiLlama because it serves as a proxy for market trust, protocol usage, and overall liquidity depth."
+    },
+    {
+      "id": "b9-misleading",
+      "type": "read",
+      "title": "Why TVL Can Mislead You",
+      "body": "While TVL is widely cited, it has major traps:\n\n1. **Double Counting:** If you deposit 10 SOL into Marinade to get mSOL, and then deposit that mSOL into Kamino as lending collateral, the same $1,500 of capital gets counted twice in aggregate stats!\n2. **Inflated Token Valuations:** If a protocol locks 1 billion of its own illiquid governance tokens priced at $1 each on paper, headline TVL might say $1 Billion, even though selling $5,000 would crash the token to zero.\n3. **Mercenary Capital:** Yield-farming mercenaries can deposit $50M for 3 days to harvest tokens and withdraw everything immediately."
+    },
+    {
+      "id": "b9-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: How DefiLlama Computes TVL",
+      "body": "TVL adapters query on-chain token account balances for each smart contract vault: `TVL = Σ (token_balance × spot_price)`. Reputable aggregators explicitly provide toggles to exclude double counting, staked governance tokens, and borrowed debt so users see genuine backing liquidity."
+    },
+    {
+      "id": "b9-quiz",
+      "type": "quiz",
+      "title": "TVL Reality Check",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "How can a protocol artificially inflate its TVL without having real user deposits?",
+          "options": [
+            "By setting up an RPC node",
+            "By minting billions of unbacked tokens with no market liquidity and locking them in its own contracts",
+            "By deploying on Solana instead of Ethereum",
+            "By verifying contract code on an explorer"
+          ],
+          "correct": 1,
+          "explainRight": "Correct! Paper valuations on illiquid self-minted tokens can create illusionary TVL.",
+          "explainWrong": "Incorrect. Illiquid self-minted tokens locked in vaults are the classic method used to inflate superficial TVL."
+        },
+        {
+          "id": "q2",
+          "prompt": "What is 'double counting' in DeFi TVL metrics?",
+          "options": [
+            "Sending two transactions at once",
+            "Counting the same underlying capital multiple times as it moves through recursive yield and lending layers",
+            "Paying double transaction fees",
+            "Having two wallets connected"
+          ],
+          "correct": 1,
+          "explainRight": "Spot on! When wrapped or yield-bearing tokens are deposited into subsequent protocols, the same dollars can be counted repeatedly.",
+          "explainWrong": "Incorrect. Double counting refers to capital that is deposited into one protocol, converted to a derivative, and deposited into another."
+        }
+      ],
+      "passScore": 2
+    },
+    {
+      "id": "b9-explore",
+      "type": "explore",
+      "title": "Explore Real TVL on DeFiLlama",
+      "cardIds": ["kamino", "raydium"]
+    }
+  ],
+  "explore": ["kamino", "raydium"]
+}

@@ -1,0 +1,149 @@
+{
+  "id": "I9",
+  "tier": "intermediate",
+  "order": 9,
+  "title": "Tokenomics 1: Supply, Allocation, and Vesting",
+  "estMinutes": 14,
+  "objectives": [
+    "Differentiate Circulating Supply, Total Supply, and Fully Diluted Valuation (FDV)",
+    "Identify the dangerous Low-Float / High-FDV launch trap",
+    "Analyze team and investor vesting schedules (Cliffs vs. Linear release)",
+    "Calculate health scores and spot predatory token design before investing"
+  ],
+  "requires": ["I8"],
+  "freePreview": false,
+  "glossaryTerms": ["circulating_supply", "total_supply", "max_supply", "market_cap", "fdv", "float", "vesting", "cliff", "unlock"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "i9-intro",
+      "type": "read",
+      "title": "The Anatomy of Token Supply",
+      "body": "Picture a pizza party where only two slices sit on the table while the menu promises a hundred-slice pie. That gap between what is served and what is promised is the hidden story behind almost every token price you see. Beginners stare at the sticker price - $0.05 or $150 - and assume it tells them something. In Web3, unit price alone is meaningless. What matters is how many slices exist, and how many are still hidden in the kitchen.\n\n**Every token economy is described by three simple numbers.**\n\n- <Term id=\"circulating_supply\">Circulating Supply</Term> - the tokens that are actually liquid and tradable on the open market right now.\n- <Term id=\"total_supply\">Total Supply</Term> - every token that exists today, including the locked and vested ones still waiting in the kitchen.\n- <Term id=\"max_supply\">Max Supply</Term> - the absolute ceiling: the most tokens that will ever exist, even after future minting.\n\n**Price is only the first number; valuation is where the truth lives.**\n\n- `Market Cap = Price × Circulating Supply` - what the market is paying for the slices already on the table.\n- `FDV (Fully Diluted Valuation) = Price × Max Supply` - what the whole pizza would be worth if every slice were served at today's price.\n\nA project can show a modest **$100M <Term id=\"market_cap\">Market Cap</Term>** while carrying a **$5B <Term id=\"fdv\">FDV</Term>**. That gap is a promise that roughly 98% of the tokens are still locked up - and one day, those slices will arrive."
+    },
+    {
+      "id": "i9-low-float-trap",
+      "type": "read",
+      "title": "The Low-Float / High-FDV Trap",
+      "body": "Imagine a nightclub that prints 10,000 tickets but hands out only 50 at the door. Those 50 people bid against each other, so resale prices soar. Meanwhile the promoter quietly holds the other 9,950 tickets and will keep feeding them to the same crowd. That is the low-float launch, and it is one of the most predatory mechanics in crypto.\n\n**How the trap is assembled, step by step.**\n\n- A project launches with only **2% to 5%** of its tokens circulating, so the <Term id=\"float\">float</Term> is deliberately tiny.\n- Because supply is artificially scarce, even a small amount of buy pressure pushes the unit price high.\n- The token now boasts an astronomical **<Term id=\"fdv\">FDV</Term> of $10 Billion**, and headlines celebrate the \"next big thing.\"\n- Behind the scenes, early venture investors and founders own the remaining ~95% at an average cost of pennies.\n\n**Why the math turns cruel over time.**\n\n- Their lockups expire on a schedule, and millions of new tokens flood into the liquidity pools.\n- Unless real demand grows *exponentially* to absorb that flood, the price is mathematically destined to bleed downward.\n- Early buyers were never the crowd - they were the exit liquidity for insiders.\n\nA low-float launch is not automatically a scam, but it is always a debt: the supply is coming, and the market has to grow into it."
+    },
+    {
+      "id": "i9-vesting-cliffs",
+      "type": "read",
+      "title": "Cliffs vs. Linear Vesting",
+      "body": "Think of a <Term id=\"vesting\">vesting</Term> schedule as a drip irrigation system for insiders. Instead of dumping the whole bucket at once, the contract meters tokens out over years - protecting ordinary buyers from being crushed on day one, but only when it is designed well.\n\n**The two mechanisms that control the release.**\n\n- **<Term id=\"cliff\">Cliff</Term> Period:** a hard lockup (often 6 to 12 months) during which **0%** of tokens can be claimed or sold.\n- **Cliff Event:** the moment that lock expires, an initial chunk (say 10%-20%) unlocks all at once.\n- **Linear Vesting:** after the cliff, the remaining tokens unlock continuously - per second or per month - over 2 to 4 years.\n\n**What to look for as an investor.**\n\n- Smooth linear release is healthy: supply trickles in alongside growing demand.\n- A project with **no cliff at all** lets insiders dump instantly and is a major red flag.\n- An insider allocation **above 40%** means retail buyers are effectively funding the exit of the founding team and early funds.\n\nRead the vesting contract before you read the roadmap - the schedule tells you who gets paid, and when."
+    },
+    {
+      "id": "i9-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: Solana Vesting Smart Contracts",
+      "body": "Vesting on Solana is not a promise in a whitepaper - it is code holding tokens hostage by math. Think of an escrow vault with a timer welded to the door.\n\n**How the program actually works.**\n\n- The project deploys an escrow program such as Streamflow, Bonfida, or a custom Anchor contract.\n- Inside it sits a locked token vault owned not by a person but by a Program Derived Address (PDA), an address only the program can sign for.\n- Every clock slot, the program reads the live time with `Clock::get()?.unix_timestamp`.\n- It compares that timestamp against the <Term id=\"cliff\">cliff</Term> and the <Term id=\"vesting\">vesting</Term> end parameters.\n- The beneficiary may withdraw only the unlocked portion: `(current_time - start_time) / total_duration * total_tokens`.\n\n**Why this design matters.**\n\n- Because the vault is controlled by the PDA, neither the team nor an attacker can move a single token early.\n- Before the cliff, the withdrawable amount is literally **zero**, so the code - not goodwill - enforces the lock.\n- When the <Term id=\"unlock\">unlock</Term> window opens, anyone can verify on a block explorer exactly how much has become claimable."
+    },
+    {
+      "id": "i9-quiz",
+      "type": "quiz",
+      "title": "Tokenomics Knowledge Check",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "A token trades at $2.00 with 50 million tokens circulating and a max supply of 1 billion. What are its Market Cap and FDV?",
+          "options": [
+            "Market Cap: $100M | FDV: $2B",
+            "Market Cap: $2B | FDV: $100M",
+            "Market Cap: $100M | FDV: $100M",
+            "Market Cap: $2B | FDV: $2B"
+          ],
+          "correct": 0,
+          "difficulty": "basic",
+          "explainRight": "Correct. Market Cap multiplies price by circulating supply ($2 × 50M = $100M), while FDV multiplies price by max supply ($2 × 1B = $2B). The 20x gap is the amount of supply still waiting to dilute early holders.",
+          "explainWrong": "Remember that the two metrics use different bases. Market Cap is price times circulating supply ($2 × 50M = $100M), and FDV is price times max supply ($2 × 1B = $2B). Swapping them is exactly how buyers underestimate how much future dilution is coming."
+        },
+        {
+          "id": "q2",
+          "prompt": "A vesting contract includes a '12-month cliff.' What does that actually mean for the beneficiary?",
+          "options": [
+            "They may sell one twelfth of their tokens each month starting immediately",
+            "Zero tokens become claimable until 12 full months have passed",
+            "They must sell all of their tokens within 12 months",
+            "The project automatically shuts down after 12 months"
+          ],
+          "correct": 1,
+          "difficulty": "basic",
+          "explainRight": "Exactly. A cliff is a hard lock: nothing is releasable until the milestone is reached, and only then does an initial chunk typically unlock at once. It exists specifically to stop insiders from dumping on day one.",
+          "explainWrong": "A cliff is a period of zero access, not a gradual monthly drip. Nothing becomes claimable until the full 12 months elapse, and only then does the first chunk unlock. Confusing a cliff with linear vesting leads beginners to badly misread a token's supply timeline."
+        },
+        {
+          "id": "q3",
+          "prompt": "Why does a launch with less than 10% of its supply circulating often hurt long-term buyers even when the project is legitimate?",
+          "options": [
+            "Low float forces Solana validators to reject the token's swaps",
+            "The locked supply is permanently destroyed by the mint over time",
+            "Tokens with a low float cannot be swapped on any DEX",
+            "Future unlocks steadily add supply, and the resulting sell pressure can outweigh organic demand"
+          ],
+          "correct": 3,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. A tiny float makes the early price look strong, but it also guarantees a long runway of future supply hitting the market. If demand does not grow faster than those unlocks, the price bleeds even when the project is real.",
+          "explainWrong": "Low float is a supply-timing problem, not a technical one - validators do not reject swaps and the supply is not burned. Because most tokens are still locked, a steady stream of future unlocks can overwhelm genuine demand and quietly dilute holders."
+        },
+        {
+          "id": "q4",
+          "prompt": "Token A has a $200M market cap and a $210M FDV. Token B has a $200M market cap and a $4B FDV. Assuming equal real usage, which conclusion is most accurate?",
+          "options": [
+            "Token B has more upside because its higher FDV proves stronger demand",
+            "Token A has almost all of its supply already circulating, while Token B faces heavy future dilution from unlocks",
+            "Both are equally safe because their market caps are identical",
+            "Token B is safer because a higher FDV implies a larger treasury"
+          ],
+          "correct": 1,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. When FDV sits close to market cap, nearly all tokens are already liquid. A large market-cap-to-FDV gap means a huge share of supply is still locked and will arrive later, repeatedly pressuring the price.",
+          "explainWrong": "A big FDV is not evidence of demand or a bigger treasury - it just means most supply is not circulating yet. Equal market caps hide very different dilution risk: Token A is nearly fully diluted, while Token B has billions in future supply still to come."
+        },
+        {
+          "id": "q5",
+          "prompt": "A project's distribution shows the team and private investors collectively own 55% of total supply, with a 6-month cliff then 3-year linear vesting. What is the most reasonable read?",
+          "options": [
+            "This is ideal, because a long vesting period guarantees the price must rise",
+            "Vesting schedules stop mattering as soon as a cliff is present",
+            "Insider ownership is high, so public buyers should weigh heavy future sell pressure against the project's real demand",
+            "The 55% is irrelevant because those tokens are not circulating yet"
+          ],
+          "correct": 2,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. A high insider allocation is not automatically fatal, but it means most future supply belongs to people who bought at pennies. The long vesting helps, yet buyers still must believe demand can absorb the eventual unlocks.",
+          "explainWrong": "Locked tokens are not harmless - they are future supply that will need buyers. With insiders holding 55%, the schedule is a countdown, and a long vesting period only spreads the pressure rather than removing it."
+        },
+        {
+          "id": "q6",
+          "prompt": "Token Z has a $10M market cap, but its total supply is 50x its circulating supply. An influencer claims 'only a $10M market cap, easy 100x.' Why is this reasoning misleading?",
+          "options": [
+            "Market cap can never increase for a token with a large max supply",
+            "FDV only matters for tokens with a market cap above $50M",
+            "To justify even the same price, buyers must eventually absorb unlocks worth roughly 49x the current float",
+            "A low market cap always means the token will be delisted"
+          ],
+          "correct": 2,
+          "difficulty": "thinking",
+          "explainRight": "Correct. The headline market cap hides a supply overhang 50x larger than the float. For the price to merely hold, new demand must soak up unlocks worth about 49x the current circulating value - a far higher bar than the small market cap suggests.",
+          "explainWrong": "A low market cap does not make a token cheap when most supply is still locked. The real target is the fully diluted valuation, and reaching it requires buyers to absorb unlocks roughly 49x the current float, so the 'easy 100x' framing ignores a giant supply overhang."
+        },
+        {
+          "id": "q7",
+          "prompt": "All else equal, which single change would most likely reduce long-term sell pressure from a token's unlock schedule?",
+          "options": [
+            "Removing the cliff so tokens unlock immediately",
+            "Increasing insider allocation from 20% to 50%",
+            "Shortening the vesting period from 4 years to 6 months",
+            "Replacing large monthly cliff unlocks with continuous per-second streaming"
+          ],
+          "correct": 3,
+          "difficulty": "thinking",
+          "explainRight": "Correct. Streaming spreads the same supply smoothly over time, so regular revenue and demand can absorb it instead of facing sudden dump events. It does not reduce the total unlocked - it removes the concentrated, front-runnable shocks.",
+          "explainWrong": "The goal is to avoid concentrated supply shocks, not to unlock faster or concentrate ownership. Removing the cliff, raising insider allocation, or shortening vesting all make pressure worse; only continuous streaming smooths the release so demand can keep pace."
+        }
+      ],
+      "passScore": 5
+    }
+  ]
+}

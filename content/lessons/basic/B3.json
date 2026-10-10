@@ -1,0 +1,71 @@
+{
+  "id": "B3",
+  "tier": "basic",
+  "order": 3,
+  "title": "Stay Safe: Wallet Security",
+  "estMinutes": 6,
+  "objectives": [
+    "Identify phishing websites and malicious copycat URLs",
+    "Understand what you are actually signing when approving a transaction",
+    "Learn what token approvals and delegate permissions mean"
+  ],
+  "requires": ["B2"],
+  "freePreview": false,
+  "glossaryTerms": ["honeypot", "rug_pull", "signature", "wallet"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "b3-intro",
+      "type": "read",
+      "title": "The Golden Rules of Web3 Security",
+      "body": "In crypto, you are your own bank. That freedom comes with responsibility:\n\n1. **Bookmark official URLs:** Attackers buy sponsored Google ads with deceptive lookalike URLs (e.g. `phantorn.app` or `jup-airdrop.xyz`). Always check your browser address bar.\n2. **Inspect transaction simulation:** Wallets like Phantom show a preview of what tokens leave your wallet. If a site says 'Claim 5,000 Free USDC' but the wallet popup says '-2.5 SOL', reject it immediately!"
+    },
+    {
+      "id": "b3-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: How Token Drainers Work",
+      "body": "Malicious drainers work by asking you to sign an instruction that sets a third-party address as the 'delegate' authority over your token accounts, or sends all your SOL as a transaction fee. Because transactions execute atomically on Solana, one rogue approval can empty all delegated accounts in a single block."
+    },
+    {
+      "id": "b3-quiz",
+      "type": "quiz",
+      "title": "Phishing Detection Quiz",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "You see a sponsored Google search result for a popular decentralized exchange offering a 'bonus $500 reward'. What is the safest action?",
+          "options": [
+            "Click the ad immediately to claim the bonus",
+            "Do not click sponsored ads; type the verified URL directly or use a saved bookmark",
+            "Connect a wallet containing your main savings",
+            "Approve all requested transactions without reading"
+          ],
+          "correct": 1,
+          "explainRight": "Correct! Phishing ads frequently buy top search spots with counterfeit replica websites.",
+          "explainWrong": "Never click sponsored ads for crypto dapps. Phishing replicas frequently appear at the top of search engines."
+        },
+        {
+          "id": "q2",
+          "prompt": "Your wallet popup says you are sending 5 SOL to an unknown address, but the website claims you are receiving an airdrop. What should you do?",
+          "options": [
+            "Approve the transaction anyway",
+            "Reject and cancel the transaction immediately",
+            "Wait 5 minutes and click approve",
+            "Refresh the browser and approve"
+          ],
+          "correct": 1,
+          "explainRight": "Always trust what your wallet extension's simulation shows over whatever text appears on a webpage!",
+          "explainWrong": "Reject it! The wallet extension shows the true on-chain instruction. The website is trying to trick you."
+        }
+      ],
+      "passScore": 2
+    },
+    {
+      "id": "b3-explore",
+      "type": "explore",
+      "title": "Explore Safety Tools",
+      "cardIds": ["phantom", "solscan"]
+    }
+  ],
+  "explore": ["phantom", "solscan"]
+}

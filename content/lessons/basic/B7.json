@@ -1,0 +1,77 @@
+{
+  "id": "B7",
+  "tier": "basic",
+  "order": 7,
+  "title": "Your First Swap on an AMM",
+  "estMinutes": 12,
+  "objectives": [
+    "Execute a decentralized token swap on our course AMM",
+    "Inspect trade quotes, exchange rates, and slippage tolerances",
+    "Understand why the price shifts slightly after every trade"
+  ],
+  "requires": ["B6"],
+  "freePreview": false,
+  "glossaryTerms": ["swap", "quote", "slippage", "price_impact", "amm"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "b7-intro",
+      "type": "read",
+      "title": "Trading Without a Middleman",
+      "body": "In traditional finance, trading stocks requires a broker, a clearing house, and bank business hours. In DeFi, a <Term id=\"swap\">swap</Term> happens directly against an on-chain smart contract in under 1 second!\n\nWhen you request a <Term id=\"quote\">quote</Term>, the AMM computes:\n1. The current spot exchange rate between the two pool reserves\n2. The expected output amount based on the pool formula\n3. The estimated <Term id=\"price_impact\">price impact</Term> of your order size"
+    },
+    {
+      "id": "b7-slippage",
+      "type": "read",
+      "title": "Slippage Tolerance: Your Safety Buffer",
+      "body": "Because multiple people trade on the blockchain at the same time, the pool price might move while your transaction is travelling to the validator.\n\nYour <Term id=\"slippage\">slippage tolerance</Term> (e.g. 0.5% or 1%) tells the contract: *'If the market moves against me and I would receive less than my minimum guaranteed amount, abort the transaction and refund my tokens.'*"
+    },
+    {
+      "id": "b7-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: The Swap Instruction",
+      "body": "When executing a swap instruction on our Anchor AMM, the program receives: `amount_in` and `min_out`. It calculates `amount_out` using the vault reserves and fee rate. Before transferring tokens, it asserts `amount_out >= min_out`. If the condition fails, the instruction reverts with an error code, protecting you from front-running or wild price swings."
+    },
+    {
+      "id": "b7-quiz",
+      "type": "quiz",
+      "title": "Swap & Slippage Quiz",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "What does a 1% slippage tolerance setting guarantee?",
+          "options": [
+            "You are guaranteed to make a 1% profit on the trade",
+            "The trade will only execute if you receive at least 99% of your quoted output; otherwise it safely cancels",
+            "You pay 1% in extra gas fees to validators",
+            "Your trade executes instantly with no checks"
+          ],
+          "correct": 1,
+          "explainRight": "Correct! Slippage tolerance sets the minimum output floor you are willing to accept.",
+          "explainWrong": "Incorrect. Slippage tolerance protects you by cancelling the trade if the price moved worse than your set threshold."
+        },
+        {
+          "id": "q2",
+          "prompt": "Why does a token's price increase inside an AMM pool when someone buys it?",
+          "options": [
+            "The developers manually adjust the price",
+            "The buyer deposited payment tokens and removed target tokens, making the target token scarcer in the pool",
+            "The blockchain clock ticked forward",
+            "It is determined by the central bank"
+          ],
+          "correct": 1,
+          "explainRight": "Spot on! Constant product math ensures that as reserve X shrinks, each remaining unit of X costs more units of Y.",
+          "explainWrong": "Incorrect. Buying a token removes it from the pool, making it scarcer and driving up its relative cost."
+        }
+      ],
+      "passScore": 2
+    },
+    {
+      "id": "b7-explore",
+      "type": "explore",
+      "title": "Explore Leading Solana DEXs",
+      "cardIds": ["jupiter", "raydium", "orca"]
+    }
+  ],
+  "explore": ["jupiter", "raydium", "orca"]
+}

@@ -1,0 +1,77 @@
+{
+  "id": "B4",
+  "tier": "basic",
+  "order": 4,
+  "title": "Gas, Fees, and Rent on Solana",
+  "estMinutes": 8,
+  "objectives": [
+    "Learn why blockchain transactions require network fees",
+    "Discover how Solana's rent-exemption mechanism stores data on-chain",
+    "Understand the transaction lifecycle: sign → send → confirmed → finalized"
+  ],
+  "requires": ["B3"],
+  "freePreview": false,
+  "glossaryTerms": ["gas_fee", "rent", "transaction", "signature", "block_explorer"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "b4-intro",
+      "type": "read",
+      "title": "Why Fees Exist: The Postage Stamp",
+      "body": "Every transaction on a blockchain requires a small network <Term id=\"gas_fee\">fee</Term> paid in the native currency (SOL on Solana).\n\nFees serve two critical purposes:\n1. **Validator compensation:** They reward the thousands of global computers validating and securing blocks.\n2. **Spam prevention:** If transactions were 100% free, malicious bots could flood the network with billions of useless requests. On Solana, a typical transaction fee is a fraction of a cent (approx. 0.000005 SOL)!"
+    },
+    {
+      "id": "b4-rent",
+      "type": "read",
+      "title": "What is Rent on Solana?",
+      "body": "On Solana, accounts hold both token balances and executable program data. To keep this data stored permanently in validator RAM, Solana requires a small refundable deposit called <Term id=\"rent\">rent</Term> (usually ~0.002 SOL for a token account).\n\nOnce an account holds enough SOL to be 'rent-exempt', it stays on the network forever. When you close the account, that entire SOL deposit is refunded directly back to your wallet!"
+    },
+    {
+      "id": "b4-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: Transaction Lifecycle",
+      "body": "When you sign a transaction, it contains: a list of instructions, required account addresses, a recent blockhash (which expires after ~60–90 seconds to prevent replay attacks), and your cryptographic signature. The transaction is forwarded directly to the current block leader validator, executed in parallel via Solana's Sealevel runtime, and confirmed across the network within 400 milliseconds."
+    },
+    {
+      "id": "b4-quiz",
+      "type": "quiz",
+      "title": "Transaction Fee Check",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "What currency is used to pay network transaction fees on Solana?",
+          "options": [
+            "US Dollar cash",
+            "SOL (the native token of Solana)",
+            "Bitcoin",
+            "Credit card rewards"
+          ],
+          "correct": 1,
+          "explainRight": "Correct! All base transaction fees on Solana are paid in native SOL.",
+          "explainWrong": "Incorrect. SOL is the native gas token of the Solana blockchain."
+        },
+        {
+          "id": "q2",
+          "prompt": "What happens to your rent deposit when you close a token account on Solana?",
+          "options": [
+            "The validators keep it permanently",
+            "The SOL deposit is refunded back to your wallet",
+            "It turns into an NFT",
+            "It is destroyed"
+          ],
+          "correct": 1,
+          "explainRight": "Spot on! Rent is just a storage deposit. Closing an unused token account returns the SOL back to you.",
+          "explainWrong": "Incorrect. Closing an account reclaims the rent-exempt SOL deposit directly back to your wallet balance."
+        }
+      ],
+      "passScore": 2
+    },
+    {
+      "id": "b4-explore",
+      "type": "explore",
+      "title": "Explore Solana Block Explorers",
+      "cardIds": ["solscan"]
+    }
+  ],
+  "explore": ["solscan"]
+}

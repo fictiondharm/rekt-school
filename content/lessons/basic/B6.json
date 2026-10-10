@@ -1,0 +1,77 @@
+{
+  "id": "B6",
+  "tier": "basic",
+  "order": 6,
+  "title": "Create Your Own Token",
+  "estMinutes": 10,
+  "objectives": [
+    "Learn what mint authority and freeze authority mean",
+    "Discover why anyone can launch a token on a permissionless blockchain",
+    "Understand the security implications of revoking mint authority"
+  ],
+  "requires": ["B5"],
+  "freePreview": false,
+  "glossaryTerms": ["mint", "total_supply", "upgrade_authority", "rug_pull"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "b6-intro",
+      "type": "read",
+      "title": "Anyone Can Mint a Token",
+      "body": "Blockchains are permissionless: you do not need permission from a government, bank, or corporation to invent a new token.\n\nTo create a token, you simply instruct the Solana Token Program to initialize a new <Term id=\"mint\">Mint account</Term>. You choose the name, ticker symbol, decimals, and initial <Term id=\"total_supply\">total supply</Term>."
+    },
+    {
+      "id": "b6-authorities",
+      "type": "read",
+      "title": "Mint Authority: The Printing Press",
+      "body": "When a token is created, an address is assigned as the **Mint Authority**.\n\nWhoever controls this address can print new tokens at any time, inflating the supply and devaluing existing holders. In honest decentralized projects, creators permanently **revoke** (set to null) the mint authority after the initial launch so no one can ever dilute the supply!"
+    },
+    {
+      "id": "b6-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: Mint Authority in Account State",
+      "body": "A Solana mint account holds a 82-byte data structure containing: `mint_authority` (Option<Pubkey>), `supply` (u64), `decimals` (u8), `is_initialized` (bool), and `freeze_authority` (Option<Pubkey>). When authority is revoked, the `COption::None` tag is written to memory. Because the Token Program code cannot be modified, no one, not even the original creator, can ever print another token."
+    },
+    {
+      "id": "b6-quiz",
+      "type": "quiz",
+      "title": "Token Creation & Mint Authority Quiz",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "What does 'Revoking Mint Authority' do for a token?",
+          "options": [
+            "Destroys all existing tokens in holders' wallets",
+            "Permanently fixes the maximum supply so no new tokens can ever be printed",
+            "Changes the token name to Bitcoin",
+            "Transfers ownership to Solana validators"
+          ],
+          "correct": 1,
+          "explainRight": "Correct! Revoking mint authority proves to investors that the creators cannot inflate or print more tokens.",
+          "explainWrong": "Incorrect. Revoking mint authority locks the supply so nobody can ever print new tokens in the future."
+        },
+        {
+          "id": "q2",
+          "prompt": "If a memecoin creator keeps the mint authority active, what risk do buyers face?",
+          "options": [
+            "The creator could mint billions of free tokens for themselves and dump them on the market",
+            "The blockchain will shut down",
+            "Gas fees will become negative",
+            "Holders lose their private keys"
+          ],
+          "correct": 0,
+          "explainRight": "Spot on! An un-revoked mint authority is a common rug-pull risk in newly launched tokens.",
+          "explainWrong": "Incorrect. An active mint authority allows the creator to print unlimited tokens and crash the price."
+        }
+      ],
+      "passScore": 2
+    },
+    {
+      "id": "b6-explore",
+      "type": "explore",
+      "title": "Explore Token Creation",
+      "cardIds": ["solscan"]
+    }
+  ],
+  "explore": ["solscan"]
+}

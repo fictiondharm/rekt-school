@@ -1,0 +1,99 @@
+@import "driver.js/dist/driver.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: #FFFDF5;
+    --surface: #FFFFFF;
+    --surface-muted: #F1F5F9;
+    --ink: #1E293B;
+    --ink-soft: #334155;
+    --ink-faint: #64748B;
+    --accent: #8B5CF6;
+    --accent-fg: #FFFFFF;
+    --secondary: #F472B6;
+    --tertiary: #FBBF24;
+    --quaternary: #34D399;
+    --border: #E2E8F0;
+    --border-strong: #1E293B;
+    --input: #FFFFFF;
+    --ring: #8B5CF6;
+    --muted: #F1F5F9;
+    --muted-fg: #64748B;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    text-transform: none;
+  }
+
+  ::selection {
+    background-color: var(--tertiary);
+    color: var(--ink);
+  }
+
+  /* Hard "pop" shadow utilities */
+  .shadow-pop {
+    box-shadow: 4px 4px 0px 0px var(--ink);
+  }
+  .shadow-pop-sm {
+    box-shadow: 2px 2px 0px 0px var(--ink);
+  }
+  .shadow-pop-lg {
+    box-shadow: 8px 8px 0px 0px var(--border);
+  }
+  .shadow-pop-accent {
+    box-shadow: 4px 4px 0px 0px var(--accent);
+  }
+  .shadow-pop-pink {
+    box-shadow: 8px 8px 0px 0px var(--secondary);
+  }
+  .shadow-pop-hover {
+    box-shadow: 6px 6px 0px 0px var(--ink);
+  }
+  .shadow-pop-active {
+    box-shadow: 2px 2px 0px 0px var(--ink);
+  }
+}
+
+/* Driver.js custom overrides for spotlight tour */
+.driver-popover {
+  border-radius: 16px !important;
+  box-shadow: 4px 4px 0px 0px var(--ink) !important;
+  border: 2px solid var(--ink) !important;
+  background-color: var(--surface) !important;
+  color: var(--ink) !important;
+  padding: 18px !important;
+}
+
+.driver-popover-title {
+  font-family: 'Outfit', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  color: var(--ink) !important;
+}
+
+.driver-popover-description {
+  font-size: 0.9rem !important;
+  line-height: 1.55 !important;
+  color: var(--ink-soft) !important;
+  margin-top: 6px !important;
+}
+
+.driver-popover-footer button {
+  border-radius: 9999px !important;
+  font-weight: 700 !important;
+  padding: 6px 14px !important;
+}

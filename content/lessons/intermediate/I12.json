@@ -1,0 +1,96 @@
+{
+  "id": "I12",
+  "tier": "intermediate",
+  "order": 12,
+  "title": "Case Studies: Historical Exploits & Lessons",
+  "estMinutes": 14,
+  "objectives": [
+    "Deconstruct the Mango Markets $114M oracle manipulation attack on Solana",
+    "Understand the Wormhole Bridge $325M signature verification bypass vulnerability",
+    "Learn why illiquid collateral and spot oracles are catastrophic architectural flaws",
+    "Analyze institutional security patterns: TWAP oracles, Pyth confidence intervals, and borrow limits"
+  ],
+  "requires": ["I11"],
+  "freePreview": false,
+  "glossaryTerms": ["oracle", "collateral", "flash_loan", "bridge"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "i12-intro",
+      "type": "read",
+      "title": "Why We Study Exploits",
+      "body": "In traditional aviation, every commercial flight accident leads to a rigorous NTSB black-box investigation and mandatory industry-wide engineering retrofits. Commercial flight is remarkably safe today precisely because the industry studied every past disaster.\n\nIn DeFi, smart contracts and economic mechanisms evolve through the exact same ruthless pressure. Hundreds of millions of dollars in historic exploits have produced modern architectural safeguards, such as decentralized Pyth confidence intervals, cross-margin borrow caps, and rigorous Anchor program validation."
+    },
+    {
+      "id": "i12-mango-exploit",
+      "type": "read",
+      "title": "Case 1: The Mango Markets $114M Oracle Drain",
+      "body": "In October 2022, an attacker targeted Mango Markets on Solana:\n\n1. **The Setup:** The attacker funded Account A and Account B with $5M USDC each.\n2. **The Artificial Pump:** On Mango's perpetual order book, Account A took a massive short position in MNGO-PERP while Account B took an equal long position. Because MNGO was an illiquid token, aggressive buying on spot DEXes surged the spot price from $0.038 to $0.91 within minutes.\n3. **Unrealized PnL Collateral:** Mango's risk engine evaluated Account B's paper unrealized profit at over $400M, treating it as valid collateral.\n4. **The Drain:** The attacker borrowed $114M in real assets (SOL, USDC, BTC, mSOL) against this inflated mark-to-market collateral, draining the protocol's liquidity pool and leaving Mango with worthless bad debt."
+    },
+    {
+      "id": "i12-wormhole-exploit",
+      "type": "read",
+      "title": "Case 2: The Wormhole $325M Signature Bypass",
+      "body": "In February 2022, Solana's premier cross-chain bridge, Wormhole, suffered a $325M exploit:\n\n1. **Cross-Chain Bridge Architecture:** When you bridge ETH to Solana, 19 institutional Guardian validators sign a VAA (Verified Action Approval) attesting that real ETH was deposited on Ethereum.\n2. **The Flaw:** Wormhole's Solana smart contract relied on `verify_signatures` to validate cryptographic proofs. However, the contract invoked an outdated Solana system instruction parser without verifying that the account address executing the verification was the genuine Solana `sysvar::instructions` account.\n3. **The Spoof:** The attacker passed a spoofed account pre-loaded with simulated success states, tricking Wormhole into believing 120,000 ETH had been deposited.\n4. **The Mint:** The contract minted 120,000 wrapped ETH (whETH) on Solana out of thin air."
+    },
+    {
+      "id": "i12-institutional-defenses",
+      "type": "read",
+      "title": "Institutional Defenses: How Protocols Guard Today",
+      "body": "Modern Solana protocols have implemented crucial defenses against these attack vectors:\n\n• **Pyth Confidence Intervals (Oracle Defense):** Pyth publishes not just a price, but an uncertainty bound (`±σ`). If a price spikes with huge confidence dispersion or low market volume, lending engines reject the quote.\n• **TWAP (Time-Weighted Average Price):** Replaces volatile spot prices with multi-block moving averages, making instantaneous price pump attacks prohibitively expensive.\n• **Hard Asset Borrow Caps:** Illiquid tokens (like low-cap governance tokens) cannot be used to borrow blue-chips like SOL or USDC, or have strict global caps limiting total exposure to $1M.\n• **Anchor Constraint Checks:** Solana smart contract frameworks like Anchor provide idiomatic `#[account(address = sysvar::instructions::ID)]` constraints to prevent program account substitution."
+    },
+    {
+      "id": "i12-deepdive",
+      "type": "deepdive",
+      "title": "Under the Hood: Economic Exploit vs. Code Vulnerability",
+      "body": "Notice the crucial difference between the two attacks:\n\n• **Wormhole was a Smart Contract Logic Bug:** The code allowed an unauthorized spoof of Solana sysvars. The mathematics were never the problem; the cryptographic validation pipeline was bypassed.\n• **Mango Markets was an Economic Mechanism Flaw:** The code functioned exactly as written. The flaw was allowing an illiquid asset to serve as cross-margin collateral based on a manipulable spot oracle price.\n\nAs a DeFi participant, auditing economic mechanism design is just as critical as checking smart contract audit reports."
+    },
+    {
+      "id": "i12-quiz",
+      "type": "quiz",
+      "title": "Exploit Analysis Knowledge Check",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "Why was the attacker in the Mango Markets exploit able to borrow $114M in real assets against an illiquid governance token?",
+          "options": [
+            "They guessed the admin private key",
+            "They manipulated the spot oracle price on thin pools, and the protocol accepted the inflated paper profits as valid borrow collateral",
+            "They executed a 51% attack on the Solana validator network",
+            "The Mango program had a syntax compilation error"
+          ],
+          "correct": 1,
+          "explainRight": "Correct! Thin pool price manipulation combined with treating illiquid mark-to-market profits as collateral created bad debt.",
+          "explainWrong": "Incorrect. The exploit manipulated thin spot oracle prices, tricking the protocol into treating artificial paper gains as collateral."
+        },
+        {
+          "id": "q2",
+          "prompt": "How does Pyth Network's 'Confidence Interval' protect lending protocols from spot price manipulation?",
+          "options": [
+            "It turns off the oracle whenever Bitcoin falls",
+            "It publishes an uncertainty band; if a price spikes abnormally without broad market volume, the wide confidence interval triggers safety freezes",
+            "It requires every user to pass KYC before borrowing",
+            "It automatically buys back dumped tokens with insurance reserves"
+          ],
+          "correct": 1,
+          "explainRight": "Spot on! Wide confidence intervals tell lending engines that market consensus is fractured, automatically halting risky liquidations or borrows.",
+          "explainWrong": "Incorrect. Confidence intervals measure price uncertainty across data providers; wide intervals alert protocols to halt transactions."
+        },
+        {
+          "id": "q3",
+          "prompt": "What is the primary architectural rule modern lending protocols enforce to prevent the Mango Markets attack from recurring?",
+          "options": [
+            "Allowing only 1 user per hour to borrow funds",
+            "Isolating illiquid tokens into separate pools and capping the amount that can ever be borrowed against them",
+            "Removing all USDC from Solana",
+            "Banning all perpetual contracts across DeFi"
+          ],
+          "correct": 1,
+          "explainRight": "Exactly! Isolated risk pools and hard borrow caps ensure that an exploit in an illiquid token cannot drain core protocol reserves.",
+          "explainWrong": "Incorrect. Modern protocols use isolated risk tiers and hard borrow caps to firewall core assets from volatile tokens."
+        }
+      ],
+      "passScore": 2
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "id": "B1",
+  "tier": "basic",
+  "order": 1,
+  "title": "Welcome: How This Course Works",
+  "estMinutes": 5,
+  "objectives": [
+    "Understand how guided lessons work",
+    "Discover the spotlight tour, glossary, and hints",
+    "Learn why Devnet play money keeps you safe"
+  ],
+  "requires": [],
+  "freePreview": true,
+  "glossaryTerms": ["wallet", "transaction", "gas_fee", "block_explorer"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "b1-welcome",
+      "type": "read",
+      "title": "Welcome to DeFi Maxi: Don't Get Rekt!",
+      "body": "Meet **Maxi** — a fictional character we created to guide you through the whole course. Maxi isn't real (no podcast, no wallet, no hot takes), think of Maxi as your personal DeFi coach, hype person, and safety buddy rolled into one.\n\nIn Web3, the golden rule is simple: **Don't get rekt. Maxi is here to guide you.**\n\nThe safest way to learn DeFi is by doing it on-chain yourself with zero fear. We guide you through connecting a <Term id=\"wallet\">wallet</Term>, broadcasting real <Term id=\"transaction\">transactions</Term>, claiming official devnet tokens, and understanding AMM swaps and liquidations.\n\nBest of all: **every lesson uses Solana Devnet**, meaning 100% of funds are free play money. You can never lose real money here!"
+    },
+    {
+      "id": "b1-tour",
+      "type": "tour",
+      "title": "Interactive UI Tour",
+      "tourId": "b1-ui-tour",
+      "steps": [
+        {
+          "target": "[data-tour='topbar-cluster']",
+          "title": "Solana Devnet Badge",
+          "text": "This badge guarantees you are in a safe sandbox using free devnet money. We never touch mainnet.",
+          "side": "bottom"
+        },
+        {
+          "target": "[data-tour='topbar-aura']",
+          "title": "Aura Points",
+          "text": "Your Aura score lives in the top bar. Answer quiz questions correctly to gain Aura, and wrong answers cost you Aura. Same for verified on-chain tasks - rewards flow straight into your Aura.",
+          "side": "bottom"
+        },
+        {
+          "target": "[data-tour='learn-panel']",
+          "title": "The Learn Panel",
+          "text": "Your interactive guide is here on the left. Follow short, clear steps at your own pace.",
+          "side": "right"
+        },
+        {
+          "target": "[data-tour='practice-panel']",
+          "title": "The Practice Panel",
+          "text": "Interactive simulators and on-chain tasks live here on the right. Try things and see instant results.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='hint-button']",
+          "title": "Need a Hint?",
+          "text": "If you ever get stuck, tap the Hint button to reveal progressive clues one by one.",
+          "side": "top"
+        }
+      ]
+    },
+    {
+      "id": "b1-interactive-preview",
+      "type": "reveal",
+      "title": "Safe to Break Things",
+      "body": "In traditional crypto, mistakes cost real money: bad slippage, phishing drainers, or sudden liquidations. \n\nHere at Rekt School, our motto is: **Do it → See what happened → Break it safely before you lose real cash.** If a trade fails or you get simulated-liquidated, celebrate! You just learned an on-chain lesson that saved you thousands of real dollars."
+    },
+    {
+      "id": "b1-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: How Wallets and Web3 Apps Talk",
+      "body": "When you use a DeFi app, the website never holds your money or your keys. Instead, your wallet (like Phantom or Solflare) holds your private key securely in your browser extension. When you want to take an action, like claiming tokens or swapping, the website builds an unsigned transaction and hands it to your wallet. You inspect the details, click 'Approve', and your wallet signs it cryptographically before sending it directly to Solana validators."
+    },
+    {
+      "id": "b1-quiz",
+      "type": "quiz",
+      "title": "Quick Knowledge Check",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "What kind of money is used in Rekt School lessons?",
+          "options": [
+            "Real US Dollars from your bank account",
+            "Real Solana mainnet cryptocurrency",
+            "Free Solana Devnet play tokens with zero real-world cost",
+            "Credit card credits"
+          ],
+          "correct": 2,
+          "explainRight": "Exactly right! Everything in the course runs on Solana Devnet where tokens are free play money.",
+          "explainWrong": "Not quite. Rekt School uses Solana Devnet, so all tokens and gas are 100% free play money."
+        },
+        {
+          "id": "q2",
+          "prompt": "Does the Rekt School website ever hold your private key or seed phrase?",
+          "options": [
+            "Yes, it stores them in an encrypted database",
+            "No, never. Your private key stays exclusively inside your own wallet extension",
+            "Yes, but only when you click 'Swap'",
+            "Yes, to pay for your gas fees"
+          ],
+          "correct": 1,
+          "explainRight": "Spot on! Your private key never leaves your wallet extension. The website only prepares transactions for you to review and sign.",
+          "explainWrong": "Incorrect. In Web3, non-custodial apps never hold or see your private keys or seed phrase."
+        }
+      ],
+      "passScore": 2
+    },
+    {
+      "id": "b1-explore",
+      "type": "explore",
+      "title": "Explore the Real Thing",
+      "cardIds": ["solscan", "phantom"]
+    }
+  ],
+  "explore": ["solscan", "phantom"]
+}

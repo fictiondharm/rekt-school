@@ -1,0 +1,150 @@
+{
+  "id": "I7",
+  "tier": "intermediate",
+  "order": 7,
+  "title": "Collateral, Health Factor, and Liquidation",
+  "estMinutes": 13,
+  "objectives": [
+    "Master Loan-To-Value (LTV) and Liquidation Thresholds",
+    "Calculate and monitor real-time Health Factor (HF)",
+    "Understand the exact mechanics of automated MEV liquidations",
+    "See why liquidators receive a bonus penalty paid by the borrower"
+  ],
+  "requires": ["I6"],
+  "freePreview": false,
+  "glossaryTerms": ["health_factor", "liquidation", "ltv", "collateral", "oracle"],
+  "disclaimer": "not-financial-advice",
+  "steps": [
+    {
+      "id": "i7-intro",
+      "type": "read",
+      "title": "Why Overcollateralization is Required",
+      "body": "Because Web3 wallets are **pseudonymous** - a string of characters with no name, no ID, and no credit file attached - a protocol has no courthouse to sue you in and no collection agency to call. That missing legal safety net is exactly why every DeFi loan is **overcollateralized**.\n\n**The vending-machine analogy:** a vending machine will not hand you a snack on a promise to pay later. It wants your coins already sitting inside it *before* the flap opens. A DeFi loan works the same way: your <Term id=\"collateral\">collateral</Term> must be locked in the contract before any borrowed token leaves the vault.\n\n- To borrow $1,000 of USDC, you deposit **more than $1,000** of volatile crypto - say $1,500 of SOL - as security.\n- The contract holds that SOL in escrow. You still own it, but you cannot withdraw it while the debt is open.\n- The extra cushion above your debt (the $500 here) is the lender's protection against SOL suddenly dropping in price.\n\n**Why the extra cushion?** If SOL crashed the instant you borrowed, the protocol would already hold more value than you owe, so it stays whole without a lawyer or a credit score. That surplus is not a fee or a penalty - it is the buffer that lets a bot-run, permissionless system remain solvent.\n\nThe gap between what you may borrow and what you deposited is set by your <Term id=\"ltv\">LTV (Loan-to-Value)</Term>, and the moment your collateral's value drifts too close to your debt, the protocol watches a single number to decide whether you are still safe."
+    },
+    {
+      "id": "i7-health-factor",
+      "type": "read",
+      "title": "The Vital Metric: Health Factor",
+      "body": "Everything we just described collapses into one number the protocol recalculates constantly: your <Term id=\"health_factor\">Health Factor</Term> (HF). It answers a single question - if your collateral were liquidated right now, would the recovered value still cover the debt with room to spare?\n\n`Health Factor = (Collateral Value × Liquidation Threshold) / Borrowed Debt`\n\n**Reading it like a dashboard gauge:**\n\n- **HF > 1.5:** Safe. Your collateral could lose a big chunk of value and you would still be covered.\n- **1.0 < HF < 1.3:** Danger zone. One bad candle can push you below the line, so top up or repay.\n- **HF < 1.0:** Liquidatable. The contract now lets anyone repay part of your loan and seize your <Term id=\"collateral\">collateral</Term>.\n\nWhy multiply by the **Liquidation Threshold** instead of the raw collateral value? Because the protocol deliberately counts your collateral at less than its market price as a safety margin. If your <Term id=\"ltv\">LTV</Term> lets you borrow against 70% of your SOL, the liquidation threshold might sit at 80% - that gap is intentional breathing room, not a bug.\n\n**A worked example:** you deposit $2,000 of SOL with an 80% threshold and borrow $1,000. Your HF is ($2,000 × 0.80) / $1,000 = 1.60. If SOL falls 30% and your collateral is now worth $1,400, HF becomes ($1,400 × 0.80) / $1,000 = 1.12 - the danger zone. If it slips once more to $1,200, HF hits 0.96 and the <Term id=\"liquidation\">liquidation</Term> machinery switches on."
+    },
+    {
+      "id": "i7-under-the-hood",
+      "type": "deepdive",
+      "title": "Under the Hood: How Liquidator Bots Profit",
+      "body": "The protocol almost never liquidates you itself - it cannot watch every position at once and it does not want to hold risky assets. Instead it posts a bounty: anyone who keeps the system solvent may profit for doing so. Those anyone-people are **liquidator bots**, and their reward is the <Term id=\"liquidation\">liquidation</Term> penalty.\n\n**How a liquidation actually executes:**\n\n- The moment your HF slips below 1.0, the contract opens a window where any bot may repay a slice of your debt (often 50%) on your behalf.\n- In exchange the bot receives your <Term id=\"collateral\">collateral</Term> at a **5% to 10% discount** to the price a <Term id=\"oracle\">oracle</Term> reports - that discount is the bonus, often called the liquidation penalty.\n- The bot immediately sells the collateral on an AMM at full market price, pocketing the spread as a near risk-free profit.\n\n**Follow the money in a clean example:** your debt is $1,000 of USDC against $1,000 of SOL. A bot repays $500 of your USDC and, thanks to a 10% bonus, seizes $550 worth of SOL. It sells that SOL for roughly $550 on a DEX, clearing about $50 of gross profit while your debt already shrank by $500.\n\nThe penalty is real, and it is *yours*: you lose the collateral the bot takes plus the bonus on top. That is why liquidators are not villains - they are the immune system of a lending market, and 1.0 is the threshold where it attacks. The <Term id=\"oracle\">oracle</Term> price is the referee that decides when that line is crossed, which is also why manipulating oracles is such a prized attack in DeFi."
+    },
+    {
+      "id": "i7-quiz",
+      "type": "quiz",
+      "title": "Liquidation Defense Quiz",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "What is the core reason DeFi loans are almost always overcollateralized?",
+          "options": [
+            "Because Solana gas fees make undercollateralized loans unprofitable for validators to process",
+            "Because a 150% collateral ratio is mandated by US securities law for all on-chain lending",
+            "Because borrowers are pseudonymous, so a protocol has no legal way to pursue an unpaid debt",
+            "Because posting more collateral lets a protocol mint extra governance tokens to reward lenders"
+          ],
+          "correct": 2,
+          "difficulty": "basic",
+          "explainRight": "Correct. A pseudonymous wallet has no identity to sue and no credit history to price, so the only enforcement mechanism a DeFi protocol has is seizing assets that are already locked up. Overcollateralization replaces the legal system with arithmetic: the collateral is worth more than the debt from the very first block. That is why the loan can be permissionless and automated rather than requiring a bank's approval process.",
+          "explainWrong": "Not quite. The real driver is pseudonymity: without a name, address, or credit file, a protocol cannot chase an unpaid borrower through any legal system, so it needs collateral worth more than the debt up front. Gas fees and governance rewards have nothing to do with it, and no US statute requires a 150% ratio on Solana. Overcollateralization is a design choice forced by the absence of legal recourse, not a regulatory rule."
+        },
+        {
+          "id": "q2",
+          "prompt": "Two borrowers each borrow $1,000 of USDC against SOL with the same 80% liquidation threshold. Borrower A deposited $3,000 of SOL; Borrower B deposited $1,200. Which position is safer against a price crash, and why?",
+          "options": [
+            "Borrower B, because a smaller collateral value means the oracle refreshes it less often",
+            "Borrower A, because the larger collateral cushion produces a higher Health Factor for the same debt",
+            "They are equally safe because both borrowers owe exactly the same $1,000 of debt",
+            "Borrower B, because liquidators only target positions holding more than $2,000 of collateral"
+          ],
+          "correct": 1,
+          "difficulty": "basic",
+          "explainRight": "Correct. Health Factor scales with the size of your collateral relative to your debt, so Borrower A starts at ($3,000 × 0.80) / $1,000 = 2.40 while Borrower B starts at ($1,200 × 0.80) / $1,000 = 0.96 - already liquidatable. More cushion means the price can fall further before HF crosses 1.0. Debt size alone tells you nothing without comparing it to the collateral backing it.",
+          "explainWrong": "Look past the identical $1,000 debt and plug in the collateral. Borrower A's HF is ($3,000 × 0.80) / $1,000 = 2.40, while Borrower B's is ($1,200 × 0.80) / $1,000 = 0.96. Oracle refresh rate plays no role, and liquidators will seize any qualifying position regardless of its size. The ratio of collateral to debt, not the debt number by itself, is what determines safety."
+        },
+        {
+          "id": "q3",
+          "prompt": "A borrower's Health Factor falls to 1.15 during a market crash. Which single action most directly raises it back toward safety?",
+          "options": [
+            "Switching to a faster RPC endpoint so prices refresh more frequently",
+            "Borrowing more USDC and swapping it into high-yield tokens to grow the position",
+            "Doing nothing, because Health Factor self-corrects at the next Solana epoch",
+            "Depositing additional collateral or repaying part of the outstanding debt"
+          ],
+          "correct": 3,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. Health Factor is effectively collateral value divided by debt, so you can only move it by changing one of those two numbers. Adding collateral raises the numerator; repaying debt lowers the denominator - both lift HF immediately. That is the borrower's only real lever when a position drifts toward liquidation, and acting early is far cheaper than being liquidated.",
+          "explainWrong": "Remember the formula: you can only raise HF by increasing collateral or decreasing debt. A faster RPC endpoint changes nothing about your ratio, borrowing more makes it worse, and Health Factor is not a network-level value that resets at epoch boundaries. Depositing collateral or repaying debt is the direct, immediate fix."
+        },
+        {
+          "id": "q4",
+          "prompt": "You deposit $2,000 of SOL with an 80% liquidation threshold and borrow $1,000 USDC, giving an initial HF of 1.60. SOL then falls 30%. What is your new Health Factor?",
+          "options": [
+            "1.12",
+            "1.28",
+            "1.60",
+            "0.90"
+          ],
+          "correct": 0,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. A 30% drop takes $2,000 to $1,400 of collateral. Then HF = ($1,400 × 0.80) / $1,000 = 1.12. Notice the two-step structure: first reprice the collateral, then apply the threshold, then divide by unchanged debt. Getting this arithmetic cold is what lets you predict how much room you have before a crash liquidates you.",
+          "explainWrong": "Work it in order. The 30% drop reprices $2,000 of collateral down to $1,400; apply the 80% threshold to get $1,120; divide by the still-$1,000 debt to reach 1.12. Answers like 1.60 forget the crash, and 0.90 or 1.28 come from applying the percentage to the wrong step. The two moves - reprice, then threshold - are the whole calculation."
+        },
+        {
+          "id": "q5",
+          "prompt": "Why do liquidator bots usually sell the seized collateral immediately on an AMM rather than holding it?",
+          "options": [
+            "Because the law requires seized collateral to be converted into stablecoins within one block",
+            "Because AMMs pay liquidators a special protocol grant for every liquidation they process",
+            "Because their profit is the gap between the discounted oracle valuation and the market price, so holding only adds price risk with no extra reward",
+            "Because the seized collateral is encrypted and only an AMM holds the key that releases it"
+          ],
+          "correct": 2,
+          "difficulty": "intermediate",
+          "explainRight": "Correct. The bot's edge is buying collateral below market (the liquidation bonus) and immediately selling it at market - a locked-in spread. If it held the volatile collateral instead, that spread could be wiped out by the next price move before it cashed out. Liquidators are in the business of capturing the bonus instantly, not in taking directional bets on SOL.",
+          "explainWrong": "Liquidators sell instantly because their edge is the discount, not a prediction. They acquire collateral cheap via the bonus and flip it at market price, so any delay re-exposes them to the very volatility that triggered the liquidation. There is no legal one-block rule, no special grant, and no cryptographic gate - it is pure risk management: capture the spread and exit."
+        },
+        {
+          "id": "q6",
+          "prompt": "A price oracle briefly reports SOL 20% lower for 30 seconds due to a manipulation attempt, even though the true market price never moved. Both the liquidator bots and the protocol's risk engine read that same oracle. What is the most accurate consequence for an otherwise healthy borrower?",
+          "options": [
+            "Nothing happens, because liquidations always use a full-day average price and ignore short spikes",
+            "The borrower can be liquidated if their HF dips below 1.0 on that manipulated reading, which is exactly why robust protocols price collateral with time-weighted averages instead of a single moment",
+            "Manipulation is impossible because oracles are run by validators who are economically unable to lie",
+            "The borrower's debt is automatically frozen for 30 seconds until the price recovers"
+          ],
+          "correct": 1,
+          "difficulty": "thinking",
+          "explainRight": "Correct. If the oracle is a single instantaneous reading, a 30-second dip can drag HF under 1.0 and trigger real liquidations even though the borrower did nothing wrong and the true price was stable. This is precisely why serious lending protocols use windowed, time-weighted averages (TWAP-style) or multiple oracle sources - smoothing out flash spikes so a transient bad print cannot force a liquidation. Oracle design, not borrower behavior, is the defense here.",
+          "explainWrong": "The danger is real: an instantaneous oracle can be pushed under a borrower's safety line for a few seconds, and liquidations that execute on that print are final. Not all protocols use day-long averages, oracles are not validator-run price feeds, and debt is never 'frozen' mid-crash. The actual fix is time-weighted or multi-source oracle pricing designed to ignore momentary manipulation."
+        },
+        {
+          "id": "q7",
+          "prompt": "Why is the liquidation threshold set higher than the maximum LTV a borrower can use?",
+          "options": [
+            "Because the threshold is a fee charged only to borrowers who never repay their loan",
+            "Because the LTV is set by the DAO while the threshold is hard-coded into Solana's runtime",
+            "Because borrowers demanded a second, redundant ratio to confuse competing lending protocols",
+            "Because the gap lets a position be liquidated while the collateral still fully covers the debt, so a small price dip cannot turn into a loss for lenders"
+          ],
+          "correct": 3,
+          "difficulty": "thinking",
+          "explainRight": "Correct. The LTV caps how much you can borrow at entry, while the higher liquidation threshold defines when you get liquidated - and that buffer is deliberate. It ensures that when HF hits 1.0, your collateral is still worth enough to repay the debt plus the liquidator's bonus, so the protocol never eats a shortfall. The two numbers exist separately precisely so a modest drawdown triggers a clean, fully-covered liquidation instead of a loss.",
+          "explainWrong": "The gap between LTV and threshold is a solvency design, not a fee, a governance quirk, or borrower noise. Because the threshold sits above the LTV, a position that reaches liquidation still holds enough collateral to cover the debt and pay the liquidator's bonus. That is what keeps a small price dip from becoming a loss that the lender or protocol would have to absorb."
+        }
+      ],
+      "passScore": 5
+    },
+    {
+      "id": "i7-explore",
+      "type": "explore",
+      "title": "Inspect Real Liquidations",
+      "cardIds": ["kamino", "raydium"]
+    }
+  ],
+  "explore": ["kamino", "raydium"]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "defi-mommy-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter content-schema build && pnpm --filter sim-core build && pnpm --filter web build",
+    "test": "pnpm -r run test",
+    "lint": "pnpm --filter web lint",
+    "typecheck": "pnpm -r run typecheck",
+    "validate-content": "pnpm --filter content-schema run validate"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "@next/swc-win32-x64-msvc"
+    ]
+  }
+}
+
