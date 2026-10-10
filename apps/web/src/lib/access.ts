@@ -8,12 +8,22 @@ export interface UserAccessProfile {
   isManualUnlocked?: boolean;
 }
 
+/**
+ * The access gate is ON by default: every lesson except the free previews
+ * (B1 and I1) is locked behind a paid unlock or invite code.
+ *
+ * It can be disabled explicitly for local development by either setting
+ * NEXT_PUBLIC_ACCESS_GATE_ENABLED=false / ACCESS_GATE_ENABLED=false, or by
+ * running `localStorage.setItem('ACCESS_GATE_ENABLED', 'false')` in the browser.
+ */
 export function isAccessGateEnabled(): boolean {
   if (typeof window !== 'undefined') {
     const localToggle = localStorage.getItem('ACCESS_GATE_ENABLED');
-    if (localToggle !== null) return localToggle === 'true';
+    if (localToggle !== null) return localToggle !== 'false';
   }
-  return process.env.ACCESS_GATE_ENABLED === 'true' || process.env.NEXT_PUBLIC_ACCESS_GATE_ENABLED === 'true';
+  const envToggle =
+    process.env.NEXT_PUBLIC_ACCESS_GATE_ENABLED ?? process.env.ACCESS_GATE_ENABLED;
+  return envToggle !== 'false';
 }
 
 export function canAccess(

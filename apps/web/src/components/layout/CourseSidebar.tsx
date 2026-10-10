@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui';
 import { CheckCircle2, Lock, Play, ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
+import { isAccessGateEnabled } from '@/lib/access';
 
 export interface CourseSidebarProps {
   currentLessonId?: string;
@@ -17,18 +18,25 @@ export function CourseSidebar({
   onToggleCollapse,
 }: CourseSidebarProps) {
   const [hasUnlockedAll, setHasUnlockedAll] = React.useState(false);
+  const [gateEnabled, setGateEnabled] = React.useState(true);
 
   React.useEffect(() => {
     const checkUnlock = () => {
       if (typeof window !== 'undefined') {
-        const unlocked = localStorage.getItem('defi_quest_unlocked_all') === 'true';
-        if (unlocked) setHasUnlockedAll(true);
+        setGateEnabled(isAccessGateEnabled());
+        const unlocked =
+          localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
+          localStorage.getItem('defi_mommy_unlocked_all') === 'true' ||
+          localStorage.getItem('defi_quest_unlocked_all') === 'true';
+        setHasUnlockedAll(unlocked);
       }
     };
     checkUnlock();
     window.addEventListener('storage', checkUnlock);
     return () => window.removeEventListener('storage', checkUnlock);
   }, []);
+
+  const unlocked = hasUnlockedAll || !gateEnabled;
 
   const basicLessons = [
     { id: 'B1', title: 'Welcome & UI Tour', free: true, active: true },
@@ -118,7 +126,7 @@ export function CourseSidebar({
                       <Play className="w-3.5 h-3.5 text-accent fill-accent shrink-0" />
                     ) : item.id === 'B1' ? (
                       <CheckCircle2 className="w-3.5 h-3.5 text-accent shrink-0" />
-                    ) : hasUnlockedAll ? (
+                    ) : unlocked ? (
                       <Play className="w-3.5 h-3.5 text-accent shrink-0" />
                     ) : (
                       <Lock className="w-3.5 h-3.5 text-ink-soft/60 shrink-0" />
@@ -160,7 +168,7 @@ export function CourseSidebar({
                   }`}
                 >
                   <div className="flex items-center gap-2 truncate">
-                    {item.free || hasUnlockedAll ? (
+                    {item.free || unlocked ? (
                       <Play className="w-3.5 h-3.5 text-accent shrink-0" />
                     ) : (
                       <Lock className="w-3.5 h-3.5 text-ink-soft/60 shrink-0" />
