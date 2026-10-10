@@ -6,3 +6,6 @@ dist
 .turbo
 *.log
 .DS_Store
+*.tsbuildinfo
+.vercel
+.env*.local
