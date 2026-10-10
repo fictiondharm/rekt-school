@@ -108,7 +108,7 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
                   <span className="relative z-10">breaking it</span>
                   <span className="absolute -bottom-1 left-0 right-0 h-3 bg-tertiary -rotate-1 z-0" aria-hidden="true" />
                 </span>{' '}
-                on Devnet first.
+                in a sandbox first.
               </h1>
 
               <p className="text-base sm:text-lg text-ink-soft leading-relaxed max-w-2xl">
