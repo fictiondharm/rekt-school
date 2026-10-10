@@ -31,6 +31,7 @@ async function redeemFromDb(code: string): Promise<RedeemResult> {
     .maybeSingle();
 
   if (error) {
+    console.error('[invite/redeem] select failed:', { code: error.code, message: error.message, details: error.details, hint: error.hint });
     return { ok: false, status: 500, message: 'Could not reach the code service. Please try again.' };
   }
   if (!data) {
@@ -50,6 +51,7 @@ async function redeemFromDb(code: string): Promise<RedeemResult> {
     .select('used_count');
 
   if (updateError) {
+    console.error('[invite/redeem] update failed:', { code: updateError.code, message: updateError.message, details: updateError.details, hint: updateError.hint });
     return { ok: false, status: 500, message: 'Could not redeem the code. Try again.' };
   }
   if (!updated || updated.length === 0) {
@@ -103,7 +105,8 @@ export async function POST(req: NextRequest) {
       tier: 'all',
       remainingUses: Math.max(max - (used + 1), 0),
     });
-  } catch {
+  } catch (e) {
+    console.error('[invite/redeem] unexpected error:', e);
     return NextResponse.json({ success: false, message: 'Server error.' }, { status: 500 });
   }
 }
