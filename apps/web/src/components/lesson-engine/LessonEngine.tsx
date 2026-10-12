@@ -8,6 +8,7 @@ import { ReadStep } from './ReadStep';
 import { QuizView } from './QuizView';
 import { UnderTheHood } from './UnderTheHood';
 import { ExploreView } from './ExploreView';
+import { CaseView } from './CaseView';
 import { MarkdownText } from '@/components/ui/MarkdownText';
 import { TourWrapper } from '../tour/TourWrapper';
 import { getMaxiAdvice } from '@/lib/maxi-advisor';
@@ -71,7 +72,8 @@ export function LessonEngine({
       currentStep.type === 'deepdive' ||
       currentStep.type === 'reveal' ||
       currentStep.type === 'explore' ||
-      currentStep.type === 'simulator'
+      currentStep.type === 'simulator' ||
+      currentStep.type === 'case'
     ) {
       return true;
     }
@@ -272,6 +274,10 @@ export function LessonEngine({
 
               {currentStep.type === 'explore' && (
                 <ExploreView cardIds={currentStep.cardIds} />
+              )}
+
+              {currentStep.type === 'case' && (
+                <CaseView caseId={currentStep.caseId} />
               )}
 
               {currentStep.type === 'simulator' && (

@@ -78,6 +78,12 @@
       ]
     },
     {
+      "id": "p5-case",
+      "type": "case",
+      "title": "Case File: Mango Markets",
+      "caseId": "mango-markets"
+    },
+    {
       "id": "p5-quiz",
       "type": "quiz",
       "title": "Oracles & Flash Loans Quiz",

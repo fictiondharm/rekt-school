@@ -38,6 +38,7 @@ export function TopBar({ lessonTitle, aura = 0, streak = 0, showTourButton = fal
               )}
               {net && (
                 <Badge
+                  data-tour="topbar-cluster"
                   variant={net.badgeVariant}
                   className="mt-1 w-fit text-[9px] px-2 py-0.5"
                 >
@@ -77,6 +78,12 @@ export function TopBar({ lessonTitle, aura = 0, streak = 0, showTourButton = fal
               className="font-bold text-sm hover:underline underline-offset-4"
             >
               Pro
+            </Link>
+            <Link
+              href="/war-stories"
+              className="font-bold text-sm hover:underline underline-offset-4"
+            >
+              War Stories
             </Link>
           </nav>
 

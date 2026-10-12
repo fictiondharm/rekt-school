@@ -1,0 +1,171 @@
+{
+  "id": "mango-markets",
+  "title": "Mango Markets: the $114M oracle squeeze",
+  "protocol": "Mango Markets",
+  "chain": "Solana",
+  "date": "2022-10-11",
+  "dateLabel": "October 11, 2022",
+  "lossUsd": "~$114M drained (~$117M across 14 tokens by some counts)",
+  "category": "Oracle price manipulation + cross-margin abuse",
+  "status": "Attacker identified, convicted of fraud and market manipulation in 2024",
+  "difficulty": "advanced",
+  "tldr": "In under an hour, a trader used two anonymous accounts and roughly $10M of his own capital to pump the price of a thinly traded governance token, MNGO, on the exchanges that fed Mango Markets' oracle. The protocol trusted that fake price, valued his unrealized perp profits at hundreds of millions, and let him borrow out almost every real asset in the vault. There was no code bug. Every transaction was valid. He just lied to the price feed - and the risk engine believed it.",
+  "lessonIds": ["P3", "P5"],
+  "labLink": "/learn/p5",
+  "labLabel": "Oracle Attack lab (P5)",
+  "mechanism": "Mango Markets was a cross-margined trading platform: one account could hold spot balances, perp positions and debt, and a single 'health' number decided how much it could borrow. The price of MNGO - used to value MNGO perp positions - came from an oracle that averaged MNGO's price across spot venues (Mango itself, plus external exchanges). Those venues had almost no MNGO liquidity.\n\nThat combination is the whole exploit:\n\n1. **Fake the price.** Buy a few million dollars of MNGO on those thin venues. With a shallow order book, a modest buy walks the price up violently - from ~$0.038 to ~$0.91 - and the oracle faithfully reports the new number.\n2. **Fake the profit.** One account was long 483M MNGO-perps; the other short. The inflated oracle marked the long side's *unrealized* profit at hundreds of millions.\n3. **Borrow against the fiction.** The risk engine accepted that unrealized profit as collateral, so the short account could borrow and withdraw ~$116M of real BTC, USDT, SOL and mSOL.\n4. **Pull the rug back down.** Once he stopped buying, MNGO collapsed to its old price. The collateral was worth a fraction of the debt, leaving the protocol with ~$115M of bad debt - and real users holding worthless claims.",
+  "timeline": [
+    {
+      "time": "3:36 - 3:50 PM ET",
+      "event": "The attacker moves ~$14M USDC from a Circle account through an exchange account, sending ~$5.5M and ~$5M to two fresh Solana wallets (court filings call them 'Solana Wallet-1' and 'Wallet-2')."
+    },
+    {
+      "time": "6:07 - 6:18 PM ET",
+      "event": "Both wallets fund two separate Mango Markets accounts with ~$5M USDC each, giving him two identities on the same protocol."
+    },
+    {
+      "time": "6:25 PM ET",
+      "event": "Wallet A posts an offer to sell 483M MNGO-perpetual futures at $0.038. Wallet B buys all of it. The two accounts are on opposite sides of one trade - a wash trade that manufactures a huge position without a real counterparty."
+    },
+    {
+      "time": "6:26 - 6:30 PM ET",
+      "event": "He spends a few million dollars buying MNGO on the thin spot venues that feed the oracle across Mango, AscendEX and FTX. The oracle price rockets."
+    },
+    {
+      "time": "6:26 - 6:45 PM ET",
+      "event": "MNGO spikes as much as ~24x, peaking near $0.91. The oracle reports the artificial high, inflating the collateral value of the long account."
+    },
+    {
+      "time": "6:29 - 6:45 PM ET",
+      "event": "Wallet B borrows and withdraws ~$116M of real assets against the fake collateral - the single largest withdrawal is ~$54M USDC, followed by ~$25M mSOL. Mango is drained of nearly all user funds."
+    },
+    {
+      "time": "6:45 PM ET",
+      "event": "He stops buying. MNGO collapses back toward its pre-attack price, leaving ~$115M of bad debt stranded in the protocol."
+    },
+    {
+      "time": "October 12, 2022",
+      "event": "An anonymous DAO proposal appears demanding ~$70M as a 'bug bounty' and asking the protocol not to pursue criminal charges. It is voted on using the MNGO acquired in the attack."
+    },
+    {
+      "time": "October 15, 2022",
+      "event": "Avraham Eisenberg publicly identifies himself, calling the exploit 'a highly profitable trading strategy' and arguing 'all of our actions were legal.'"
+    },
+    {
+      "time": "October - late 2022",
+      "event": "~$67M is returned to Mango after a DAO vote; ~$47M is kept."
+    },
+    {
+      "time": "December 26-27, 2022",
+      "event": "Eisenberg is arrested in Puerto Rico; the DOJ, CFTC and SEC all bring charges."
+    },
+    {
+      "time": "April 18, 2024",
+      "event": "A Manhattan jury finds Eisenberg guilty of fraud and market manipulation."
+    }
+  ],
+  "actors": [
+    {
+      "label": "MNGO",
+      "role": "The asset used to fake the collateral",
+      "address": "MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac",
+      "addressKind": "token-mint",
+      "note": "The governance token whose thin, easily-moved price the oracle trusted. Verify the mint address character-for-character - fake MNGO clones exist.",
+      "explorerUrl": "https://solscan.io/token/MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac",
+      "source": "Solscan / CoinGecko token pages"
+    },
+    {
+      "label": "Mango Markets",
+      "role": "The victim protocol",
+      "addressKind": "program",
+      "note": "A cross-margined spot + perpetuals + lending platform on Solana. Its oracle and risk engine - not its code - were the weak points.",
+      "source": "Mango Markets; SEC/CFTC complaints"
+    },
+    {
+      "label": "Solana Wallet-1 / Mango Account-1",
+      "role": "Funder and long side of the wash trade",
+      "addressKind": "wallet",
+      "note": "Received ~$5.5M USDC from an exchange account the attacker controlled. Opened an anonymous Mango account and took the 483M MNGO-perp long.",
+      "source": "DOJ indictment (SDNY, 23 CRIM 010)"
+    },
+    {
+      "label": "Solana Wallet-2 / Mango Account-2",
+      "role": "Short side, then the withdrawal account",
+      "addressKind": "wallet",
+      "note": "Received ~$5M USDC. Took the matching short, then borrowed and withdrew the ~$116M against the inflated long.",
+      "source": "DOJ indictment (SDNY, 23 CRIM 010)"
+    },
+    {
+      "label": "Attacker-controlled exchange account",
+      "role": "Origination of funds",
+      "addressKind": "wallet",
+      "note": "Registered in a different person's name with a foreign address, funded from a Circle account. The upstream common source is a key linkage clue for investigators.",
+      "source": "DOJ indictment (SDNY, 23 CRIM 010)"
+    }
+  ],
+  "transactions": [
+    {
+      "label": "Wash trade setup",
+      "time": "6:25 PM ET",
+      "description": "Wallet A sells 483M MNGO-perps at $0.038; Wallet B buys all of it. No real counterparty - the same person on both sides.",
+      "explorerUrl": "https://solscan.io/token/MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac"
+    },
+    {
+      "label": "Oracle pump",
+      "time": "6:26 - 6:30 PM ET",
+      "description": "A few million dollars of MNGO buys across thin spot venues walk the oracle price up ~24x to nearly $0.91.",
+      "explorerUrl": "https://solscan.io/token/MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac"
+    },
+    {
+      "label": "The squeeze",
+      "time": "6:29 - 6:45 PM ET",
+      "description": "Wallet B borrows and withdraws ~$116M of real assets (~$54M USDC and ~$25M mSOL among the largest) against the fake collateral."
+    }
+  ],
+  "researchMethod": [
+    {
+      "step": "Start with the asset, not the headlines",
+      "detail": "Open the MNGO mint on Solscan. Get the exact mint address and check its supply and holders. Always confirm you are looking at the real token - clones with identical symbols are the #1 trap."
+    },
+    {
+      "step": "Find the anomaly window",
+      "detail": "Chart MNGO around the attack date. Look for a vertical candle: a move that is absurd relative to recent volume. On October 11 the move ran from ~$0.038 to ~$0.91 in minutes. That asymmetry is the signature of a thin market being pushed."
+    },
+    {
+      "step": "Pivot to the venue",
+      "detail": "Ask 'where was this priced?' Mango's oracle averaged MNGO across spot venues. If a token's oracle depends on low-liquidity markets, the oracle is manipulable - so an attacker does not need to hack anything."
+    },
+    {
+      "step": "Look for a wash trade",
+      "detail": "On Mango, two fresh accounts opened 483M MNGO-perps against each other. Same size, opposite sides, seconds apart, funded near-simultaneously = one person wearing two masks."
+    },
+    {
+      "step": "Trace the funding upstream",
+      "detail": "Follow each wallet's first inflows. Both were seeded from the same exchange account. Shared funding sources are how investigators link 'unrelated' wallets."
+    },
+    {
+      "step": "Follow the exits",
+      "detail": "Find the borrow/withdraw transactions - BTC, USDT, SOL and mSOL leaving the protocol. The direction and timing of outflows shows intent and impact."
+    },
+    {
+      "step": "Corroborate with public reports",
+      "detail": "Cross-check your on-chain reading against the SEC, CFTC and DOJ filings and investigator write-ups (Elliptic, Solidus Labs). On-chain data plus legal documents is how a case becomes undeniable."
+    }
+  ],
+  "redFlags": [
+    "The MNGO oracle was a volume-weighted price over markets with almost no liquidity - a few million dollars could move it ~24x.",
+    "The risk engine treated *unrealized* perpetual profits as borrowable collateral, so paper gains became real withdrawals.",
+    "Two anonymous accounts traded a 483M-token position against each other (a wash trade) - a classic manipulation footprint.",
+    "The position size dwarfed the protocol's real liquidity, meaning any honest valuation would have rejected it."
+  ],
+  "sources": [
+    { "label": "SEC — Charges against Avraham Eisenberg ($116M)", "url": "https://www.sec.gov/newsroom/press-releases/2023-13" },
+    { "label": "CFTC — Charges against Avraham Eisenberg", "url": "https://www.cftc.gov/PressRoom/PressReleases/8647-23" },
+    { "label": "CFTC complaint (oracle manipulation)", "url": "https://www.cftc.gov/media/8046/enfeisenbergcomplaint010923/download" },
+    { "label": "DOJ — SDNY indictment, 23 CRIM 010", "url": "https://www.justice.gov/usao-sdny/press-release/file/1566841/dl" },
+    { "label": "Elliptic — Mango exploit analysis ($117.8M across 14 tokens)", "url": "https://www.elliptic.co/insights/mango-market-exploit-defi-loses-nearly-900-million-to-hackers-in-costliest-30-days-on-record" },
+    { "label": "Solidus Labs — order-book minute-by-minute", "url": "https://www.soliduslabs.com/post/mango-hack" },
+    { "label": "CoinDesk — Eisenberg found guilty", "url": "https://www.coindesk.com/policy/2024/04/18/mango-markets-exploiter-avi-eisenberg-found-guilty-of-fraud-and-manipulation" }
+  ],
+  "glossaryTerms": ["oracle", "collateral", "perpetual", "leverage", "liquidation", "market_cap"]
+}

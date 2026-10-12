@@ -5,3 +5,4 @@ export * from './Tooltip';
 export * from './Callout';
 export * from './Slider';
 export * from './Disclaimer';
+export * from './MarkdownText';

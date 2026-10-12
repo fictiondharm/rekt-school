@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui';
-import { CheckCircle2, Lock, Play, ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
+import { CheckCircle2, Lock, Play, ChevronLeft, ChevronRight, BookOpen, Skull } from 'lucide-react';
 import { isAccessGateEnabled } from '@/lib/access';
 
 export interface CourseSidebarProps {
@@ -265,6 +265,13 @@ export function CourseSidebar({
         >
           <BookOpen className="w-4 h-4 text-accent" />
           <span>Full Solana DeFi Glossary</span>
+        </Link>
+        <Link
+          href="/war-stories"
+          className="flex items-center gap-2 p-2 rounded-lg text-xs font-semibold text-ink-soft hover:text-danger hover:bg-danger/10 transition-colors"
+        >
+          <Skull className="w-4 h-4 text-danger" />
+          <span>War Stories: Real Exploits</span>
         </Link>
       </div>
     </aside>

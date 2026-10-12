@@ -97,5 +97,23 @@
     "watchOutFor": "Liquidity can be pulled at any moment; a good chart does not mean a safe token.",
     "url": "https://dexscreener.com",
     "lastVerified": "2026-10-01"
+  },
+  {
+    "id": "solana-explorer",
+    "name": "Solana Explorer",
+    "category": "Explorers",
+    "whatItDoes": "The official Solana Labs block explorer for viewing any transaction, account, program, or token mint, including a mint's live mint and freeze authority settings.",
+    "watchOutFor": "Mind the cluster toggle (Mainnet vs Devnet) - a token can look clean on the wrong network.",
+    "url": "https://explorer.solana.com",
+    "lastVerified": "2026-10-01"
+  },
+  {
+    "id": "rugcheck",
+    "name": "RugCheck",
+    "category": "Security / Token Analyzers",
+    "whatItDoes": "A Solana token safety scanner that reports mint and freeze authority status, LP lock or burn, holder concentration, and top-holder distribution as a fast pre-trade red-flag check.",
+    "watchOutFor": "A clean score is a starting filter, not an audit - it cannot see off-chain rug plans.",
+    "url": "https://rugcheck.xyz",
+    "lastVerified": "2026-10-01"
   }
 ]

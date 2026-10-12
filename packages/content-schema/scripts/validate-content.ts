@@ -6,6 +6,7 @@ import {
   LessonSchema,
   GlossaryTermSchema,
   ExploreCardSchema,
+  CaseSchema,
 } from '../src/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -90,9 +91,94 @@ function validateLessons(dir: string) {
   }
 }
 
+function validateCases(dir: string) {
+  if (!fs.existsSync(dir)) return;
+  const entries = fs.readdirSync(dir).filter((f) => f.endsWith('.json'));
+  for (const name of entries) {
+    try {
+      const raw = fs.readFileSync(path.join(dir, name), 'utf8');
+      const data = JSON.parse(raw);
+      const parsed = CaseSchema.safeParse(data);
+      if (!parsed.success) {
+        console.error(`❌ Validation failed in cases/${name}:`, parsed.error.format());
+        errorsCount++;
+      } else {
+        console.log(`✅ Validated case: ${parsed.data.id} - ${parsed.data.title}`);
+        totalChecked++;
+      }
+    } catch (err) {
+      console.error(`❌ Error reading cases/${name}:`, err);
+      errorsCount++;
+    }
+  }
+}
+
+function readIds(file: string, key = 'id'): Set<string> {
+  if (!fs.existsSync(file)) return new Set();
+  const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+  if (!Array.isArray(data)) return new Set();
+  return new Set(data.map((x: Record<string, unknown>) => String(x[key])));
+}
+
+// Referential integrity: catch ids that are referenced but never defined.
+// These pass schema validation (plain string arrays) but silently render nothing.
+function checkReferences() {
+  const glossaryIds = readIds(path.join(contentDir, 'glossary.json'));
+  const cardIds = readIds(path.join(contentDir, 'explore-cards.json'));
+
+  const casesDir = path.join(contentDir, 'cases');
+  const caseIds = new Set<string>();
+  if (fs.existsSync(casesDir)) {
+    for (const name of fs.readdirSync(casesDir).filter((f) => f.endsWith('.json'))) {
+      caseIds.add(String(JSON.parse(fs.readFileSync(path.join(casesDir, name), 'utf8')).id));
+    }
+  }
+
+  const lessonFiles: string[] = [];
+  const collect = (dir: string) => {
+    if (!fs.existsSync(dir)) return;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) collect(full);
+      else if (entry.name.endsWith('.json')) lessonFiles.push(full);
+    }
+  };
+  collect(path.join(contentDir, 'lessons'));
+  const lessonIds = new Set(lessonFiles.map((f) => JSON.parse(fs.readFileSync(f, 'utf8')).id));
+
+  for (const file of lessonFiles) {
+    const lesson = JSON.parse(fs.readFileSync(file, 'utf8'));
+    const badTerms = (lesson.glossaryTerms ?? []).filter((t: string) => !glossaryIds.has(t));
+    const badCards = (lesson.steps ?? [])
+      .filter((s: { type: string }) => s.type === 'explore')
+      .flatMap((s: { cardIds?: string[] }) => s.cardIds ?? [])
+      .filter((c: string) => !cardIds.has(c));
+    const badCases = (lesson.steps ?? [])
+      .filter((s: { type: string }) => s.type === 'case')
+      .map((s: { caseId?: string }) => s.caseId)
+      .filter((c: string | undefined): c is string => !!c && !caseIds.has(c));
+    if (badTerms.length || badCards.length || badCases.length) {
+      errorsCount++;
+      console.error(`❌ [ref] ${lesson.id}: ${badTerms.length ? `unknown glossaryTerms [${badTerms.join(', ')}] ` : ''}${badCards.length ? `unknown cardIds [${badCards.join(', ')}] ` : ''}${badCases.length ? `unknown caseIds [${badCases.join(', ')}]` : ''}`);
+    }
+  }
+
+  for (const name of fs.readdirSync(casesDir).filter((f) => f.endsWith('.json'))) {
+    const c = JSON.parse(fs.readFileSync(path.join(casesDir, name), 'utf8'));
+    const badTerms = (c.glossaryTerms ?? []).filter((t: string) => !glossaryIds.has(t));
+    const badLessons = (c.lessonIds ?? []).filter((t: string) => !lessonIds.has(t));
+    if (badTerms.length || badLessons.length) {
+      errorsCount++;
+      console.error(`❌ [ref] case ${c.id}: ${badTerms.length ? `unknown glossaryTerms [${badTerms.join(', ')}] ` : ''}${badLessons.length ? `unknown lessonIds [${badLessons.join(', ')}]` : ''}`);
+    }
+  }
+}
+
 validateGlossary();
 validateExploreCards();
 validateLessons(path.join(contentDir, 'lessons'));
+validateCases(path.join(contentDir, 'cases'));
+checkReferences();
 
 console.log(`\nValidation complete. Checked ${totalChecked} items.`);
 if (errorsCount > 0) {

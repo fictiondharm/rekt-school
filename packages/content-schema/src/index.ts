@@ -141,3 +141,61 @@ export const ExploreCardSchema = z.object({
   lastVerified: z.string(),
 });
 export type ExploreCard = z.infer<typeof ExploreCardSchema>;
+
+export const CaseActorSchema = z.object({
+  label: z.string(),
+  role: z.string(),
+  address: z.string().optional(),
+  addressKind: z
+    .enum(['wallet', 'protocol-account', 'token-mint', 'program', 'dao'])
+    .optional(),
+  note: z.string().optional(),
+  explorerUrl: z.string().url().optional(),
+  source: z.string().optional(),
+});
+export type CaseActor = z.infer<typeof CaseActorSchema>;
+
+export const CaseTxSchema = z.object({
+  label: z.string(),
+  time: z.string().optional(),
+  description: z.string(),
+  signature: z.string().optional(),
+  explorerUrl: z.string().url().optional(),
+});
+export type CaseTx = z.infer<typeof CaseTxSchema>;
+
+export const CaseSourceSchema = z.object({
+  label: z.string(),
+  url: z.string().url(),
+});
+export type CaseSource = z.infer<typeof CaseSourceSchema>;
+
+export const CaseSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  protocol: z.string(),
+  chain: z.string().default('Solana'),
+  date: z.string(),
+  dateLabel: z.string(),
+  lossUsd: z.string(),
+  category: z.string(),
+  status: z.string(),
+  difficulty: z.enum(['beginner', 'intermediate', 'advanced']).default('advanced'),
+  tldr: z.string(),
+  lessonIds: z.array(z.string()).default([]),
+  labLink: z.string().optional(),
+  labLabel: z.string().optional(),
+  mechanism: z.string(),
+  timeline: z.array(
+    z.object({ time: z.string(), event: z.string() }),
+  ),
+  actors: z.array(CaseActorSchema).default([]),
+  transactions: z.array(CaseTxSchema).default([]),
+  researchMethod: z.array(
+    z.object({ step: z.string(), detail: z.string() }),
+  ),
+  redFlags: z.array(z.string()).min(1),
+  sources: z.array(CaseSourceSchema).min(1),
+  glossaryTerms: z.array(z.string()).default([]),
+});
+export type Case = z.infer<typeof CaseSchema>;

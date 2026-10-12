@@ -456,6 +456,18 @@
     "category": "safety"
   },
   {
+    "id": "mint_authority",
+    "term": "Mint Authority",
+    "definition": "The wallet allowed to create new units of a token - the 'printing press'. If it is not revoked, the holder can mint unlimited supply and dump it on buyers.",
+    "category": "safety"
+  },
+  {
+    "id": "freeze_authority",
+    "term": "Freeze Authority",
+    "definition": "The wallet allowed to freeze token accounts, blocking holders from selling or transferring. An active freeze authority is a major red flag on a new token.",
+    "category": "safety"
+  },
+  {
     "id": "position_sizing",
     "term": "Position Sizing",
     "definition": "Calculating what percentage of your capital to allocate to any single trade to control risk.",
