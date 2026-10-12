@@ -16,6 +16,38 @@
   "disclaimer": "not-financial-advice",
   "steps": [
     {
+      "id": "p11-tour",
+      "type": "tour",
+      "title": "Spotlight Tour: Position Sizing Lab",
+      "tourId": "p11-lab-tour",
+      "steps": [
+        {
+          "target": "[data-tour='practice-panel']",
+          "title": "Your Pro Sandbox",
+          "text": "This is a risk-of-ruin simulator. Same edge, different bet sizes - one path grows, the other goes to zero.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p11-head']",
+          "title": "Module Badge",
+          "text": "LAB P11 marks the Kelly and drawdown lab. Reset restores the default edge and risk per bet.",
+          "side": "top"
+        },
+        {
+          "target": "[data-tour='p11-lab']",
+          "title": "Edge and Bet Size",
+          "text": "Set your win rate, payoff ratio and risk per bet. The equity curve runs 20 bets to show whether your sizing compounds or ruins you.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p11-explainer']",
+          "title": "What Just Happened?",
+          "text": "The explainer compares your bet to full and half Kelly - and why over-betting destroys you even with a genuinely positive edge.",
+          "side": "top"
+        }
+      ]
+    },
+    {
       "id": "p11-intro",
       "type": "read",
       "title": "The Brutal Asymmetry of Losses",

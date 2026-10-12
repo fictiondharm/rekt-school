@@ -64,7 +64,7 @@ export function P12Companion() {
 
   return (
     <div className="w-full max-w-lg space-y-5">
-      <div className="space-y-1">
+      <div className="space-y-1" data-tour="p12-head">
         <div className="flex items-start justify-between gap-3">
           <Badge variant="accent" className="mb-1">
             CAPSTONE P12 &bull; PROTOCOL ARCHITECT
@@ -79,7 +79,7 @@ export function P12Companion() {
         </p>
       </div>
 
-      <Card className="p-6 space-y-5 bg-surface border border-border shadow-sm">
+      <Card data-tour="p12-lab" className="p-6 space-y-5 bg-surface border border-border shadow-sm">
         <div className="space-y-2">
           <span className="text-[10px] font-mono uppercase tracking-wider text-ink-soft">1. Price Source (P5)</span>
           <Seg
@@ -173,7 +173,7 @@ export function P12Companion() {
         </a>
       </Card>
 
-      <Card className="p-4 bg-surface border-2 border-ink rounded-xl shadow-pop-lg flex items-start gap-3">
+      <Card data-tour="p12-explainer" className="p-4 bg-surface border-2 border-ink rounded-xl shadow-pop-lg flex items-start gap-3">
         {fatal ? (
           <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
         ) : (

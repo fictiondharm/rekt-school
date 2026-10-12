@@ -51,7 +51,7 @@ export function P11Companion() {
 
   return (
     <div className="w-full max-w-lg space-y-5">
-      <div className="space-y-1">
+      <div className="space-y-1" data-tour="p11-head">
         <div className="flex items-start justify-between gap-3">
           <Badge variant="accent" className="mb-1">
             LAB P11 &bull; POSITION SIZING
@@ -66,7 +66,7 @@ export function P11Companion() {
         </p>
       </div>
 
-      <Card className="p-6 space-y-5 bg-surface border border-border shadow-sm">
+      <Card data-tour="p11-lab" className="p-6 space-y-5 bg-surface border border-border shadow-sm">
         <Slider
           label="Win Rate"
           value={winRate}
@@ -176,7 +176,7 @@ export function P11Companion() {
         </div>
       </Card>
 
-      <Card className="p-4 bg-surface border-2 border-ink rounded-xl shadow-pop-lg flex items-start gap-3">
+      <Card data-tour="p11-explainer" className="p-4 bg-surface border-2 border-ink rounded-xl shadow-pop-lg flex items-start gap-3">
         {ruined ? (
           <Skull className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
         ) : risk > kelly && kelly > 0 ? (

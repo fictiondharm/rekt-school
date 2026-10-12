@@ -27,7 +27,7 @@ export function P6Companion() {
 
   return (
     <div className="w-full max-w-lg space-y-5">
-      <div className="space-y-1">
+      <div className="space-y-1" data-tour="p6-head">
         <div className="flex items-start justify-between gap-3">
           <Badge variant="accent" className="mb-1">
             LAB P6 &bull; SANDWICH DEFENSE
@@ -42,7 +42,7 @@ export function P6Companion() {
         </p>
       </div>
 
-      <Card className="p-6 space-y-5 bg-surface border border-border shadow-sm">
+      <Card data-tour="p6-lab" className="p-6 space-y-5 bg-surface border border-border shadow-sm">
         <Slider
           label="Your Trade Size"
           value={tradeSize}
@@ -131,7 +131,7 @@ export function P6Companion() {
         </div>
       </Card>
 
-      <Card className="p-4 bg-surface border-2 border-ink rounded-xl shadow-pop-lg flex items-start gap-3">
+      <Card data-tour="p6-explainer" className="p-4 bg-surface border-2 border-ink rounded-xl shadow-pop-lg flex items-start gap-3">
         {botProfit > 0 ? (
           <ShieldAlert className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
         ) : (

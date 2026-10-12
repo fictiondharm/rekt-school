@@ -16,6 +16,38 @@
   "disclaimer": "not-financial-advice",
   "steps": [
     {
+      "id": "p1-tour",
+      "type": "tour",
+      "title": "Spotlight Tour: Your Order Desk",
+      "tourId": "p1-lab-tour",
+      "steps": [
+        {
+          "target": "[data-tour='practice-panel']",
+          "title": "Your Pro Sandbox",
+          "text": "Every Pro lesson pairs the reading on the left with a live sandbox on the right. Nothing here touches real funds - break it freely.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p1-head']",
+          "title": "Module Badge",
+          "text": "Each lab is badged with its P-number so you always know where you are. Hit Reset any time to return to the starting state.",
+          "side": "top"
+        },
+        {
+          "target": "[data-tour='p1-lab']",
+          "title": "The Controls",
+          "text": "Pick Market, Limit, or Stop, then drag order size and book liquidity. The fill price, slippage and total cost update instantly.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p1-explainer']",
+          "title": "What Just Happened?",
+          "text": "After every change this panel translates the numbers back into the lesson idea - read it to lock in the intuition.",
+          "side": "top"
+        }
+      ]
+    },
+    {
       "id": "p1-intro",
       "type": "read",
       "title": "Three Ways to Enter a Trade",

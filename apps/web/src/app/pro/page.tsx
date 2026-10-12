@@ -68,12 +68,19 @@ export default function ProPage() {
                     <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded border-2 border-ink bg-bg">
                       {item.id}
                     </span>
-                    <Badge
-                      variant={item.tag === 'ONCHAIN' ? 'sandbox' : 'yellow'}
-                      className="text-[10px] px-2 py-0.5"
-                    >
-                      {item.tag}
-                    </Badge>
+                    <div className="flex items-center gap-1.5">
+                      {item.id === 'P5' && (
+                        <Badge variant="accent" className="text-[10px] px-2 py-0.5">
+                          FREE
+                        </Badge>
+                      )}
+                      <Badge
+                        variant={item.tag === 'ONCHAIN' ? 'sandbox' : 'yellow'}
+                        className="text-[10px] px-2 py-0.5"
+                      >
+                        {item.tag}
+                      </Badge>
+                    </div>
                   </div>
                   <h3 className="font-heading font-bold text-base leading-snug min-h-[2.75rem]">
                     {item.title}

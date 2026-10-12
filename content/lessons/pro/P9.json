@@ -16,6 +16,38 @@
   "disclaimer": "not-financial-advice",
   "steps": [
     {
+      "id": "p9-tour",
+      "type": "tour",
+      "title": "Spotlight Tour: Bonding Curve Lab",
+      "tourId": "p9-lab-tour",
+      "steps": [
+        {
+          "target": "[data-tour='practice-panel']",
+          "title": "Your Pro Sandbox",
+          "text": "This is a bonding-curve launch simulator. Price rises with supply - you will buy early and hope the crowd arrives.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p9-head']",
+          "title": "Module Badge",
+          "text": "LAB P9 marks the sniper lab. Reset clears the rug toggle and restores the defaults.",
+          "side": "top"
+        },
+        {
+          "target": "[data-tour='p9-lab']",
+          "title": "Buy and Hope",
+          "text": "Set your buy size and the crowd inflow after you, then toggle whether the creator rugs the liquidity.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p9-explainer']",
+          "title": "What Just Happened?",
+          "text": "Your profit comes dollar-for-dollar from later buyers - the explainer shows the brutal exit-liquidity reality of a curve.",
+          "side": "top"
+        }
+      ]
+    },
+    {
       "id": "p9-intro",
       "type": "read",
       "title": "The Bonding Curve: Price From Supply Alone",

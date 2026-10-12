@@ -16,6 +16,38 @@
   "disclaimer": "not-financial-advice",
   "steps": [
     {
+      "id": "p2-tour",
+      "type": "tour",
+      "title": "Spotlight Tour: Depth & Spread Lab",
+      "tourId": "p2-lab-tour",
+      "steps": [
+        {
+          "target": "[data-tour='practice-panel']",
+          "title": "Your Pro Sandbox",
+          "text": "The right panel is a live execution lab. Everything you change on the left of it recalculates here in real time.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p2-head']",
+          "title": "Module Badge",
+          "text": "LAB P2 marks the depth-and-spread lab. Reset restores the defaults whenever you want a clean slate.",
+          "side": "top"
+        },
+        {
+          "target": "[data-tour='p2-lab']",
+          "title": "Two Market Models",
+          "text": "Toggle between a stepped order book (CLOB) and a smooth AMM curve, then change order size and depth to feel how each one punishes size.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p2-explainer']",
+          "title": "What Just Happened?",
+          "text": "This panel explains whether the book or the curve hurt you more - and why depth is the cushion under every fill.",
+          "side": "top"
+        }
+      ]
+    },
+    {
       "id": "p2-intro",
       "type": "read",
       "title": "Two Machines That Quote a Price",

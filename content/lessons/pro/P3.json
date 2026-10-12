@@ -16,6 +16,38 @@
   "disclaimer": "not-financial-advice",
   "steps": [
     {
+      "id": "p3-tour",
+      "type": "tour",
+      "title": "Spotlight Tour: Perps Simulator",
+      "tourId": "p3-lab-tour",
+      "steps": [
+        {
+          "target": "[data-tour='practice-panel']",
+          "title": "Your Pro Sandbox",
+          "text": "This is your perps desk. You start with $100 of simulated margin and zero real risk.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p3-head']",
+          "title": "Module Badge",
+          "text": "LAB P3 badges the leverage lab. Reset brings you back to 10x and a clean position.",
+          "side": "top"
+        },
+        {
+          "target": "[data-tour='p3-lab']",
+          "title": "Leverage & Price Move",
+          "text": "Pick long or short, then drag leverage and the price move. The liquidation bar shows exactly how close you are to being force-closed.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p3-explainer']",
+          "title": "What Just Happened?",
+          "text": "The explainer calculates whether an ordinary wiggle just liquidated you - and why leverage multiplies the percentage move.",
+          "side": "top"
+        }
+      ]
+    },
+    {
       "id": "p3-intro",
       "type": "read",
       "title": "Leverage: A Loan That Trades For You",

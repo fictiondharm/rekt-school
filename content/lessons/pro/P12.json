@@ -16,6 +16,38 @@
   "disclaimer": "not-financial-advice",
   "steps": [
     {
+      "id": "p12-tour",
+      "type": "tour",
+      "title": "Spotlight Tour: Protocol Architect",
+      "tourId": "p12-lab-tour",
+      "steps": [
+        {
+          "target": "[data-tour='practice-panel']",
+          "title": "Your Pro Sandbox",
+          "text": "The capstone. You design a full protocol here, then stress-test it against every attacker from P5 to P11.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p12-head']",
+          "title": "Module Badge",
+          "text": "CAPSTONE P12 marks the architect lab. Reset returns every dial to the deliberately weak starting state.",
+          "side": "top"
+        },
+        {
+          "target": "[data-tour='p12-lab']",
+          "title": "Set Every Dial",
+          "text": "Choose your oracle, liquidity model, max leverage, upgrade authority and incentives. Each dimension scores out of 10 and the total grades your protocol.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p12-explainer']",
+          "title": "What Just Happened?",
+          "text": "The explainer names your fatal flaw if you have one - and describes what a genuinely self-consistent, survivor protocol actually looks like.",
+          "side": "top"
+        }
+      ]
+    },
+    {
       "id": "p12-intro",
       "type": "read",
       "title": "You Are the Architect Now",

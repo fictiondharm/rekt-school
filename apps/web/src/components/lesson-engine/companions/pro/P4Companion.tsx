@@ -28,7 +28,7 @@ export function P4Companion() {
 
   return (
     <div className="w-full max-w-lg space-y-5">
-      <div className="space-y-1">
+      <div className="space-y-1" data-tour="p4-head">
         <div className="flex items-start justify-between gap-3">
           <Badge variant="accent" className="mb-1">
             LAB P4 &bull; FUNDING ARBITRAGE
@@ -43,7 +43,7 @@ export function P4Companion() {
         </p>
       </div>
 
-      <Card className="p-6 space-y-5 bg-surface border border-border shadow-sm">
+      <Card data-tour="p4-lab" className="p-6 space-y-5 bg-surface border border-border shadow-sm">
         <div className="grid grid-cols-2 gap-2 text-xs">
           <button
             type="button"
@@ -132,7 +132,7 @@ export function P4Companion() {
         </div>
       </Card>
 
-      <Card className="p-4 bg-surface border-2 border-ink rounded-xl shadow-pop-lg flex items-start gap-3">
+      <Card data-tour="p4-explainer" className="p-4 bg-surface border-2 border-ink rounded-xl shadow-pop-lg flex items-start gap-3">
         <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
         <div className="space-y-1 text-xs">
           <h4 className="font-heading font-bold text-ink">What Just Happened?</h4>

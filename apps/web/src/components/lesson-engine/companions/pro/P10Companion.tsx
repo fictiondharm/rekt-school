@@ -45,7 +45,7 @@ export function P10Companion() {
 
   return (
     <div className="w-full max-w-lg space-y-5">
-      <div className="space-y-1">
+      <div className="space-y-1" data-tour="p10-head">
         <div className="flex items-start justify-between gap-3">
           <Badge variant="accent" className="mb-1">
             LAB P10 &bull; RED FLAG AUDIT
@@ -60,7 +60,7 @@ export function P10Companion() {
         </p>
       </div>
 
-      <Card className="p-6 space-y-4 bg-surface border border-border shadow-sm">
+      <Card data-tour="p10-lab" className="p-6 space-y-4 bg-surface border border-border shadow-sm">
         <div className="p-4 rounded-xl bg-bg border border-border space-y-3">
           <div className="flex justify-between items-center">
             <span className="font-heading font-semibold text-sm text-ink flex items-center gap-1.5">
@@ -117,7 +117,7 @@ export function P10Companion() {
         </div>
       </Card>
 
-      <Card className="p-4 bg-surface border-2 border-ink rounded-xl shadow-pop-lg flex items-start gap-3">
+      <Card data-tour="p10-explainer" className="p-4 bg-surface border-2 border-ink rounded-xl shadow-pop-lg flex items-start gap-3">
         {score >= 80 ? (
           <ShieldCheck className="w-5 h-5 text-accent shrink-0 mt-0.5" />
         ) : (

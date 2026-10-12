@@ -16,6 +16,38 @@
   "disclaimer": "not-financial-advice",
   "steps": [
     {
+      "id": "p4-tour",
+      "type": "tour",
+      "title": "Spotlight Tour: Funding Rate Lab",
+      "tourId": "p4-lab-tour",
+      "steps": [
+        {
+          "target": "[data-tour='practice-panel']",
+          "title": "Your Pro Sandbox",
+          "text": "This panel is a funding-rate cash-flow model. Funding settles every 8 hours - here you can fast-forward it.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p4-head']",
+          "title": "Module Badge",
+          "text": "LAB P4 marks the funding arbitrage lab. Reset returns the rate and notional to their defaults.",
+          "side": "top"
+        },
+        {
+          "target": "[data-tour='p4-lab']",
+          "title": "Choose a Side",
+          "text": "Pick delta-neutral (short perp) or long perp, then drag the funding rate, notional and holding period to see the payments stack up.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p4-explainer']",
+          "title": "What Just Happened?",
+          "text": "The explainer tells you who pays whom and how the carry trade resolves - including when a negative rate flips the trade against you.",
+          "side": "top"
+        }
+      ]
+    },
+    {
       "id": "p4-intro",
       "type": "read",
       "title": "Why Perps Need a Funding Rate",

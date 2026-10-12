@@ -16,6 +16,38 @@
   "disclaimer": "not-financial-advice",
   "steps": [
     {
+      "id": "p6-tour",
+      "type": "tour",
+      "title": "Spotlight Tour: Sandwich Defense Lab",
+      "tourId": "p6-lab-tour",
+      "steps": [
+        {
+          "target": "[data-tour='practice-panel']",
+          "title": "Your Pro Sandbox",
+          "text": "This panel lets you watch an MEV bot sandwich your swap - then hide from it with private routing.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p6-head']",
+          "title": "Module Badge",
+          "text": "LAB P6 marks the sandwich defense lab. Reset restores the public-mempool starting state.",
+          "side": "top"
+        },
+        {
+          "target": "[data-tour='p6-lab']",
+          "title": "Expose or Hide",
+          "text": "Set your trade size, pool depth and slippage tolerance, then toggle private routing to see how much a bot can steal when your order is visible.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p6-explainer']",
+          "title": "What Just Happened?",
+          "text": "The explainer shows the bot front-run and back-run - and how your own slippage tolerance is the door you leave open.",
+          "side": "top"
+        }
+      ]
+    },
+    {
       "id": "p6-intro",
       "type": "read",
       "title": "MEV: The Money in Choosing Order",

@@ -11,10 +11,42 @@
     "Learn the concrete defenses protocols use to make oracle manipulation unprofitable"
   ],
   "requires": ["P4"],
-  "freePreview": false,
+  "freePreview": true,
   "glossaryTerms": ["oracle", "twap", "flash_loan", "price_impact", "collateral", "liquidation"],
   "disclaimer": "not-financial-advice",
   "steps": [
+    {
+      "id": "p5-tour",
+      "type": "tour",
+      "title": "Spotlight Tour: Oracle Attack Lab",
+      "tourId": "p5-lab-tour",
+      "steps": [
+        {
+          "target": "[data-tour='practice-panel']",
+          "title": "Your Pro Sandbox",
+          "text": "This is an attack simulator. You get to play the attacker in a safe place so you can recognize the play in the wild.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p5-head']",
+          "title": "Module Badge",
+          "text": "LAB P5 marks the oracle attack lab. Reset clears the attack and restores the defaults.",
+          "side": "top"
+        },
+        {
+          "target": "[data-tour='p5-lab']",
+          "title": "Spot vs TWAP",
+          "text": "Switch between a manipulable spot oracle and a robust TWAP, then drag pool depth and flash-borrow size to attempt the exploit.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p5-explainer']",
+          "title": "What Just Happened?",
+          "text": "The explainer tells you whether the attack is profitable - and what defense makes lying to the oracle too expensive to bother.",
+          "side": "top"
+        }
+      ]
+    },
     {
       "id": "p5-intro",
       "type": "read",

@@ -56,7 +56,7 @@ export function CourseSidebar({
     { id: 'P2', title: 'Order Books vs AMMs', free: false },
     { id: 'P3', title: 'Leverage & Perpetuals', free: false },
     { id: 'P4', title: 'Funding Rates & Mark Price', free: false },
-    { id: 'P5', title: 'Oracles & Flash Loans', free: false },
+    { id: 'P5', title: 'Oracles & Flash Loans', free: true },
     { id: 'P6', title: 'MEV & Sandwiches', free: false },
     { id: 'P7', title: 'Concentrated Liquidity', free: false },
     { id: 'P8', title: 'Cross-Chain Bridges', free: false },
@@ -234,6 +234,11 @@ export function CourseSidebar({
                       {item.id}: {item.title}
                     </span>
                   </div>
+                  {item.free && (
+                    <Badge variant="accent" className="text-[10px] px-1.5 py-0 shrink-0">
+                      Free Preview
+                    </Badge>
+                  )}
                   {item.id === 'P12' && (
                     <Badge variant="yellow" className="text-[10px] px-1.5 py-0 shrink-0">
                       Finals

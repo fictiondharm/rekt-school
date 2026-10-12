@@ -574,5 +574,131 @@
     "term": "Reentrancy",
     "definition": "A smart-contract vulnerability where a contract calls out to another before finishing its own state update, letting the callee re-enter and drain funds. Fixed by updating state before external calls.",
     "category": "safety"
+  },
+  {
+    "id": "ct",
+    "term": "CT (Crypto Twitter)",
+    "definition": "The loose community of traders, builders, and shills on Twitter/X where crypto narratives, launches, and slang originate. If something is trending loudly on CT, you are usually late to it.",
+    "category": "trenches"
+  },
+  {
+    "id": "gm",
+    "term": "GM",
+    "definition": "Good morning - the ritual greeting that opens every Crypto Twitter timeline. Posting it daily is a way to stay visible; it means almost nothing else.",
+    "category": "trenches"
+  },
+  {
+    "id": "ser",
+    "term": "Ser",
+    "definition": "A mock-courteous form of sir, used sarcastically or sincerely between degens. Often precedes a condescending correction or a badly disguised shill.",
+    "category": "trenches"
+  },
+  {
+    "id": "fren",
+    "term": "Fren",
+    "definition": "Friend, in degen spelling. Frequently applied to people who are actively dumping on you - a warning to judge wallets, not vibes.",
+    "category": "trenches"
+  },
+  {
+    "id": "degen",
+    "term": "Degen",
+    "definition": "Short for degenerate - a trader who chases high-risk plays for the thrill. Used with pride and as a caution, since degeneracy is how most accounts reach zero.",
+    "category": "trenches"
+  },
+  {
+    "id": "based",
+    "term": "Based",
+    "definition": "Praise for an opinion or move that is unfashionably correct or admirably bold. The opposite of a capitulation take.",
+    "category": "trenches"
+  },
+  {
+    "id": "hodl",
+    "term": "HODL",
+    "definition": "Hold On for Dear Life - refusing to sell through volatility. A typo of hold that became a badge of conviction; it only works on assets that survive the drawdown.",
+    "category": "trenches"
+  },
+  {
+    "id": "lfg",
+    "term": "LFG",
+    "definition": "Let's Freaking Go - pure hype punctuation. It signals momentum and is loudest right before the local top.",
+    "category": "trenches"
+  },
+  {
+    "id": "copium",
+    "term": "Copium",
+    "definition": "Fabricated comfort a holder inhales to justify a losing position. Recognizing copium in yourself is the first step to cutting a bad trade.",
+    "category": "trenches"
+  },
+  {
+    "id": "hopium",
+    "term": "Hopium",
+    "definition": "Optimism without evidence - the fuel behind buying a chart on a story alone. It is the gentle cousin of copium.",
+    "category": "trenches"
+  },
+  {
+    "id": "shill",
+    "term": "Shill / Shilling",
+    "definition": "Promoting a token, usually while holding it, to drive others in and lift the price. Follow the wallet: a shiller who is already up is looking for exit liquidity.",
+    "category": "trenches"
+  },
+  {
+    "id": "exit_liquidity",
+    "term": "Exit Liquidity",
+    "definition": "The buyers who arrive last; their money is the profit the earlier holders take. If a pitch needs you to buy to make someone else whole, you are the exit liquidity.",
+    "category": "trenches"
+  },
+  {
+    "id": "whale",
+    "term": "Whale",
+    "definition": "A wallet large enough to move a market on its own. Whales can create a trend, and their exits can crush it.",
+    "category": "trenches"
+  },
+  {
+    "id": "moonshot",
+    "term": "Moonshot",
+    "definition": "A long-odds bet with an enormous upside if it works. Fine as a small, sized position; ruinous when it becomes the whole portfolio.",
+    "category": "trenches"
+  },
+  {
+    "id": "flippening",
+    "term": "Flippening",
+    "definition": "The moment one asset's market cap overtakes another's (classically ETH overtaking BTC). The term now describes any major narrative power shift.",
+    "category": "trenches"
+  },
+  {
+    "id": "bag",
+    "term": "Bag / Bags",
+    "definition": "Your holdings in a token - often used ruefully (holding heavy bags). A bag you cannot exit at a fair price is a liability, not an asset.",
+    "category": "trenches"
+  },
+  {
+    "id": "cto",
+    "term": "CTO (Community Takeover)",
+    "definition": "When a token's original dev abandons it and the community keeps it alive. It can signal real grassroots conviction - or just a new set of people looking for exit liquidity.",
+    "category": "trenches"
+  },
+  {
+    "id": "sniping",
+    "term": "Sniping",
+    "definition": "Buying in the very first seconds of a launch, often via bots. Snipers front-run retail and their dump is a major source of early price collapse.",
+    "category": "trenches"
+  },
+  {
+    "id": "dev",
+    "term": "Dev",
+    "definition": "The (usually anonymous) deployer of a token. Whether the dev holds, sells, or rugs is central to memecoin risk - check the deployer's other launches.",
+    "category": "trenches"
+  },
+  {
+    "id": "cabal",
+    "term": "Cabal",
+    "definition": "Suspected group of connected insiders quietly accumulating, coordinating, and exiting together. Sometimes real, sometimes paranoid - always worth checking wallet clusters.",
+    "category": "trenches"
+  },
+  {
+    "id": "pnl",
+    "term": "PnL (Profit and Loss)",
+    "definition": "Your realized or unrealized gains and losses. This is the line that actually matters; screenshots of wins mean nothing without the losses beside them.",
+    "category": "trenches"
   }
 ]

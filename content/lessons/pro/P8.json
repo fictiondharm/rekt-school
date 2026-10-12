@@ -16,6 +16,38 @@
   "disclaimer": "not-financial-advice",
   "steps": [
     {
+      "id": "p8-tour",
+      "type": "tour",
+      "title": "Spotlight Tour: Bridge Reserve Lab",
+      "tourId": "p8-lab-tour",
+      "steps": [
+        {
+          "target": "[data-tour='practice-panel']",
+          "title": "Your Pro Sandbox",
+          "text": "This is a bridge lock-and-mint simulator. You will lock value on one chain, mint a wrapped asset, then try to break it.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p8-head']",
+          "title": "Module Badge",
+          "text": "LAB P8 marks the bridge lab. Reset clears the attack and restores the multisig trust model.",
+          "side": "top"
+        },
+        {
+          "target": "[data-tour='p8-lab']",
+          "title": "Pick a Trust Model",
+          "text": "Choose between a multisig, an optimistic-plus-rate-limit bridge, and zk proof verification, set the locked value, then launch the exploit.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p8-explainer']",
+          "title": "What Just Happened?",
+          "text": "The explainer shows how much an attacker drains under each model - and why proof-based bridges survive the same attack.",
+          "side": "top"
+        }
+      ]
+    },
+    {
       "id": "p8-intro",
       "type": "read",
       "title": "How a Bridge Moves Value",

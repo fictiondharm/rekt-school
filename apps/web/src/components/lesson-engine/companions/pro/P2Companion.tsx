@@ -59,7 +59,7 @@ export function P2Companion() {
 
   return (
     <div className="w-full max-w-lg space-y-5">
-      <div className="space-y-1">
+      <div className="space-y-1" data-tour="p2-head">
         <div className="flex items-start justify-between gap-3">
           <Badge variant="accent" className="mb-1">
             LAB P2 &bull; DEPTH &amp; SPREAD
@@ -74,7 +74,7 @@ export function P2Companion() {
         </p>
       </div>
 
-      <Card className="p-6 space-y-5 bg-surface border border-border shadow-sm">
+      <Card data-tour="p2-lab" className="p-6 space-y-5 bg-surface border border-border shadow-sm">
         <div className="grid grid-cols-2 gap-2 text-xs">
           <button
             type="button"
@@ -205,7 +205,7 @@ export function P2Companion() {
         </div>
       </Card>
 
-      <Card className="p-4 bg-surface border-2 border-ink rounded-xl shadow-pop-lg flex items-start gap-3">
+      <Card data-tour="p2-explainer" className="p-4 bg-surface border-2 border-ink rounded-xl shadow-pop-lg flex items-start gap-3">
         <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
         <div className="space-y-1 text-xs">
           <h4 className="font-heading font-bold text-ink">What Just Happened?</h4>

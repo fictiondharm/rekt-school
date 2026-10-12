@@ -16,6 +16,38 @@
   "disclaimer": "not-financial-advice",
   "steps": [
     {
+      "id": "p7-tour",
+      "type": "tour",
+      "title": "Spotlight Tour: Concentrated Liquidity Lab",
+      "tourId": "p7-lab-tour",
+      "steps": [
+        {
+          "target": "[data-tour='practice-panel']",
+          "title": "Your Pro Sandbox",
+          "text": "This is a concentrated-liquidity desk. You will pack capital into a narrow band and watch what happens when price leaves it.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p7-head']",
+          "title": "Module Badge",
+          "text": "LAB P7 marks the CLMM range lab. Reset restores the default range and price move.",
+          "side": "top"
+        },
+        {
+          "target": "[data-tour='p7-lab']",
+          "title": "Range & Efficiency",
+          "text": "Dial your capital, range width and price move. The bar shows whether price stayed inside your tick range - in range earns fees, out of range earns nothing.",
+          "side": "left"
+        },
+        {
+          "target": "[data-tour='p7-explainer']",
+          "title": "What Just Happened?",
+          "text": "Concentration multiplies fees AND impermanent loss - the explainer spells out which side of that trade-off you are on.",
+          "side": "top"
+        }
+      ]
+    },
+    {
       "id": "p7-intro",
       "type": "read",
       "title": "Why Concentration Changes Everything",

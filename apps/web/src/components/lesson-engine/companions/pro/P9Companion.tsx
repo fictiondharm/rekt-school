@@ -33,7 +33,7 @@ export function P9Companion() {
 
   return (
     <div className="w-full max-w-lg space-y-5">
-      <div className="space-y-1">
+      <div className="space-y-1" data-tour="p9-head">
         <div className="flex items-start justify-between gap-3">
           <Badge variant="accent" className="mb-1">
             LAB P9 &bull; BONDING CURVE SNIPER
@@ -48,7 +48,7 @@ export function P9Companion() {
         </p>
       </div>
 
-      <Card className="p-6 space-y-5 bg-surface border border-border shadow-sm">
+      <Card data-tour="p9-lab" className="p-6 space-y-5 bg-surface border border-border shadow-sm">
         <Slider
           label="Your Buy Size"
           value={buySize}
@@ -149,7 +149,7 @@ export function P9Companion() {
         </a>
       </Card>
 
-      <Card className="p-4 bg-surface border-2 border-ink rounded-xl shadow-pop-lg flex items-start gap-3">
+      <Card data-tour="p9-explainer" className="p-4 bg-surface border-2 border-ink rounded-xl shadow-pop-lg flex items-start gap-3">
         {pnl >= 0 && !rugged ? (
           <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
         ) : (
