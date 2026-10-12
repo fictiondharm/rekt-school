@@ -1,0 +1,219 @@
+{
+  "id": "cashio",
+  "title": "Cashio: the stablecoin that printed $2 billion of fake money",
+  "protocol": "Cashio (CASH)",
+  "chain": "Solana",
+  "date": "2022-03-23",
+  "dateLabel": "March 23, 2022",
+  "lossUsd": "~$52.8M (estimates range $28M–$52.8M)",
+  "category": "Infinite mint / missing account validation",
+  "status": "Never restarted. The attacker refunded small holders (under ~$100k), pledged the rest to charity, and was never charged. Roughly $25M was never returned.",
+  "difficulty": "intermediate",
+  "tldr": "Cashio was a Solana stablecoin that printed 1 CASH for every real Saber USDC/USDT liquidity token you deposited. Its mint program (\"Brrr\") accepted the \"Bank\" and \"collateral\" accounts it was handed and never checked them against the *real* CASH mint - every single validation compared accounts to each other. The attacker built a fake account chain (a worthless LP token, a fake Bank, a fake Saber swap) that agreed with itself, passed all the checks, and minted **2,000,000,000 CASH** from nothing. Then they redeemed and dumped it for ~$52.8M. No private key was ever stolen. The program simply verified the wrong thing.",
+  "lessonIds": ["P10"],
+  "labLink": "/learn/p10",
+  "labLabel": "Red Flag Audit lab (P10)",
+  "background": [
+    {
+      "label": "What it is",
+      "text": "Cashio was a stablecoin on Solana. Its token, CASH, was meant to always be worth $1. It launched in November 2021 under a developer known as 0xGhostChain. Unlike so-called 'algorithmic' stablecoins that back themselves with code and market games, CASH claimed to be fully collateralized - real dollars held in a pool should back every CASH."
+    },
+    {
+      "label": "What it does",
+      "text": "It lets you turn real stablecoin liquidity into CASH and back. You deposit a Saber USDC/USDT liquidity-provider (LP) token - a token that already represents $1 of USDC + USDT quietly earning interest - and the protocol prints 1 CASH. Later you burn the CASH and get the LP token back. Deposit $1 of real backing, get 1 CASH. That is the entire promise."
+    },
+    {
+      "label": "How it works",
+      "text": "The machinery lived in a Solana program nicknamed 'Brrr'. A special instruction called print_cash took a list of accounts - most importantly a 'Bank' account (the protocol's record of what collateral is valid) and a 'Collateral' account (the LP token you claim to have deposited) - and minted CASH against them. Because Solana programs cannot blindly trust the accounts they are handed, print_cash ran a series of assert_keys_eq! checks to make sure the accounts lined up before printing."
+    },
+    {
+      "label": "Why it is risky",
+      "text": "Everything rested on those checks actually proving the deposit was real. But spot the flaw: they only compared the accounts to each other, never to a fixed, trusted root like the genuine CASH mint. On Solana you control the transaction you submit - so you can supply the Bank, the Collateral, and the swap accounts yourself. If every check is 'does A match B' and you made both A and B, the checks pass every time. A 'stablecoin' is only as real as its collateral check."
+    }
+  ],
+  "mechanism": "A stablecoin earns its $1 peg one way: someone deposits real value, and the protocol prints the coin against it.\n\nCashio worked like this:\n\n- You deposit a Saber USDC/USDT **LP token**. That token already represents $1 of real, yield-bearing stablecoin backing.\n- You receive **1 CASH**. Burn CASH, get the LP token back.\n\nThe logic lived in a program called **Brrr**. Its `print_cash` instruction took a list of accounts and minted CASH. Two of those accounts mattered most:\n\n- the **Bank** account - the protocol's own record describing which collateral is valid, and\n- the **Collateral / Arrow** account - the LP token you claim to have deposited.\n\nOn Solana a program cannot trust the accounts it is handed; it has to check them. Brrr *did* check - it ran a chain of `assert_keys_eq!` tests. But here is the fatal detail: **every check compared two accounts the caller supplied, to each other.** Nothing was ever compared to a fixed, trusted root - not the real CASH mint, not the protocol's genuine Bank account.\n\nPicture a bouncer who only checks that the photo on your ID matches your face, and never checks that the ID itself is real. Forge your own ID and you match every time.\n\n**The break:**\n\n1. The attacker created their own worthless LP token mint and used `init_arrow_vendor_miner` to mint **2,000,000,000** fake LP tokens to themselves.\n2. They built a fake **Bank**, a fake **Collateral**, and a fake **Saber swap** account - all pointing at their fake token and referencing each other.\n3. They called `print_cash` with that forged chain. Each `assert_keys_eq!` compared one attacker-made account to another attacker-made account. They all matched. The checks passed.\n4. `print_cash` minted **2,000,000,000 real CASH** - against collateral worth nothing.\n5. The new CASH was indistinguishable from real money. The attacker redeemed part of it for the pool's genuine USDC/USDT backing (~$27.2M) and sold the rest on decentralized exchanges (~$25.6M), then shuttled the proceeds off Solana through the Jupiter aggregator and the Wormhole bridge and converted them to ETH.\n\n**The fix:** anchor the validation to reality - confirm that the collateral's backing mint (the `crate_mint`) is the real CASH mint, rather than an account the caller supplied. One comparison against a trusted root would have rejected the entire forged chain. The lesson: `assert_keys_eq!(a, b)` proves nothing about safety when the attacker controls both `a` and `b`.",
+  "timeline": [
+    {
+      "time": "November 2021",
+      "event": "Cashio launches on Solana. CASH pegs to $1, minted against Saber USDC/USDT LP tokens. The project is never given a third-party audit before launch."
+    },
+    {
+      "time": "Nov 2021 – Mar 2022",
+      "event": "CASH grows to hold roughly $28.9M of collateral. Users trust the peg and the 'fully collateralized' claim without any independent review of the mint code."
+    },
+    {
+      "time": "March 23, 2022 ~08:20 UTC",
+      "event": "The attacker creates a worthless LP token mint and, via `init_arrow_vendor_miner`, mints 2,000,000,000 fake LP tokens. They assemble a forged Bank / Collateral / Saber-swap account chain that references only itself."
+    },
+    {
+      "time": "March 23, 2022 ~08:20 UTC",
+      "event": "The attacker calls `print_cash` with the forged accounts. Every validation check compares attacker-supplied accounts to each other, so all pass - and 2,000,000,000 CASH are minted from nothing."
+    },
+    {
+      "time": "March 23, 2022 ~09:00 UTC",
+      "event": "Cashio and developer 0xGhostChain publicly warn users: 'There is an infinite mint glitch. Please withdraw your funds from pools.' The run on the peg begins."
+    },
+    {
+      "time": "March 23, 2022 (hours after)",
+      "event": "The attacker redeems CASH for the pool's real collateral (~$27.2M) and dumps the rest on decentralized exchanges (~$25.6M), moving funds off Solana via Jupiter and the Wormhole bridge and converting to ETH."
+    },
+    {
+      "time": "March 23, 2022 (evening)",
+      "event": "CASH collapses from $1 to about $0.00005. Cashio's TVL falls from $28.87M to roughly $569K in a single day."
+    },
+    {
+      "time": "March 24–31, 2022",
+      "event": "The attacker posts on-chain claiming they only meant to take from those who did not need the money. Accounts under ~$100k are partially refunded; the attacker refuses to return funds to 'rich Americans and Europeans' and invites victims to justify their own assets."
+    },
+    {
+      "time": "Since 2022",
+      "event": "Cashio never restarts. Roughly $25M is never returned. The attacker is never publicly identified or charged. The team had engaged an audit firm only after the exploit, when it was far too late."
+    }
+  ],
+  "actors": [
+    {
+      "label": "Cashio 'Brrr' program",
+      "role": "The victim contract",
+      "addressKind": "program",
+      "note": "The Solana program whose `print_cash` instruction minted CASH. It validated the accounts it was handed only against each other, with no anchor to a trusted root - the flaw that allowed forged collateral to pass.",
+      "source": "BlockSec post-mortem"
+    },
+    {
+      "label": "CASH token mint",
+      "role": "The real stablecoin being printed",
+      "address": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+      "addressKind": "token-mint",
+      "note": "The genuine CASH mint. The missing check was, in effect: 'is the collateral backed by THIS mint?' - a question the code never asked.",
+      "explorerUrl": "https://solscan.io/token/CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+      "source": "Solscan"
+    },
+    {
+      "label": "Fake LP token mint",
+      "role": "Attacker-created 'collateral'",
+      "address": "GoSK6XvdKquQwVYokYz8sKhFgkJAYwjq4i8ttjeukBmp",
+      "addressKind": "token-mint",
+      "note": "A token the attacker minted themselves (2,000,000,000 supply) and presented as valid Saber backing. Worth $0, but the checks never compared it to anything real.",
+      "explorerUrl": "https://solscan.io/token/GoSK6XvdKquQwVYokYz8sKhFgkJAYwjq4i8ttjeukBmp",
+      "source": "BlockSec post-mortem"
+    },
+    {
+      "label": "Attacker Solana wallet",
+      "role": "Signed the forged mint transaction",
+      "addressKind": "wallet",
+      "note": "Not publicly confirmed in full. BlockSec identified the signing address by the prefix 0x6D7f. The wallet funded the attack and received the 2,000,000,000 unbacked CASH.",
+      "source": "BlockSec post-mortem"
+    },
+    {
+      "label": "Saber CASH pools",
+      "role": "Where the dumped CASH landed",
+      "addressKind": "protocol-account",
+      "note": "Saber's CASH liquidity pools absorbed most of the dump. A large share of the real loss fell on Saber LPs, not just Cashio's own vault - a reminder that one broken protocol drains its neighbors too.",
+      "source": "The Block; Halborn"
+    },
+    {
+      "label": "0xGhostChain / Cashio team",
+      "role": "Protocol developers",
+      "note": "Anonymous developer who launched Cashio in November 2021. Warned users within minutes of the exploit and publicly promised a post-mortem. The protocol itself was never third-party audited before users' money was on the line.",
+      "source": "The Block; Halborn"
+    }
+  ],
+  "transactions": [
+    {
+      "label": "Forge the fake collateral",
+      "time": "March 23, 2022 ~08:20 UTC",
+      "description": "The attacker mints a worthless LP token and, through `init_arrow_vendor_miner`, creates an Arrow account and deposits 2,000,000,000 fake LP tokens to themselves - worthless paper dressed up as valid Saber backing.",
+      "signature": "fad83BqAwEXGGyqY6FEGdgptUXt6YVowa6vmaCbfP9NEY7dRoBUAJ6TDsj1L5mK8rXKJ3LPZPPnQqGMuPVYxDNN",
+      "explorerUrl": "https://solscan.io/tx/fad83BqAwEXGGyqY6FEGdgptUXt6YVowa6vmaCbfP9NEY7dRoBUAJ6TDsj1L5mK8rXKJ3LPZPPnQqGMuPVYxDNN"
+    },
+    {
+      "label": "Mint 2,000,000,000 CASH",
+      "time": "March 23, 2022 ~08:20 UTC",
+      "description": "A single `print_cash` call supplies the forged Bank, Collateral and Saber-swap accounts. Each `assert_keys_eq!` check passes because every account being compared was made by the attacker - and 2,000,000,000 CASH are printed against nothing.",
+      "signature": "4fgL8D6QXKH1q3Gt9GPzeRDpTgq4cE5hxf1hNDUWrJVUe4qDJ1xmUZE7KJWDANT99jD8UvwNeBb1imvujz3Pz2K5",
+      "explorerUrl": "https://solscan.io/tx/4fgL8D6QXKH1q3Gt9GPzeRDpTgq4cE5hxf1hNDUWrJVUe4qDJ1xmUZE7KJWDANT99jD8UvwNeBb1imvujz3Pz2K5"
+    },
+    {
+      "label": "Redeem and dump",
+      "time": "March 23, 2022 (hours after)",
+      "description": "The attacker redeems minted CASH for the pool's real USDC/USDT backing (~$27.2M) and sells the rest into decentralized-exchange pools (~$25.6M), crushing the peg to about $0.00005 in the process."
+    },
+    {
+      "label": "Exit to Ethereum",
+      "time": "March 23, 2022",
+      "description": "The proceeds are routed off Solana using the Jupiter aggregator and the Wormhole bridge, then converted to ETH on Ethereum - turning fake CASH into real, hard-to-trace value on another chain."
+    }
+  ],
+  "researchMethod": [
+    {
+      "step": "Turn the headline into three questions",
+      "detail": "A headline is a claim, not evidence. 'A stablecoin printed $2 billion of fake money' tells you almost nothing by itself. Pin down WHAT moved, WHEN, and WHICH account touched it - then ask the real question: what was supposed to stop this?",
+      "doThis": "Open Cashio's official warning next to the CASH token page on Solscan. Write down the exact date/time in UTC, the asset, and the chain involved.",
+      "lookFor": "The word that reframes everything: 'mint'. A stablecoin can only print CASH against real collateral - so the whole case becomes: how did fake collateral pass the check?",
+      "example": "Cashio, March 23 2022. 2,000,000,000 CASH were MINTED, not stolen from a wallet. That one word points straight at the minting program's collateral validation.",
+      "tools": ["Cashio X post", "Solscan"]
+    },
+    {
+      "step": "Find the before and after",
+      "detail": "Money never vanishes - it appears somewhere. For an infinite mint, find the account that received the newly created tokens. That first recipient is your attacker.",
+      "doThis": "Open the CASH token's holders/transfers on Solscan, sort by size and by time, and focus on the minutes around the exploit.",
+      "lookFor": "A wallet that did not exist before receiving a giant, fresh batch of CASH - then moving it immediately into stablecoin pools.",
+      "example": "Cashio: 2,000,000,000 CASH appear to a single wallet during the attack window, then are swapped for USDC/USDT/UST within hours. That is the smoking gun.",
+      "tools": ["Solscan token page", "Solana Explorer"]
+    },
+    {
+      "step": "Walk the money backwards to the funder",
+      "detail": "Attackers leave a paper trail BEFORE the strike. The setup transactions often expose exactly how the trick was built.",
+      "doThis": "Open the suspect wallet's oldest transactions in the hours before the mint and read what it created.",
+      "lookFor": "Deliberate scaffolding: a brand-new token minted by the attacker, a fresh 'Arrow' account, or a burst of fake accounts created minutes before the exploit.",
+      "example": "Cashio: right before the mint, the attacker created their own worthless LP token and minted 2,000,000,000 of it - the fake collateral the mint would soon accept.",
+      "tools": ["Solscan address history"]
+    },
+    {
+      "step": "Reconstruct the exact trick",
+      "detail": "For a code exploit, read the transaction the way the program did. Find the function guarding the money and ask: what did it ACTUALLY check?",
+      "doThis": "Open the exploit transaction, expand the full instruction list, and identify every account passed into `print_cash`. Then read the program's validation logic.",
+      "lookFor": "A check that only compares two caller-supplied values, with no comparison to a trusted root. Cashio's `assert_keys_eq!` checks each compared one attacker-made account to another.",
+      "example": "Cashio: the attacker supplied their own Bank, Collateral and Saber-swap accounts. Every check said 'these match each other' - and they did, because one person made all of them. Nothing asked 'is this the real CASH mint?'",
+      "tools": ["Solscan tx detail", "BlockSec post-mortem"]
+    },
+    {
+      "step": "Prove the exit and read the fix",
+      "detail": "A case is proven when the money leaving matches independent reports - and when the fix names the exact missing check.",
+      "doThis": "Trace where the minted CASH went, total the value, then compare against security-firm write-ups and read the (eventual) audit.",
+      "lookFor": "The fix. The missing line is a comparison against a trusted root: 'the collateral's backing mint must equal the real CASH mint.' That one check is what was absent.",
+      "example": "Cashio: ~$52.8M was drained ($27.2M redeemed + $25.6M sold) and moved to Ethereum via Wormhole. The post-mortem put it plainly - the program never validated the input accounts against the protocol's real configuration.",
+      "tools": ["The Block", "iTokenly hack registry", "BlockSec"]
+    }
+  ],
+  "redFlags": [
+    "The mint accepted caller-supplied 'Bank' and 'collateral' accounts with no anchor to a known-good root (the real CASH mint) - the entire attack in one sentence.",
+    "Every validation was an assert_keys_eq! comparing two caller-supplied accounts to each other. When an attacker controls both sides of a comparison, the check proves nothing.",
+    "One instruction could mint 2,000,000,000 tokens - unlimited mint with no per-user cap or secondary confirmation.",
+    "The project was never third-party audited before launch, yet marketed as a 'fully collateralized' stablecoin. 'Collateralized' is a claim about code, not a slogan.",
+    "Users trusted the $1 peg without checking whether the mint path was actually tied to real collateral - the one thing that made the peg meaningful.",
+    "The blast radius extended beyond Cashio: Saber's CASH pools ate much of the dump, showing how one broken protocol drains its neighbors."
+  ],
+  "sources": [
+    { "label": "BlockSec — Revisiting the CashioApp security incident (root-cause analysis)", "url": "https://blocksec.com/blog/revisiting-the-cashio-app-security-incident" },
+    { "label": "The Block — Cashio exploited for $52.8M in 'infinite mint glitch'", "url": "https://www.theblock.co/post/138934/stablecoin-cashio-on-solana-exploited-for-28-million-in-infinite-mint-glitch" },
+    { "label": "iTokenly — Cashio hack (March 2022) hack registry entry", "url": "https://itokenly.com/hacks/cashio" },
+    { "label": "AMBCrypto — Decoding the if, but, and so of the Cashio hack (TRM Labs)", "url": "https://ambcrypto.com/decoding-the-if-but-and-so-of-cashio-hack" },
+    { "label": "Fortune — the Cashio 'Robin Hood' hacker says he'll give some back", "url": "https://fortune.com/2022/03/25/crypto-robin-hood-stole-50-million-hacker-heist-cashio" },
+    { "label": "Yahoo Finance / CoinDesk — Cashio hacker asks victims to 'apply' for refunds", "url": "https://finance.yahoo.com/news/cashio-hacker-asks-victims-apply-083017131.html" },
+    { "label": "CertiK — Cashio app incident analysis", "url": "https://www.certik.com/ko/blog/cashio-app-incident-analysis" }
+  ],
+  "mintReplay": {
+    "token": "CASH",
+    "mintAmount": 2000000000,
+    "collateralTokens": 2000000000,
+    "checkCount": 9,
+    "missingCheck": "assert_keys_eq!(bank.crate_mint, CASH)",
+    "exitedUsd": 52800000,
+    "bridgeNote": "Jupiter + Wormhole bridge to Ethereum, swapped to ETH",
+    "priceBefore": 1,
+    "priceAfter": 0.00005,
+    "tvlBefore": 28870000,
+    "tvlAfter": 569000
+  },
+  "glossaryTerms": ["stablecoin", "collateral", "mint", "lp_token", "peg", "mint_authority", "audit", "tvl"]
+}

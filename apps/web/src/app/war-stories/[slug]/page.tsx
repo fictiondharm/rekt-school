@@ -5,6 +5,7 @@ import { TopBar } from '@/components/layout/TopBar';
 import { Card, Badge, Button, Disclaimer, MarkdownText } from '@/components/ui';
 import { CaseReplay } from '@/components/war-stories/CaseReplay';
 import { BridgeReplay } from '@/components/war-stories/BridgeReplay';
+import { MintReplay } from '@/components/war-stories/MintReplay';
 import { Collapsible } from '@/components/war-stories/Collapsible';
 import { InvestigatorPlaybook } from '@/components/war-stories/InvestigatorPlaybook';
 import { getAllCases, getCase } from '@/lib/cases';
@@ -236,13 +237,14 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
           </div>
         </Collapsible>
 
-        {(c.replay || c.bridgeReplay) && (
+        {(c.replay || c.bridgeReplay || c.mintReplay) && (
           <section className="space-y-3">
             <h2 className="font-heading font-bold text-xl flex items-center gap-2">
               <FlaskConical className="w-5 h-5 text-accent" /> Replay the attack
             </h2>
             {c.replay && <CaseReplay replay={c.replay} protocol={c.protocol} />}
             {c.bridgeReplay && <BridgeReplay replay={c.bridgeReplay} protocol={c.protocol} />}
+            {c.mintReplay && <MintReplay replay={c.mintReplay} protocol={c.protocol} />}
           </section>
         )}
 

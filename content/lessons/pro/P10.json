@@ -78,6 +78,12 @@
       ]
     },
     {
+      "id": "p10-case",
+      "type": "case",
+      "title": "Case File: Cashio",
+      "caseId": "cashio"
+    },
+    {
       "id": "p10-quiz",
       "type": "quiz",
       "title": "Smart Contract Auditing Quiz",

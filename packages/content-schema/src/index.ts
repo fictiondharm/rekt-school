@@ -197,6 +197,21 @@ export const CaseBridgeReplaySchema = z.object({
 });
 export type CaseBridgeReplay = z.infer<typeof CaseBridgeReplaySchema>;
 
+export const CaseMintReplaySchema = z.object({
+  token: z.string(),
+  mintAmount: z.number(),
+  collateralTokens: z.number(),
+  checkCount: z.number().int(),
+  missingCheck: z.string(),
+  exitedUsd: z.number(),
+  bridgeNote: z.string(),
+  priceBefore: z.number(),
+  priceAfter: z.number(),
+  tvlBefore: z.number(),
+  tvlAfter: z.number(),
+});
+export type CaseMintReplay = z.infer<typeof CaseMintReplaySchema>;
+
 export const CaseSchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -236,5 +251,6 @@ export const CaseSchema = z.object({
   glossaryTerms: z.array(z.string()).default([]),
   replay: CaseReplaySchema.optional(),
   bridgeReplay: CaseBridgeReplaySchema.optional(),
+  mintReplay: CaseMintReplaySchema.optional(),
 });
 export type Case = z.infer<typeof CaseSchema>;
