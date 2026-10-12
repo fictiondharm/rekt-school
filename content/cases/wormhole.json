@@ -108,28 +108,44 @@
   ],
   "researchMethod": [
     {
-      "step": "Start from the asset, not the headline",
-      "detail": "Identify what was minted (120,000 wETH) and where it came from. A wrapped asset should only be minted against a real deposit - so the first question is always 'who authorized this mint?'"
+      "step": "Turn the headline into three questions",
+      "detail": "A headline is a claim, not evidence. 'A bridge lost $326M' tells you almost nothing. Pin down WHAT moved, WHEN, and WHICH address touched it - then ask the real question: who was supposed to authorize that move?",
+      "doThis": "Open the bridge's official statement next to the Solana explorer. Write down the exact date/time in UTC, the asset, and the chain(s) involved.",
+      "lookFor": "The one word that reframes everything. Here it was 'minted'. A bridge can only mint a wrapped token against a real deposit - so the whole case becomes: who faked the deposit?",
+      "example": "Wormhole, February 2 2022. The 120,000 wETH (~$326M) was MINTED on Solana - not stolen from a wallet. That one word points straight at the bridge's verification logic.",
+      "tools": ["Wormhole X post", "Solscan"]
     },
     {
-      "step": "Map the authorization path",
-      "detail": "Find the verification function (`verify_signatures`) and read what it actually checks. Who is supposed to approve? Here: 13-of-19 guardians. Then see how that approval reaches the code."
+      "step": "Find the before and after",
+      "detail": "Money never vanishes - it appears somewhere. Find the account that received the newly created tokens. On a bridge, that first recipient is your attacker.",
+      "doThis": "Open the wrapped token's mint page on the explorer and look at its transfers/holders for the attack window, sorted by size and time.",
+      "lookFor": "A brand-new wallet that did not exist before the attack receiving the entire mint in one go - then immediately moving it.",
+      "example": "Wormhole: 120,000 wETH appears on Solana to an address with no prior history. That is the smoking gun - a claim on ETH that was never locked on Ethereum.",
+      "tools": ["Solscan token page", "Solana Explorer"]
     },
     {
-      "step": "Hunt the 'trusted by address' assumption",
-      "detail": "The bug is a classic: the code trusted an account because of the role it was passed in as, without verifying the account's owner. Grep for deprecated `load_instruction_at` and ask 'could I pass my own account here?'"
+      "step": "Walk the money backwards to the funder",
+      "detail": "Attackers leave a paper trail before the strike. Even a tiny 'decoy' transaction can be the fingerprint that ties a wallet to the exploit.",
+      "doThis": "Open the suspect wallet's OLDEST transactions and look at what it did in the minutes right BEFORE the big move.",
+      "lookFor": "Small, deliberate setup transactions - a tiny deposit, a dust transfer, a test call - that signal preparation and link the wallet to the attack.",
+      "example": "Wormhole: the attacker first deposited a tiny ~0.1 ETH to make the activity look normal, then immediately submitted the crafted transaction. That little decoy is the tell.",
+      "tools": ["Solscan address history"]
     },
     {
-      "step": "Reproduce the instruction-ordering trick",
-      "detail": "Signature verification was delegated to an earlier instruction in the same transaction. Realize the attacker controls their own transaction, so they can fabricate that earlier instruction and the sysvar that reports on it."
+      "step": "Reconstruct the exact trick",
+      "detail": "For a code exploit, read the transaction the way the program did. Find the function guarding the money and ask: what did it ACTUALLY check?",
+      "doThis": "Open the exploit transaction and expand the full instruction list (Solana) or the decoded call trace and logs (EVM). Identify the vulnerable function and every account passed into it.",
+      "lookFor": "A trusted account taken on faith. Wormhole read the result of a signature check from the 'instructions' sysvar using the deprecated, UNCHECKED loader `load_instruction_at` - it never verified who owned that account.",
+      "example": "Wormhole: the attacker supplied their OWN account as the instructions sysvar, filled with a forged 'signatures verified' instruction. The bridge read it and believed 13 guardians had approved a deposit that never happened.",
+      "tools": ["Solscan tx detail", "de.fi / Merkle Science"]
     },
     {
-      "step": "Check the fix, learn the lesson",
-      "detail": "Find the patch commit. The fix swaps `load_instruction_at` for `load_instruction_at_checked`, which validates the account owner. One changed function is often the whole difference - read fixes; they teach the precise invariant that was missing."
-    },
-    {
-      "step": "Follow the exit",
-      "detail": "Track the minted tokens out to Ethereum. Investigators corralled exact addresses (the Solana mint recipient and the Ethereum withdrawal wallet) and totals (~93,750 ETH bridged out) - detail that turns a story into a provable case."
+      "step": "Prove the exit and read the fix",
+      "detail": "A case becomes proven when the money leaving matches independent reports - and when the patch names the exact vulnerability.",
+      "doThis": "Trace the minted wETH out to Ethereum, total it, then compare against security-firm write-ups. Finally, read the fix commit.",
+      "lookFor": "The fix. When a team swaps `load_instruction_at` for `load_instruction_at_checked`, that one added word tells you precisely what was missing: an ownership check.",
+      "example": "Wormhole: ~93,750 ETH was bridged out to Ethereum before the bridge was halted. Within hours the code was patched to validate the sysvar's owner, and Jump Crypto repaid 120,000 ETH the next day.",
+      "tools": ["Rekt.news", "DeFiLlama hacks", "Chainalysis"]
     }
   ],
   "redFlags": [

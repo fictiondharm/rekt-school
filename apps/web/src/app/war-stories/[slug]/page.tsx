@@ -5,6 +5,8 @@ import { TopBar } from '@/components/layout/TopBar';
 import { Card, Badge, Button, Disclaimer, MarkdownText } from '@/components/ui';
 import { CaseReplay } from '@/components/war-stories/CaseReplay';
 import { BridgeReplay } from '@/components/war-stories/BridgeReplay';
+import { Collapsible } from '@/components/war-stories/Collapsible';
+import { InvestigatorPlaybook } from '@/components/war-stories/InvestigatorPlaybook';
 import { getAllCases, getCase } from '@/lib/cases';
 import {
   ArrowLeft,
@@ -16,6 +18,7 @@ import {
   FlaskConical,
   BookText,
   ExternalLink,
+  Fingerprint,
 } from 'lucide-react';
 
 export function generateStaticParams() {
@@ -44,7 +47,7 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
     <div className="min-h-screen bg-bg text-ink flex flex-col">
       <TopBar lessonTitle={c.protocol} />
 
-      <main className="flex-1 w-full max-w-4xl mx-auto p-6 sm:p-8 space-y-8">
+      <main className="flex-1 w-full max-w-4xl mx-auto p-6 sm:p-8 space-y-6">
         <div>
           <Link
             href="/war-stories"
@@ -89,20 +92,26 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
           <MarkdownText content={c.tldr} className="text-sm" />
         </Card>
 
-        <section className="space-y-3">
-          <h2 className="font-heading font-bold text-xl flex items-center gap-2">
-            <BookText className="w-5 h-5 text-accent" /> The mechanism
-          </h2>
-          <Card className="p-5 border-2 border-ink rounded-xl shadow-pop">
-            <MarkdownText content={c.mechanism} className="text-sm" />
-          </Card>
-        </section>
+        <Collapsible title="The mechanism" icon={<BookText className="w-5 h-5 text-accent" />} defaultOpen>
+          <MarkdownText content={c.mechanism} className="text-sm" />
+        </Collapsible>
 
-        <section className="space-y-3">
-          <h2 className="font-heading font-bold text-xl flex items-center gap-2">
-            <Clock className="w-5 h-5 text-accent" /> Timeline
-          </h2>
-          <div className="space-y-0">
+        <Collapsible
+          title="The Investigator's Playbook"
+          icon={<Fingerprint className="w-5 h-5 text-accent" />}
+          hint={`${c.researchMethod.length} moves`}
+          defaultOpen
+        >
+          <InvestigatorPlaybook steps={c.researchMethod} />
+        </Collapsible>
+
+        <Collapsible
+          title="Timeline"
+          icon={<Clock className="w-5 h-5 text-accent" />}
+          hint={`${c.timeline.length} events`}
+          defaultOpen
+        >
+          <div className="space-y-0 pt-1">
             {c.timeline.map((t, i) => (
               <div key={i} className="flex gap-4">
                 <div className="flex flex-col items-center">
@@ -116,14 +125,15 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
               </div>
             ))}
           </div>
-        </section>
+        </Collapsible>
 
         {c.actors.length > 0 && (
-          <section className="space-y-3">
-            <h2 className="font-heading font-bold text-xl flex items-center gap-2">
-              <Wallet className="w-5 h-5 text-accent" /> Wallets &amp; accounts
-            </h2>
-            <div className="grid gap-3 sm:grid-cols-2">
+          <Collapsible
+            title="Wallets & accounts"
+            icon={<Wallet className="w-5 h-5 text-accent" />}
+            hint="who was who"
+          >
+            <div className="grid gap-3 sm:grid-cols-2 pt-1">
               {c.actors.map((a) => (
                 <Card key={a.label} className="p-4 space-y-2 border border-border rounded-xl">
                   <div className="flex items-start justify-between gap-2">
@@ -161,15 +171,16 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
                 </Card>
               ))}
             </div>
-          </section>
+          </Collapsible>
         )}
 
         {c.transactions.length > 0 && (
-          <section className="space-y-3">
-            <h2 className="font-heading font-bold text-xl flex items-center gap-2">
-              <Search className="w-5 h-5 text-accent" /> Key moves
-            </h2>
-            <div className="space-y-3">
+          <Collapsible
+            title="Key moves"
+            icon={<Search className="w-5 h-5 text-accent" />}
+            hint={`${c.transactions.length} steps`}
+          >
+            <div className="space-y-3 pt-1">
               {c.transactions.map((t, i) => (
                 <Card key={i} className="p-4 space-y-1.5 border border-border rounded-xl">
                   <div className="flex items-center justify-between gap-2">
@@ -185,37 +196,16 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
                 </Card>
               ))}
             </div>
-          </section>
+          </Collapsible>
         )}
 
-        <section className="space-y-3">
-          <h2 className="font-heading font-bold text-xl flex items-center gap-2">
-            <Search className="w-5 h-5 text-accent" /> How to research a case
-          </h2>
-          <p className="text-sm text-ink-soft">
-            This is the repeatable method. Learn it once and you can trace almost any on-chain
-            incident yourself - no paid tools required.
-          </p>
-          <div className="space-y-3">
-            {c.researchMethod.map((r, i) => (
-              <div key={i} className="flex gap-3">
-                <div className="shrink-0 w-7 h-7 rounded-full bg-accent text-white border-2 border-ink flex items-center justify-center text-xs font-bold">
-                  {i + 1}
-                </div>
-                <div className="space-y-1 pt-0.5">
-                  <div className="font-heading font-bold text-sm">{r.step}</div>
-                  <p className="text-xs text-ink-soft leading-relaxed">{r.detail}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="font-heading font-bold text-xl flex items-center gap-2">
-            <TriangleAlert className="w-5 h-5 text-accent" /> Red flags you could have spotted
-          </h2>
-          <div className="space-y-2">
+        <Collapsible
+          title="Red flags you could have spotted"
+          icon={<TriangleAlert className="w-5 h-5 text-danger" />}
+          hint={`${c.redFlags.length}`}
+          defaultOpen
+        >
+          <div className="space-y-2 pt-1">
             {c.redFlags.map((f, i) => (
               <div key={i} className="flex gap-3 p-3 rounded-xl bg-danger/5 border border-danger/30">
                 <TriangleAlert className="w-4 h-4 text-danger shrink-0 mt-0.5" />
@@ -223,7 +213,7 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
               </div>
             ))}
           </div>
-        </section>
+        </Collapsible>
 
         {(c.replay || c.bridgeReplay) && (
           <section className="space-y-3">
@@ -243,9 +233,8 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
                 <h2 className="font-heading font-bold text-base">Replay it in the sandbox</h2>
               </div>
               <p className="text-sm text-ink-soft leading-relaxed">
-                Don't just read it - do it. {c.labLabel ?? 'The matching lab'} lets you drag the
-                same levers the attacker used and watch the collateral value inflate, then collapse.
-                Safe, simulated, and free.
+                Don&apos;t just read it - do it. {c.labLabel ?? 'The matching lab'} lets you pull the
+                same levers the attacker used and watch it unfold. Safe, simulated, and free.
               </p>
               <Link href={c.labLink}>
                 <Button variant="primary" className="gap-2">
@@ -256,9 +245,8 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
           </section>
         )}
 
-        <section className="space-y-3">
-          <h2 className="font-heading font-bold text-xl">Sources</h2>
-          <ul className="space-y-2">
+        <Collapsible title="Sources" icon={<ExternalLink className="w-5 h-5 text-accent" />}>
+          <ul className="space-y-2 pt-1">
             {c.sources.map((s, i) => (
               <li key={i}>
                 <a
@@ -272,7 +260,7 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
               </li>
             ))}
           </ul>
-        </section>
+        </Collapsible>
 
         <Disclaimer />
       </main>

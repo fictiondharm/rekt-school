@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { TopBar } from '@/components/layout/TopBar';
 import { Card, Badge, Button, Disclaimer } from '@/components/ui';
 import { getAllCases } from '@/lib/cases';
-import { ArrowLeft, ArrowRight, Flame, Skull, Search, Wallet, FileWarning } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Flame, Skull } from 'lucide-react';
 
 export const metadata = {
   title: 'War Stories - Rekt School',
@@ -42,18 +42,30 @@ export default function WarStoriesPage() {
           </p>
         </section>
 
-        <section className="grid gap-3 sm:grid-cols-3">
-          {[
-            { icon: Search, title: 'See the whole attack', body: 'A minute-by-minute timeline, not a one-line headline.' },
-            { icon: Wallet, title: 'Wallets & transactions', body: 'The real actors and moves, with explorer links.' },
-            { icon: FileWarning, title: 'Learn the method', body: 'Step-by-step how a tracer reconstructs a case from scratch.' },
-          ].map((item) => (
-            <Card key={item.title} className="p-4 space-y-2 border-2 border-ink rounded-xl shadow-pop">
-              <item.icon className="w-5 h-5 text-accent" />
-              <h3 className="font-heading font-bold text-sm">{item.title}</h3>
-              <p className="text-xs text-ink-soft leading-relaxed">{item.body}</p>
-            </Card>
-          ))}
+        <section className="space-y-3">
+          <div className="text-center space-y-1">
+            <h2 className="font-heading font-bold text-xl">How to read any exploit</h2>
+            <p className="text-sm text-ink-soft max-w-2xl mx-auto">
+              Every case teaches the same repeatable routine - the 5 moves professional
+              investigators use. All you need is a block explorer and curiosity.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-5">
+            {[
+              { n: '1', title: 'Turn the headline into questions' },
+              { n: '2', title: 'Find the before & after' },
+              { n: '3', title: 'Walk the money backwards' },
+              { n: '4', title: 'Reconstruct the trick' },
+              { n: '5', title: 'Prove it & cross-check' },
+            ].map((item) => (
+              <Card key={item.n} className="p-4 space-y-2 border-2 border-ink rounded-xl shadow-pop">
+                <span className="w-7 h-7 rounded-full bg-accent text-white border-2 border-ink flex items-center justify-center text-xs font-bold">
+                  {item.n}
+                </span>
+                <h3 className="font-heading font-bold text-xs leading-snug">{item.title}</h3>
+              </Card>
+            ))}
+          </div>
         </section>
 
         <section className="space-y-4">

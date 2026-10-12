@@ -219,7 +219,14 @@ export const CaseSchema = z.object({
   actors: z.array(CaseActorSchema).default([]),
   transactions: z.array(CaseTxSchema).default([]),
   researchMethod: z.array(
-    z.object({ step: z.string(), detail: z.string() }),
+    z.object({
+      step: z.string(),
+      detail: z.string(),
+      doThis: z.string().optional(),
+      lookFor: z.string().optional(),
+      example: z.string().optional(),
+      tools: z.array(z.string()).optional(),
+    }),
   ),
   redFlags: z.array(z.string()).min(1),
   sources: z.array(CaseSourceSchema).min(1),

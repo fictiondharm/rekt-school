@@ -128,32 +128,44 @@
   ],
   "researchMethod": [
     {
-      "step": "Start with the asset, not the headlines",
-      "detail": "Open the MNGO mint on Solscan. Get the exact mint address and check its supply and holders. Always confirm you are looking at the real token - clones with identical symbols are the #1 trap."
+      "step": "Turn the headline into three questions",
+      "detail": "A headline is a claim, not evidence. 'Mango was hacked for $114M' tells you almost nothing. Your very first move is always the same: pin down WHAT moved, WHEN it moved, and WHICH address touched it. Convert the story into questions you can actually answer on a block explorer.",
+      "doThis": "Open the protocol's official statement (their X/Twitter post or blog) next to a block explorer. Write down three facts: the exact date and time in UTC, the asset that left, and the chain it was on.",
+      "lookFor": "Vague wording. If the team says 'funds were drained' but never says how, that gap is exactly where your investigation starts.",
+      "example": "Mango, October 11 2022, Solana. The twist: the attacker did not steal one token - he walked out with ~$116M of real BTC, USDT, SOL and mSOL. So the real question became: 'how were those real assets unlocked?'",
+      "tools": ["Protocol X post", "Solscan"]
     },
     {
-      "step": "Find the anomaly window",
-      "detail": "Chart MNGO around the attack date. Look for a vertical candle: a move that is absurd relative to recent volume. On October 11 the move ran from ~$0.038 to ~$0.91 in minutes. That asymmetry is the signature of a thin market being pushed."
+      "step": "Find the before and after",
+      "detail": "Money never vanishes - it moves. Ignore the narrative and find the account that GAINED and the account that LOST. Spotting that transfer is the single most useful skill in on-chain analysis.",
+      "doThis": "Open the abused token on the explorer and filter its transfers/holders to the attack day, sorted by size. Then open the victim protocol's own main account and read its recent token transfers in and out.",
+      "lookFor": "A brand-new address - created hours earlier, almost no history - receiving an enormous amount in a single transaction. That is almost always the attacker.",
+      "example": "On Mango's side you can see the attacker's account borrow and withdraw ~$116M in minutes, led by ~$54M USDC and ~$25M mSOL. No wallet received that much from Mango before - that spike is the anomaly.",
+      "tools": ["Solscan", "Solana Explorer"]
     },
     {
-      "step": "Pivot to the venue",
-      "detail": "Ask 'where was this priced?' Mango's oracle averaged MNGO across spot venues. If a token's oracle depends on low-liquidity markets, the oracle is manipulable - so an attacker does not need to hack anything."
+      "step": "Walk the money backwards to the funder",
+      "detail": "Every attacker's wallet has a birthday. Follow its very first transaction upstream and you usually find an exchange, a bridge, or a single source that also funded their other wallets.",
+      "doThis": "Open the suspect wallet, go to its transaction/transfer history, and scroll all the way to the OLDEST entries. Note who sent the first funds and exactly when.",
+      "lookFor": "Two or more wallets that look unrelated but were seeded by the same funder. Shared funding is how investigators prove 'one person, many accounts'.",
+      "example": "Mango's two 'anonymous' accounts were both funded from ONE exchange account the attacker controlled - court filings (SDNY) trace ~$5.5M and ~$5M from that single source into two fresh Solana wallets minutes apart.",
+      "tools": ["Solscan address history", "DOJ / SEC filings"]
     },
     {
-      "step": "Look for a wash trade",
-      "detail": "On Mango, two fresh accounts opened 483M MNGO-perps against each other. Same size, opposite sides, seconds apart, funded near-simultaneously = one person wearing two masks."
+      "step": "Reconstruct the exact trick",
+      "detail": "Now the fun part: figure out the 'how'. Read the suspicious transaction step by step and match each move to what the protocol was supposed to allow.",
+      "doThis": "Open the biggest transaction on the explorer and expand it fully. On Solana, read the instruction list top to bottom (including inner instructions). On EVM, expand the decoded logs and call trace.",
+      "lookFor": "A sequence that only makes sense if someone is lying to the system: an oracle update right before a borrow, two accounts trading with each other, a fake number accepted as collateral.",
+      "example": "Mango: the tell is a wash trade - two fresh accounts opened 483M MNGO-perps against each other at $0.038. Then a few million dollars of MNGO buys spiked the oracle to ~$0.91, and the 'profitable' side borrowed against that fake number.",
+      "tools": ["Solscan tx detail", "Solidus Labs write-up"]
     },
     {
-      "step": "Trace the funding upstream",
-      "detail": "Follow each wallet's first inflows. Both were seeded from the same exchange account. Shared funding sources are how investigators link 'unrelated' wallets."
-    },
-    {
-      "step": "Follow the exits",
-      "detail": "Find the borrow/withdraw transactions - BTC, USDT, SOL and mSOL leaving the protocol. The direction and timing of outflows shows intent and impact."
-    },
-    {
-      "step": "Corroborate with public reports",
-      "detail": "Cross-check your on-chain reading against the SEC, CFTC and DOJ filings and investigator write-ups (Elliptic, Solidus Labs). On-chain data plus legal documents is how a case becomes undeniable."
+      "step": "Prove the exit and cross-check the numbers",
+      "detail": "A case only becomes 'proven' when the money leaving matches independent sources. Never trust a single report - triangulate until the picture is consistent.",
+      "doThis": "Trace where the stolen value went (the outflows), total it yourself, then compare against neutral trackers and security-firm post-mortems.",
+      "lookFor": "Number alignment - and disagreement. When sources differ it usually reveals exactly which assets were counted, and how. Mango is reported as both ~$114M and ~$117.8M for that reason.",
+      "example": "Mango: your on-chain withdrawals line up with Elliptic's ~$117.8M across 14 tokens. The SEC, CFTC and DOJ filings then turn the raw on-chain picture into a named, charged, legally-documented case.",
+      "tools": ["Rekt.news", "DeFiLlama hacks", "Elliptic"]
     }
   ],
   "redFlags": [
