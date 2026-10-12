@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { TopBar } from '@/components/layout/TopBar';
 import { Card, Badge, Button, Disclaimer, MarkdownText } from '@/components/ui';
-import { FlowDiagram } from '@/components/war-stories/FlowDiagram';
 import { CaseReplay } from '@/components/war-stories/CaseReplay';
+import { BridgeReplay } from '@/components/war-stories/BridgeReplay';
 import { getAllCases, getCase } from '@/lib/cases';
 import {
   ArrowLeft,
@@ -188,15 +188,6 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
           </section>
         )}
 
-        {c.flow && (
-          <section className="space-y-3">
-            <h2 className="font-heading font-bold text-xl flex items-center gap-2">
-              <Search className="w-5 h-5 text-accent" /> The money trail
-            </h2>
-            <FlowDiagram flow={c.flow} />
-          </section>
-        )}
-
         <section className="space-y-3">
           <h2 className="font-heading font-bold text-xl flex items-center gap-2">
             <Search className="w-5 h-5 text-accent" /> How to research a case
@@ -234,12 +225,13 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
           </div>
         </section>
 
-        {c.replay && (
+        {(c.replay || c.bridgeReplay) && (
           <section className="space-y-3">
             <h2 className="font-heading font-bold text-xl flex items-center gap-2">
               <FlaskConical className="w-5 h-5 text-accent" /> Replay the attack
             </h2>
-            <CaseReplay replay={c.replay} protocol={c.protocol} />
+            {c.replay && <CaseReplay replay={c.replay} protocol={c.protocol} />}
+            {c.bridgeReplay && <BridgeReplay replay={c.bridgeReplay} protocol={c.protocol} />}
           </section>
         )}
 

@@ -167,13 +167,9 @@ function checkReferences() {
     const c = JSON.parse(fs.readFileSync(path.join(casesDir, name), 'utf8'));
     const badTerms = (c.glossaryTerms ?? []).filter((t: string) => !glossaryIds.has(t));
     const badLessons = (c.lessonIds ?? []).filter((t: string) => !lessonIds.has(t));
-    const nodeIds = new Set((c.flow?.nodes ?? []).map((n: { id: string }) => n.id));
-    const badEdges = (c.flow?.edges ?? [])
-      .flatMap((e: { from: string; to: string }) => [e.from, e.to])
-      .filter((id: string) => !nodeIds.has(id));
-    if (badTerms.length || badLessons.length || badEdges.length) {
+    if (badTerms.length || badLessons.length) {
       errorsCount++;
-      console.error(`❌ [ref] case ${c.id}: ${badTerms.length ? `unknown glossaryTerms [${badTerms.join(', ')}] ` : ''}${badLessons.length ? `unknown lessonIds [${badLessons.join(', ')}] ` : ''}${badEdges.length ? `flow edges reference unknown nodes [${badEdges.join(', ')}]` : ''}`);
+      console.error(`❌ [ref] case ${c.id}: ${badTerms.length ? `unknown glossaryTerms [${badTerms.join(', ')}] ` : ''}${badLessons.length ? `unknown lessonIds [${badLessons.join(', ')}]` : ''}`);
     }
   }
 }

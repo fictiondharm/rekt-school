@@ -1,0 +1,163 @@
+{
+  "id": "wormhole",
+  "title": "Wormhole: the $326M shortcut past the guardians",
+  "protocol": "Wormhole Token Bridge",
+  "chain": "Solana ↔ Ethereum",
+  "date": "2022-02-02",
+  "dateLabel": "February 2, 2022",
+  "lossUsd": "~$326M (120,000 wETH)",
+  "category": "Bridge / signature-verification bypass",
+  "status": "Patched within hours; Jump Crypto repaid the 120,000 ETH from treasury on Feb 3, 2022, restoring 1:1 backing. Attacker never publicly identified; funds not returned.",
+  "difficulty": "advanced",
+  "tldr": "Wormhole's Solana bridge verified messages with a 13-of-19 'guardian' signature check. The catch: the program did not do the expensive signature math itself - it read the result from a *prior instruction* in the same transaction, trusting the system-provided 'instructions' account. The attacker passed a fake version of that account, filled it with a forged 'signatures are valid' instruction, and the program believed the guardians had approved a 120,000 ETH deposit that never happened. It minted 120,000 wETH from nothing, then bridged it to Ethereum. No key was stolen. The program simply verified the wrong thing.",
+  "lessonIds": ["P8", "P10"],
+  "labLink": "/learn/p8",
+  "labLabel": "Cross-Chain Bridge lab (P8)",
+  "mechanism": "A bridge moves value between chains by locking an asset on one side and minting a wrapped claim on the other. The critical question is: **who is allowed to say 'the asset really was locked'?**\n\nWormhole answered with **guardians**: 19 validators who sign a message (a VAA) attesting to a deposit. On the destination chain, the program checks that at least 13 of the 19 signatures are valid. If they are, it mints the wrapped token.\n\n**The shortcut that broke it:**\n\n1. Elliptic-curve signature checks are expensive, so Wormhole did not run the curve math inside the bridge program. Instead, the transaction includes a separate instruction to Solana's native `secp256k1` precompile that verifies the signatures, and `verify_signatures` reads the *result* of that earlier instruction from the 'instructions' sysvar account.\n2. To find that earlier instruction, the code called `load_instruction_at` - the **deprecated, unchecked** version. It trusted whatever account was passed as the instructions sysvar *by address*, never verifying who owned it.\n3. The attacker passed their **own account** in place of the real sysvar, containing a fake 'secp256k1 verified these signatures' instruction. `verify_signatures` read the forgery and accepted it as the guardians' approval.\n4. Wormhole then accepted an attacker-authored VAA claiming 120,000 ETH had been deposited on Ethereum - a transfer that never occurred - and minted 120,000 wETH on Solana.\n5. The attacker bridged 93,750 ETH out to Ethereum via the bridge's legitimate path.\n\nThe fix - shipped the same day - replaced `load_instruction_at` with `load_instruction_at_checked`, which verifies the account's owner is the System Program before trusting it. One line. The difference between a trustworthy signature and a forged one.",
+  "timeline": [
+    {
+      "time": "February 2, 2022",
+      "event": "The attacker deposits a small amount (~0.1 ETH) to make the activity look legitimate, then submits the crafted transaction: a fake secp256k1 instruction plus a spoofed instructions-sysvar account."
+    },
+    {
+      "time": "February 2, 2022",
+      "event": "A forged VAA is accepted as guardian-approved, and 120,000 wETH is minted on Solana to the attacker. Wormhole's security model never noticed."
+    },
+    {
+      "time": "Minutes later",
+      "event": "The attacker bridges the minted wETH back to Ethereum - ~10,000 ETH within minutes, then a further ~80,000 ETH. Roughly 93,750 ETH total left the bridge before it was halted."
+    },
+    {
+      "time": "February 2, 2022",
+      "event": "Wormhole confirms the exploit publicly ('the wormhole network was exploited for 120k wETH') and takes the bridge down for maintenance."
+    },
+    {
+      "time": "February 2, 2022",
+      "event": "The vulnerability is patched - `load_instruction_at` is replaced with the checked variant that validates the sysvar account's owner."
+    },
+    {
+      "time": "February 2-3, 2022",
+      "event": "Wormhole sends an on-chain message to the attacker offering a $10M 'whitehat' bounty to return the funds. It is not accepted."
+    },
+    {
+      "time": "February 3, 2022",
+      "event": "Jump Crypto, Wormhole's parent, deposits 120,000 ETH from its own treasury to back the mint 1:1. The bridge is restored and every wETH holder is made whole."
+    },
+    {
+      "time": "Since 2022",
+      "event": "The attacker has never been publicly identified and the funds were never returned."
+    }
+  ],
+  "actors": [
+    {
+      "label": "Wormhole Token Bridge (Solana)",
+      "role": "The victim contract",
+      "addressKind": "program",
+      "note": "The Solana-side bridge program containing the vulnerable `verify_signatures` function. It guarded hundreds of millions in bridged value with a single unchecked sysvar read.",
+      "source": "Wormhole; post-mortems (Merkle Science, samczsun)"
+    },
+    {
+      "label": "Guardian set",
+      "role": "The 19 validators whose signatures the bridge should have required",
+      "addressKind": "dao",
+      "note": "A 13-of-19 multisig of guardians must sign a VAA for a cross-chain transfer to be valid. The attacker bypassed all 19 - without holding a single guardian key.",
+      "source": "Wormhole documentation"
+    },
+    {
+      "label": "Attacker Solana wallet",
+      "role": "Received the 120,000 unbacked wETH",
+      "address": "CxegPrfn2ge5dNiQberUrQJkHCcimeR4VXkeawcFBBka",
+      "addressKind": "wallet",
+      "note": "The Solana-side address associated with the minted wETH and the forged signatures. Reported by investigators; confirm on Solscan before relying on it.",
+      "explorerUrl": "https://solscan.io/account/CxegPrfn2ge5dNiQberUrQJkHCcimeR4VXkeawcFBBka",
+      "source": "de.fi exploit analysis (addresses)"
+    },
+    {
+      "label": "Attacker Ethereum wallet",
+      "role": "Received the bridged-out ETH",
+      "address": "0x629e7da20197a5429d30da36e77d06cdf796b71a",
+      "addressKind": "wallet",
+      "note": "The Ethereum-side address that received the bridged-back ETH (~93,750 ETH). Reported by investigators; confirm on Etherscan before relying on it.",
+      "explorerUrl": "https://etherscan.io/address/0x629e7da20197a5429d30da36e77d06cdf796b71a",
+      "source": "de.fi exploit analysis (addresses)"
+    },
+    {
+      "label": "Jump Crypto",
+      "role": "Backstopped the loss",
+      "addressKind": "wallet",
+      "note": "Wormhole's parent company. It quietly deposited 120,000 ETH from its treasury the next day, converting an unbacked mint into a 1:1-backed token and absorbing the loss itself.",
+      "source": "Wormhole statement; press coverage"
+    }
+  ],
+  "transactions": [
+    {
+      "label": "The spoofed sysvar read",
+      "time": "February 2, 2022",
+      "description": "The attacker supplies their own account as the 'instructions' sysvar. `verify_signatures` reads it with the unchecked `load_instruction_at`, sees a fake 'signatures verified' instruction, and trusts it."
+    },
+    {
+      "label": "Mint 120,000 wETH",
+      "time": "February 2, 2022",
+      "description": "With the forged VAA accepted, `complete_wrapped` mints 120,000 wETH on Solana - a claim on ETH that was never locked on the other side."
+    },
+    {
+      "label": "Bridge out ~93,750 ETH",
+      "time": "February 2, 2022",
+      "description": "The attacker uses the bridge's normal path to send the minted value back to Ethereum (~10,000 ETH, then ~80,000 ETH more), draining real ETH from the bridge's reserves."
+    }
+  ],
+  "researchMethod": [
+    {
+      "step": "Start from the asset, not the headline",
+      "detail": "Identify what was minted (120,000 wETH) and where it came from. A wrapped asset should only be minted against a real deposit - so the first question is always 'who authorized this mint?'"
+    },
+    {
+      "step": "Map the authorization path",
+      "detail": "Find the verification function (`verify_signatures`) and read what it actually checks. Who is supposed to approve? Here: 13-of-19 guardians. Then see how that approval reaches the code."
+    },
+    {
+      "step": "Hunt the 'trusted by address' assumption",
+      "detail": "The bug is a classic: the code trusted an account because of the role it was passed in as, without verifying the account's owner. Grep for deprecated `load_instruction_at` and ask 'could I pass my own account here?'"
+    },
+    {
+      "step": "Reproduce the instruction-ordering trick",
+      "detail": "Signature verification was delegated to an earlier instruction in the same transaction. Realize the attacker controls their own transaction, so they can fabricate that earlier instruction and the sysvar that reports on it."
+    },
+    {
+      "step": "Check the fix, learn the lesson",
+      "detail": "Find the patch commit. The fix swaps `load_instruction_at` for `load_instruction_at_checked`, which validates the account owner. One changed function is often the whole difference - read fixes; they teach the precise invariant that was missing."
+    },
+    {
+      "step": "Follow the exit",
+      "detail": "Track the minted tokens out to Ethereum. Investigators corralled exact addresses (the Solana mint recipient and the Ethereum withdrawal wallet) and totals (~93,750 ETH bridged out) - detail that turns a story into a provable case."
+    }
+  ],
+  "redFlags": [
+    "Signature verification was delegated to a separate instruction and read via the *unchecked* `load_instruction_at`, which trusts the sysvar account by address.",
+    "The bridge never validated that the instructions account was owned by the System Program - the single check that would have stopped the attack.",
+    "One unchecked sysvar read gated the mint of effectively unlimited value - no cap, no secondary confirmation.",
+    "Cross-chain verification is inherently complex, and the code had not been adversarially tested against malformed/spoofed proof inputs.",
+    "The whole security model assumed honest inputs; an attacker fully controls the transaction they submit."
+  ],
+  "sources": [
+    { "label": "Fortune — hackers steal ~$320M from Wormhole", "url": "https://fortune.com/2022/02/03/hackers-steal-320-million-crypto-wrapped-ether-wormhole-defi-project" },
+    { "label": "Ars Technica — how $323M was stolen from Wormhole", "url": "https://arstechnica.com/information-technology/2022/02/how-323-million-in-crypto-was-stolen-from-a-blockchain-bridge-called-wormhole" },
+    { "label": "Merkle Science — analysis of the Wormhole bridge exploit", "url": "https://www.merklescience.com/blog/hack-track-analysis-of-wormhole-token-bridge-exploit" },
+    { "label": "Chainalysis — lessons from the Wormhole exploit", "url": "https://www.chainalysis.com/blog/wormhole-hack-february-2022" },
+    { "label": "de.fi — Wormhole exploit, root cause & addresses", "url": "https://de.fi/blog/wormhole-exploit-the-second-largest-defi-hack-ever-237ed5c81670" },
+    { "label": "Security Affairs — $326M stolen, $10M bounty offer", "url": "https://securityaffairs.com/127570/cyber-crime/wormhole-hack.html" },
+    { "label": "TechCrunch — Wormhole confirms $320M exploit", "url": "https://techcrunch.com/2022/02/03/blockchain-bridge-wormhole-confirms-that-exploiter-stole-320-million-worth-of-crypto-assets" }
+  ],
+  "bridgeReplay": {
+    "token": "wETH",
+    "amount": 120000,
+    "pricePerToken": 2681,
+    "bridgedOut": 93750,
+    "guardians": 19,
+    "requiredSigs": 13,
+    "decoy": 0.1,
+    "vulnerableFn": "load_instruction_at",
+    "fixedFn": "load_instruction_at_checked"
+  },
+  "glossaryTerms": ["bridge", "wrapped_asset", "signature", "validator", "public_key", "audit"]
+}

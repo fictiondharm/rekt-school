@@ -170,46 +170,6 @@ export const CaseSourceSchema = z.object({
 });
 export type CaseSource = z.infer<typeof CaseSourceSchema>;
 
-export const CaseFlowNodeSchema = z.object({
-  id: z.string(),
-  label: z.string(),
-  kind: z.enum([
-    'attacker',
-    'funding',
-    'wallet',
-    'account',
-    'venue',
-    'oracle',
-    'protocol',
-    'asset',
-    'exit',
-    'outcome',
-  ]),
-  address: z.string().optional(),
-  detail: z.string().optional(),
-  explorerUrl: z.string().url().optional(),
-  col: z.number().int().min(0),
-  row: z.number().int().min(0),
-});
-export type CaseFlowNode = z.infer<typeof CaseFlowNodeSchema>;
-
-export const CaseFlowEdgeSchema = z.object({
-  from: z.string(),
-  to: z.string(),
-  label: z.string().optional(),
-  kind: z
-    .enum(['fund', 'trade', 'price', 'exploit', 'extract', 'outcome'])
-    .default('fund'),
-});
-export type CaseFlowEdge = z.infer<typeof CaseFlowEdgeSchema>;
-
-export const CaseFlowSchema = z.object({
-  caption: z.string().optional(),
-  nodes: z.array(CaseFlowNodeSchema).min(1),
-  edges: z.array(CaseFlowEdgeSchema).min(1),
-});
-export type CaseFlow = z.infer<typeof CaseFlowSchema>;
-
 export const CaseReplaySchema = z.object({
   token: z.string(),
   basePrice: z.number(),
@@ -223,6 +183,19 @@ export const CaseReplaySchema = z.object({
   availableAssets: z.number(),
 });
 export type CaseReplay = z.infer<typeof CaseReplaySchema>;
+
+export const CaseBridgeReplaySchema = z.object({
+  token: z.string(),
+  amount: z.number(),
+  pricePerToken: z.number(),
+  bridgedOut: z.number(),
+  guardians: z.number().int(),
+  requiredSigs: z.number().int(),
+  decoy: z.number(),
+  vulnerableFn: z.string(),
+  fixedFn: z.string(),
+});
+export type CaseBridgeReplay = z.infer<typeof CaseBridgeReplaySchema>;
 
 export const CaseSchema = z.object({
   id: z.string(),
@@ -251,7 +224,7 @@ export const CaseSchema = z.object({
   redFlags: z.array(z.string()).min(1),
   sources: z.array(CaseSourceSchema).min(1),
   glossaryTerms: z.array(z.string()).default([]),
-  flow: CaseFlowSchema.optional(),
   replay: CaseReplaySchema.optional(),
+  bridgeReplay: CaseBridgeReplaySchema.optional(),
 });
 export type Case = z.infer<typeof CaseSchema>;

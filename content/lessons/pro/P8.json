@@ -78,6 +78,12 @@
       ]
     },
     {
+      "id": "p8-case",
+      "type": "case",
+      "title": "Case File: Wormhole",
+      "caseId": "wormhole"
+    },
+    {
       "id": "p8-quiz",
       "type": "quiz",
       "title": "Cross-Chain Bridges Quiz",
