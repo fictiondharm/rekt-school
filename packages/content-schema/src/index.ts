@@ -212,6 +212,9 @@ export const CaseSchema = z.object({
   lessonIds: z.array(z.string()).default([]),
   labLink: z.string().optional(),
   labLabel: z.string().optional(),
+  background: z
+    .array(z.object({ label: z.string(), text: z.string() }))
+    .default([]),
   mechanism: z.string(),
   timeline: z.array(
     z.object({ time: z.string(), event: z.string() }),

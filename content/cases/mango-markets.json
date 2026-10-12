@@ -13,6 +13,24 @@
   "lessonIds": ["P3", "P5"],
   "labLink": "/learn/p5",
   "labLabel": "Oracle Attack lab (P5)",
+  "background": [
+    {
+      "label": "What it is",
+      "text": "Mango Markets was a trading platform built on Solana smart contracts - think of a crypto exchange with no company in the middle. There was no website holding your coins; the rules were code, and anyone could use it."
+    },
+    {
+      "label": "What it does",
+      "text": "On Mango you could do three things from one account: buy and sell tokens (spot), take leveraged bets that a token would go up or down (perpetual futures), and lend or borrow against your balances to earn or pay interest."
+    },
+    {
+      "label": "How it works",
+      "text": "The core idea is 'cross-margin.' Instead of separate wallets for each trade, one account holds your tokens, your open positions and your loans together, and a single number - your health - decides how much you are allowed to borrow. To compute that number, the platform constantly needs to know what everything is worth."
+    },
+    {
+      "label": "Where prices come from",
+      "text": "Mango did not decide prices itself. It used an oracle that read a token's price off several exchanges and averaged them. If those exchanges had thin trading, the price was easy to nudge - and because borrowing power depended on that price, nudging a price meant nudging how much anyone could borrow. That is the door the attacker walked through."
+    }
+  ],
   "mechanism": "Mango Markets was a cross-margined trading platform: one account could hold spot balances, perp positions and debt, and a single 'health' number decided how much it could borrow. The price of MNGO - used to value MNGO perp positions - came from an oracle that averaged MNGO's price across spot venues (Mango itself, plus external exchanges). Those venues had almost no MNGO liquidity.\n\nThat combination is the whole exploit:\n\n1. **Fake the price.** Buy a few million dollars of MNGO on those thin venues. With a shallow order book, a modest buy walks the price up violently - from ~$0.038 to ~$0.91 - and the oracle faithfully reports the new number.\n2. **Fake the profit.** One account was long 483M MNGO-perps; the other short. The inflated oracle marked the long side's *unrealized* profit at hundreds of millions.\n3. **Borrow against the fiction.** The risk engine accepted that unrealized profit as collateral, so the short account could borrow and withdraw ~$116M of real BTC, USDT, SOL and mSOL.\n4. **Pull the rug back down.** Once he stopped buying, MNGO collapsed to its old price. The collateral was worth a fraction of the debt, leaving the protocol with ~$115M of bad debt - and real users holding worthless claims.",
   "timeline": [
     {

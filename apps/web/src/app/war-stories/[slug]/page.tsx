@@ -19,6 +19,7 @@ import {
   BookText,
   ExternalLink,
   Fingerprint,
+  Boxes,
 } from 'lucide-react';
 
 export function generateStaticParams() {
@@ -91,6 +92,26 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
           <div className="text-[10px] font-bold uppercase tracking-wider text-accent">TL;DR</div>
           <MarkdownText content={c.tldr} className="text-sm" />
         </Card>
+
+        {c.background.length > 0 && (
+          <Collapsible
+            title={`Background: what is ${c.protocol}?`}
+            icon={<Boxes className="w-5 h-5 text-accent" />}
+            hint="plain English"
+            defaultOpen
+          >
+            <div className="space-y-2.5 pt-1">
+              {c.background.map((b) => (
+                <div key={b.label} className="p-3 rounded-lg bg-bg border border-border space-y-0.5">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-accent">
+                    {b.label}
+                  </div>
+                  <p className="text-sm text-ink-soft leading-relaxed">{b.text}</p>
+                </div>
+              ))}
+            </div>
+          </Collapsible>
+        )}
 
         <Collapsible title="The mechanism" icon={<BookText className="w-5 h-5 text-accent" />} defaultOpen>
           <MarkdownText content={c.mechanism} className="text-sm" />

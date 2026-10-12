@@ -13,6 +13,24 @@
   "lessonIds": ["P8", "P10"],
   "labLink": "/learn/p8",
   "labLabel": "Cross-Chain Bridge lab (P8)",
+  "background": [
+    {
+      "label": "What it is",
+      "text": "Wormhole is a bridge - infrastructure that lets assets travel between blockchains that otherwise cannot talk to each other. This case is about the Solana <-> Ethereum path, but the same design secures many chains."
+    },
+    {
+      "label": "What it does",
+      "text": "It lets you 'move' value across chains. If you want to use your ETH on Solana, you lock your real ETH in the bridge on Ethereum and receive a wrapped token (wETH) on Solana that is meant to be backed 1:1. Later you can burn the wETH and unlock your real ETH. No ETH is ever teleported - it is locked on one side and a claim is minted on the other."
+    },
+    {
+      "label": "How it works",
+      "text": "A bridge must decide when it is safe to mint the wrapped token on the far side. Wormhole used 'guardians' - 19 independent validators who watch the chains and sign a message (called a VAA) that says 'we really saw this deposit.' On the destination chain, the bridge checks that at least 13 of those 19 signatures are genuine. If enough are, it trusts the message and mints."
+    },
+    {
+      "label": "Why it is risky",
+      "text": "Everything rests on that signature check being real. If an attacker can make the chain believe '13 guardians approved this deposit,' the bridge will happily mint wrapped tokens for a deposit that never happened - creating value out of thin air. That single check is what the attacker broke."
+    }
+  ],
   "mechanism": "A bridge moves value between chains by locking an asset on one side and minting a wrapped claim on the other. The critical question is: **who is allowed to say 'the asset really was locked'?**\n\nWormhole answered with **guardians**: 19 validators who sign a message (a VAA) attesting to a deposit. On the destination chain, the program checks that at least 13 of the 19 signatures are valid. If they are, it mints the wrapped token.\n\n**The shortcut that broke it:**\n\n1. Elliptic-curve signature checks are expensive, so Wormhole did not run the curve math inside the bridge program. Instead, the transaction includes a separate instruction to Solana's native `secp256k1` precompile that verifies the signatures, and `verify_signatures` reads the *result* of that earlier instruction from the 'instructions' sysvar account.\n2. To find that earlier instruction, the code called `load_instruction_at` - the **deprecated, unchecked** version. It trusted whatever account was passed as the instructions sysvar *by address*, never verifying who owned it.\n3. The attacker passed their **own account** in place of the real sysvar, containing a fake 'secp256k1 verified these signatures' instruction. `verify_signatures` read the forgery and accepted it as the guardians' approval.\n4. Wormhole then accepted an attacker-authored VAA claiming 120,000 ETH had been deposited on Ethereum - a transfer that never occurred - and minted 120,000 wETH on Solana.\n5. The attacker bridged 93,750 ETH out to Ethereum via the bridge's legitimate path.\n\nThe fix - shipped the same day - replaced `load_instruction_at` with `load_instruction_at_checked`, which verifies the account's owner is the System Program before trusting it. One line. The difference between a trustworthy signature and a forged one.",
   "timeline": [
     {
