@@ -7,7 +7,7 @@
   "dateLabel": "October 11, 2022",
   "lossUsd": "~$114M drained (~$117M across 14 tokens by some counts)",
   "category": "Oracle price manipulation + cross-margin abuse",
-  "status": "Attacker identified, convicted of fraud and market manipulation in 2024",
+  "status": "Convicted April 2024; conviction overturned on May 23, 2025 (judge found insufficient evidence of false representation to a permissionless protocol)",
   "difficulty": "advanced",
   "tldr": "In under an hour, a trader used two anonymous accounts and roughly $10M of his own capital to pump the price of a thinly traded governance token, MNGO, on the exchanges that fed Mango Markets' oracle. The protocol trusted that fake price, valued his unrealized perp profits at hundreds of millions, and let him borrow out almost every real asset in the vault. There was no code bug. Every transaction was valid. He just lied to the price feed - and the risk engine believed it.",
   "lessonIds": ["P3", "P5"],
@@ -62,6 +62,10 @@
     {
       "time": "April 18, 2024",
       "event": "A Manhattan jury finds Eisenberg guilty of fraud and market manipulation."
+    },
+    {
+      "time": "May 23, 2025",
+      "event": "U.S. District Judge Arun Subramanian overturns the fraud and market-manipulation convictions, ruling prosecutors failed to prove Eisenberg made false representations to a permissionless, smart-contract-run protocol. Eisenberg is separately still serving a four-year sentence from an unrelated 2024 guilty plea."
     }
   ],
   "actors": [
@@ -165,7 +169,48 @@
     { "label": "DOJ — SDNY indictment, 23 CRIM 010", "url": "https://www.justice.gov/usao-sdny/press-release/file/1566841/dl" },
     { "label": "Elliptic — Mango exploit analysis ($117.8M across 14 tokens)", "url": "https://www.elliptic.co/insights/mango-market-exploit-defi-loses-nearly-900-million-to-hackers-in-costliest-30-days-on-record" },
     { "label": "Solidus Labs — order-book minute-by-minute", "url": "https://www.soliduslabs.com/post/mango-hack" },
-    { "label": "CoinDesk — Eisenberg found guilty", "url": "https://www.coindesk.com/policy/2024/04/18/mango-markets-exploiter-avi-eisenberg-found-guilty-of-fraud-and-manipulation" }
+    { "label": "CoinDesk — Eisenberg found guilty", "url": "https://www.coindesk.com/policy/2024/04/18/mango-markets-exploiter-avi-eisenberg-found-guilty-of-fraud-and-manipulation" },
+    { "label": "CoinDesk — conviction overturned (May 2025)", "url": "https://www.coindesk.com/business/2025/05/24/judge-overturns-convictions-in-mango-markets-exploiters-crypto-fraud-case" }
   ],
+  "flow": {
+    "caption": "Attacker wallet addresses are not published in the court filings, so actors are labelled exactly as the DOJ indictment and Solidus Labs' order-book analysis name them. Amounts, timing and venue-by-venue buys come from those documents.",
+    "nodes": [
+      { "id": "circle", "label": "Circle Account-1", "kind": "funding", "detail": "Eisenberg's Circle account. Origin of ~$14.18M USDC.", "col": 0, "row": 1 },
+      { "id": "exch", "label": "Exchange-1 Account", "kind": "funding", "detail": "Registered to another person, foreign address. ~$12.5M USDC in.", "col": 1, "row": 1 },
+      { "id": "w1", "label": "Solana Wallet-1", "kind": "wallet", "detail": "Receives ~$5.52M USDC. Long side of the wash trade.", "col": 2, "row": 0 },
+      { "id": "w2", "label": "Solana Wallet-2", "kind": "wallet", "detail": "Receives ~$5M USDC. Short side, then the withdrawal account.", "col": 2, "row": 2 },
+      { "id": "venues", "label": "Thin MNGO venues", "kind": "venue", "detail": "Mango spot ($1.44M), AscendEX (~$1M), FTX. Almost no liquidity.", "col": 3, "row": 0 },
+      { "id": "accounts", "label": "Two Mango accounts", "kind": "account", "detail": "483M MNGO-PERP wash trade at $0.038 - a self-trade.", "col": 3, "row": 2 },
+      { "id": "oracle", "label": "Mango Oracle", "kind": "oracle", "detail": "Averages MNGO across Mango + AscendEX + FTX. ~$4M of buys moved it +2,300%.", "col": 4, "row": 1 },
+      { "id": "protocol", "label": "Mango Markets", "kind": "protocol", "detail": "Cross-margin risk engine trusts the oracle blindly.", "col": 4, "row": 2 },
+      { "id": "exit", "label": "~$116M withdrawn", "kind": "exit", "detail": "BTC, USDT, SOL, mSOL - nearly all user liquidity.", "col": 5, "row": 2 },
+      { "id": "bad", "label": "~$115M bad debt", "kind": "outcome", "detail": "MNGO collapses back; user claims left worthless.", "col": 5, "row": 4 }
+    ],
+    "edges": [
+      { "from": "circle", "to": "exch", "label": "~$12.5M USDC", "kind": "fund" },
+      { "from": "exch", "to": "w1", "label": "~$5.52M", "kind": "fund" },
+      { "from": "exch", "to": "w2", "label": "~$5M", "kind": "fund" },
+      { "from": "w1", "to": "accounts", "label": "fund + open", "kind": "fund" },
+      { "from": "w2", "to": "accounts", "label": "fund + open", "kind": "fund" },
+      { "from": "accounts", "to": "oracle", "label": "wash trade 483M", "kind": "trade" },
+      { "from": "venues", "to": "oracle", "label": "buy MNGO +2,300%", "kind": "price" },
+      { "from": "oracle", "to": "protocol", "label": "fake price accepted", "kind": "price" },
+      { "from": "accounts", "to": "protocol", "label": "borrow on fake profit", "kind": "exploit" },
+      { "from": "protocol", "to": "exit", "label": "$116M out", "kind": "extract" },
+      { "from": "exit", "to": "bad", "label": "price collapses", "kind": "outcome" }
+    ]
+  },
+  "replay": {
+    "token": "MNGO",
+    "basePrice": 0.038,
+    "peakPrice": 0.91,
+    "entryPrice": 0.038,
+    "position": 483000000,
+    "positionUnit": "MNGO-perp",
+    "seed": 5000000,
+    "maxBuy": 12000000,
+    "thinDepth": 3000000,
+    "availableAssets": 116000000
+  },
   "glossaryTerms": ["oracle", "collateral", "perpetual", "leverage", "liquidation", "market_cap"]
 }
