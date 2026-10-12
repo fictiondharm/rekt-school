@@ -77,6 +77,10 @@ export function CourseSidebar({
     { id: 'I8', title: 'Staking & Liquid Staking (LST)', free: false },
     { id: 'I9', title: 'Tokenomics 1: Supply & Vesting', free: false },
     { id: 'I10', title: 'Token Cliffs & Unlock Pressure', free: false },
+    { id: 'I11', title: 'Estimating a Launch', free: false },
+    { id: 'I12', title: 'Historical Exploits & Lessons', free: false },
+    { id: 'I13', title: 'Read the Chain Yourself', free: false },
+    { id: 'I14', title: 'Governance, DAOs & Airdrops', free: false },
   ];
 
   if (isCollapsed) {
@@ -103,7 +107,7 @@ export function CourseSidebar({
           <h3 className="font-heading font-bold text-sm text-ink flex items-center gap-1.5">
             Rekt School Curriculum
           </h3>
-          <p className="text-xs text-ink-soft">Tier 1: Basic · Tier 2: Labs · Tier 3: Pro (Sandbox)</p>
+          <p className="text-xs text-ink-soft">Tier 1: Basic · Tier 2: Intermediate · Tier 3: Pro</p>
         </div>
         <button
           onClick={onToggleCollapse}
@@ -252,13 +256,6 @@ export function CourseSidebar({
       </div>
 
       <div className="p-3 border-t border-border space-y-1">
-        <Link
-          href="/labs"
-          className="flex items-center gap-2 p-2 rounded-lg text-xs font-semibold text-ink-soft hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
-        >
-          <Play className="w-4 h-4 text-indigo-500" />
-          <span>Interactive Labs Hub</span>
-        </Link>
         <Link
           href="/glossary"
           className="flex items-center gap-2 p-2 rounded-lg text-xs font-semibold text-ink-soft hover:text-accent hover:bg-accent/10 transition-colors"

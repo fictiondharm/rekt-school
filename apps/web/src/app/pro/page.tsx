@@ -108,9 +108,9 @@ export default function ProPage() {
                 <Sparkles className="w-4 h-4" /> Start P1: Order Types
               </Button>
             </Link>
-            <Link href="/labs">
+            <Link href="/war-stories">
               <Button variant="secondary" className="gap-2">
-                Explore the Labs
+                Read the War Stories
               </Button>
             </Link>
           </div>

@@ -420,7 +420,7 @@ export function LessonEngine({
                     </Link>
                   )
                 ) : lesson.id.startsWith('I') ? (
-                  parseInt(lesson.id.replace('I', ''), 10) < 10 ? (
+                  parseInt(lesson.id.replace('I', ''), 10) < 14 ? (
                     <Link
                       href={`/learn/i${parseInt(lesson.id.replace('I', ''), 10) + 1}`}
                       className="block pt-1"
@@ -431,9 +431,9 @@ export function LessonEngine({
                       </Button>
                     </Link>
                   ) : (
-                    <Link href="/labs" className="block pt-1">
+                    <Link href="/pro" className="block pt-1">
                       <Button variant="accent" className="w-full gap-2 text-xs font-bold">
-                        Explore the Labs Hub <ArrowRight className="w-4 h-4" />
+                        Finished Intermediate - Explore the Pro tier <ArrowRight className="w-4 h-4" />
                       </Button>
                     </Link>
                   )

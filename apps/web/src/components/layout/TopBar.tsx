@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { WalletChip } from '@/components/onchain/WalletChip';
-import { Badge } from '@/components/ui';
-import { getNetworkMeta, getNetworkMetaByLesson } from '@/lib/tier';
 import { Sparkles } from 'lucide-react';
 import type { Tier } from '@defi-mommy/content-schema';
 
@@ -16,75 +16,85 @@ interface TopBarProps {
   lessonId?: string;
 }
 
-export function TopBar({ lessonTitle, aura = 0, streak = 0, showTourButton = false, tier, lessonId }: TopBarProps) {
-  const net = lessonId
-    ? getNetworkMetaByLesson(lessonId)
-    : tier
-    ? getNetworkMeta(tier)
-    : undefined;
+interface NavLink {
+  label: string;
+  href: string;
+  isActive: (path: string) => boolean;
+}
+
+const NAV_LINKS: NavLink[] = [
+  {
+    label: 'Basic',
+    href: '/basic',
+    isActive: (p) => p === '/basic' || p.startsWith('/basic/') || /^\/learn\/b/i.test(p),
+  },
+  {
+    label: 'Intermediate',
+    href: '/intermediate',
+    isActive: (p) => p.startsWith('/intermediate') || /^\/learn\/i/i.test(p),
+  },
+  {
+    label: 'Pro',
+    href: '/pro',
+    isActive: (p) => p === '/pro' || p.startsWith('/pro/') || /^\/learn\/p/i.test(p),
+  },
+  {
+    label: 'War Stories',
+    href: '/war-stories',
+    isActive: (p) => p.startsWith('/war-stories'),
+  },
+  {
+    label: 'Glossary',
+    href: '/glossary',
+    isActive: (p) => p.startsWith('/glossary'),
+  },
+];
+
+export function TopBar({ lessonTitle, aura = 0, showTourButton = false }: TopBarProps) {
+  const pathname = usePathname() || '/';
+
   return (
     <header className="sticky top-0 z-30 bg-white border-b-2 border-ink">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-16 items-center justify-between gap-4">
           <Link
             href="/"
             aria-label="Rekt School home"
-            className="flex items-center gap-3 text-ink hover:opacity-80 transition-opacity"
+            className="flex items-center gap-2.5 text-ink hover:opacity-80 transition-opacity shrink-0"
           >
+            <Image
+              src="/brand/logo-icon.png"
+              alt="Rekt School"
+              width={32}
+              height={32}
+              className="w-8 h-8 object-contain"
+            />
             <div className="flex flex-col">
               <span className="font-heading font-bold text-lg leading-none tracking-tight">Rekt School</span>
               {lessonTitle && (
                 <span className="font-medium text-xs tracking-wider text-ink-faint mt-1">{lessonTitle}</span>
               )}
-              {net && (
-                <Badge
-                  data-tour="topbar-cluster"
-                  variant={net.badgeVariant}
-                  className="mt-1 w-fit text-[9px] px-2 py-0.5"
-                >
-                  {net.badgeLabel}
-                </Badge>
-              )}
             </div>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-8">
-            <Link
-              href="/learn/b1"
-              className="font-bold text-sm hover:underline underline-offset-4"
-            >
-              Basic
-            </Link>
-            <Link
-              href="/learn/i1"
-              className="font-bold text-sm hover:underline underline-offset-4"
-            >
-              Intermediate
-            </Link>
-            <Link
-              href="/labs"
-              className="font-bold text-sm hover:underline underline-offset-4"
-            >
-              Labs
-            </Link>
-            <Link
-              href="/glossary"
-              className="font-bold text-sm hover:underline underline-offset-4"
-            >
-              Glossary
-            </Link>
-            <Link
-              href="/pro"
-              className="font-bold text-sm hover:underline underline-offset-4"
-            >
-              Pro
-            </Link>
-            <Link
-              href="/war-stories"
-              className="font-bold text-sm hover:underline underline-offset-4"
-            >
-              War Stories
-            </Link>
+          <nav className="hidden md:flex items-center gap-1">
+            {NAV_LINKS.map((link) => {
+              const active = link.isActive(pathname);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={active ? 'page' : undefined}
+                  className={`px-3 py-1.5 rounded-full text-sm font-bold transition-colors ${
+                    active
+                      ? 'bg-accent text-white'
+                      : 'text-ink hover:bg-accent/10 hover:text-accent'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="flex items-center gap-3">
