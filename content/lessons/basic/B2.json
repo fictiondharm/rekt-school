@@ -5,9 +5,9 @@
   "title": "Your Wallet: Keys and Addresses",
   "estMinutes": 8,
   "objectives": [
-    "Understand the difference between public keys and private keys",
-    "Learn why a seed phrase can recreate your entire wallet",
-    "Discover how digital signatures prove ownership without revealing secrets"
+    "Why your address is safe to share and your seed phrase never is",
+    "Where the 12 words come from and what they actually control",
+    "How a signature proves you approved something without revealing your key"
   ],
   "requires": ["B1"],
   "freePreview": false,
@@ -17,25 +17,19 @@
     {
       "id": "b2-intro",
       "type": "read",
-      "title": "Public vs Private: The Postbox Analogy",
-      "body": "Think of a crypto <Term id=\"wallet\">wallet</Term> like a high-security postbox with two completely different sides.\n\n**The front slot: your public identity.** Your <Term id=\"public_key\">public key</Term> (usually shortened into an <Term id=\"address\">address</Term> like `7xKX...9dQ`) is the slot on the front of the box. Anyone in the world can drop letters or tokens through it. It is completely safe to share with friends, exchanges, or websites - publishing it invites payments, it never risks them.\n\n**The back door: your private key.** Your <Term id=\"private_key\">private key</Term> is the only key that unlocks the back of the box to take things out. Whoever holds it *is* you as far as the blockchain is concerned. If someone copies your private key, they can empty your box in seconds, with no refund and no reversal.\n\n**The mental model that prevents 90% of hacks:** an address is a *destination*, a private key is *ownership*. You hand out destinations all day. You never, ever hand out ownership."
-    },
-    {
-      "id": "b2-seed-phrase",
-      "type": "read",
-      "title": "The Master Key: Your Seed Phrase",
-      "body": "When you install Phantom or Solflare, you are given a 12 or 24-word <Term id=\"seed_phrase\">seed phrase</Term> like *'ripple canyon velvet ...'*.\n\n**Why 12 words hold an entire wallet.** That sequence is not a random password stored on a server. It is a mathematical seed. From those words, your wallet deterministically derives every private key and every address you will ever use. Anyone who has the seed phrase can regenerate your whole wallet on any device, anywhere.\n\n**Three rules that will keep you safe:**\n- Write it on paper or stamp it into metal. Never screenshot it, never store it in Notes, Photos, or cloud drives.\n- **Never type your seed phrase into any website, Discord form, or Google Doc.**\n- Real wallet popups will **NEVER** ask you to re-enter your seed phrase to approve a transaction. If a page asks, it is a drainer - close it instantly.\n\nRemember: losing your seed phrase loses the wallet. Leaking it gives the wallet away. There is no 'forgot password' link in self-custody."
+      "title": "Two halves of a wallet",
+      "body": "A <Term id=\"wallet\">wallet</Term> has two halves, and confusing them is how people lose everything.\n\nOne is your <Term id=\"public_key\">public key</Term>, written as an <Term id=\"address\">address</Term> - something like `7xKX...9dQ`. It's a destination. Give it to anyone: people use it to send you tokens, exchanges use it to pay you out, sites use it to check what you hold. Publishing it can only bring you things.\n\nThe other is your <Term id=\"private_key\">private key</Term>. A 32-byte number nobody ever sees, and it's the only thing that can sign on your wallet's behalf. Whoever holds it controls the address. Not \"has access to\" - controls. They can empty it in a single transaction, and Solana does not do refunds.\n\nSo the mental model worth keeping: **an address is a destination, a private key is a hand.** You hand out destinations all day. You never hand out the hand.\n\nMost people never touch the private key directly. They meet a <Term id=\"seed_phrase\">seed phrase</Term> instead - 12 words, generated once when you install Phantom or Solflare.\n\n**Where the 12 words come from**\n\nThe words are not a password stored on a server. They're the root of a tree. From that one sequence your wallet derives every private key and every address you'll ever use, in a fixed order, on any device.\n\nWhich cuts both ways, and it's worth saying plainly. Lose the words and you lose the wallet - there is no reset. Leak the words and you've given the wallet away, because anyone can rebuild it on their own phone in about ten seconds.\n\nThree habits that prevent most losses:\n- Paper or metal. Never a screenshot, never Notes, never a cloud drive - those sync, and so does the thief.\n- No site, no Discord form, no \"support agent\" needs them. Ever.\n- A real wallet will never ask you to re-enter your seed phrase to approve something. If a page asks, close the tab."
     },
     {
       "id": "b2-under-the-hood",
       "type": "deepdive",
-      "title": "Under the Hood: How Signing Works",
-      "body": "When you approve an action, your wallet uses the Ed25519 elliptic-curve algorithm to combine your private key with the transaction message. This produces a unique 64-byte cryptographic <Term id=\"signature\">signature</Term>. Anyone on the network can mathematically verify using your public key that the signature was created by your private key, without ever seeing or deducing the private key itself."
+      "title": "What a signature actually is",
+      "body": "Solana uses Ed25519, an elliptic curve. When you approve something, your wallet combines your private key with the exact bytes of the transaction and produces a <Term id=\"signature\">signature</Term> - 64 bytes of it.\n\nTwo properties make that useful. Anyone can check the signature against your <Term id=\"public_key\">public key</Term> and confirm it came from your key, without your key ever leaving the extension. And it can't be reversed - you can't get the key from the signature.\n\nIt also means the signature only approves *this specific* transaction. Not your wallet, not a permission, not future transactions. Which is exactly why a drainer has to talk you into approving something new every single time."
     },
     {
       "id": "b2-quiz",
       "type": "quiz",
-      "title": "Wallet Security Quiz",
+      "title": "Two questions",
       "questions": [
         {
           "id": "q1",
@@ -47,21 +41,21 @@
             "Your browser password"
           ],
           "correct": 2,
-          "explainRight": "Correct! Your public key / address is meant to be shared so people can send you tokens.",
-          "explainWrong": "Incorrect. Only your public key (address) can be shared. Private keys and seed phrases must stay 100% secret."
+          "explainRight": "Your address. That is what it is for.",
+          "explainWrong": "Only the address. A seed phrase or a private key is complete control of the wallet."
         },
         {
           "id": "q2",
           "prompt": "If a website asks you to enter your seed phrase to 'verify your wallet' or 'claim an airdrop', what should you do?",
           "options": [
             "Enter it quickly before the airdrop expires",
-            "Close the tab immediately. It is a scam drainer trying to steal your funds",
+            "Close the tab immediately. No legitimate app ever asks for your seed phrase",
             "Type only the first 6 words",
             "Send it to a support agent on Telegram"
           ],
           "correct": 1,
-          "explainRight": "100% right! Legitimate Web3 dapps never ask for your seed phrase. That is always a phishing drainer.",
-          "explainWrong": "Never enter your seed phrase! Any site asking for your seed words is trying to steal your wallet."
+          "explainRight": "Close it. Nobody running a real protocol needs your words to verify anything.",
+          "explainWrong": "Never. A real wallet never asks for the words, so whoever is asking is taking the wallet."
         }
       ],
       "passScore": 2
@@ -69,7 +63,7 @@
     {
       "id": "b2-explore",
       "type": "explore",
-      "title": "Explore Top Solana Wallets",
+      "title": "Look up a real address",
       "cardIds": ["phantom", "solscan"]
     }
   ],

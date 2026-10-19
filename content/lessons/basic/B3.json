@@ -5,9 +5,9 @@
   "title": "Stay Safe: Wallet Security",
   "estMinutes": 6,
   "objectives": [
-    "Identify phishing websites and malicious copycat URLs",
-    "Understand what you are actually signing when approving a transaction",
-    "Learn what token approvals and delegate permissions mean"
+    "How to tell a phishing page from the real one before you connect",
+    "What you are actually approving when you click sign",
+    "What a delegate or an on-chain approval can do to your wallet"
   ],
   "requires": ["B2"],
   "freePreview": false,
@@ -17,45 +17,45 @@
     {
       "id": "b3-intro",
       "type": "read",
-      "title": "The Golden Rules of Web3 Security",
-      "body": "In crypto, you are your own bank. That freedom is powerful, but it means there is no fraud department to call and no chargeback to file. Your security habits *are* your bank vault. Two rules stop almost every attack:\n\n1. **Bookmark official URLs:** Attackers buy sponsored Google ads with deceptive lookalike URLs (e.g. `phantorn.app` or `jup-airdrop.xyz`). The safest habit is to type the URL manually or use a bookmark you saved yourself. Never sign in to a crypto app you reached through an ad or a DM link.\n2. **Trust your wallet's simulation over the website:** Wallets like Phantom show a preview of exactly what tokens leave your wallet before you sign. If a site promises *'Claim 5,000 Free USDC'* but the popup shows `-2.5 SOL` leaving you, that is the truth - reject it immediately.\n\n**A third, quieter rule:** slow down. Scams rely on urgency and FOMO. A real protocol never punishes you for taking 10 seconds to read the details."
+      "title": "The two rules that stop most attacks",
+      "body": "In crypto you are the bank, which means there's no fraud department to call and no chargeback to file. Your habits are the vault.\n\nTwo rules stop most of what's out there.\n\n**Rule one: get to the site the right way.** Phishing isn't clever code, it's a URL that looks almost right. Attackers buy the sponsored slot above search results, because that's the one link people click without reading. `phantorn.app` instead of phantom.app. `jup-airdrop.xyz` instead of the official claim page. The fix is boring and it works: bookmark the apps you use, and always reach them from the bookmark. Never from a search result, an ad, or a link in a DM.\n\n**Rule two: believe the wallet, not the page.** When you sign, your wallet shows what will actually change - which tokens leave, what you receive. That preview is built from the transaction itself, not from the website's marketing copy. The page can say \"Claim 5,000 free USDC\" as loudly as it wants. If the popup shows 2.5 SOL leaving your wallet, the popup is right.\n\nThere's a third rule underneath both, and it's the one scammers actually rely on: slow down. Urgency is the business model - \"claim within 10 minutes\", \"your wallet will be suspended\". A real protocol has never once punished anyone for taking fifteen seconds to read a prompt."
     },
     {
       "id": "b3-under-the-hood",
       "type": "deepdive",
-      "title": "Under the Hood: How Token Drainers Work",
-      "body": "Malicious drainers work by asking you to sign an instruction that sets a third-party address as the 'delegate' authority over your token accounts, or sends all your SOL as a transaction fee. Because transactions execute atomically on Solana, one rogue approval can empty all delegated accounts in a single block."
+      "title": "How a drainer empties a wallet",
+      "body": "A drainer is rarely a hack. It's an approval you gave, waiting to be used.\n\nHere's the usual shape. A site asks you to sign a transaction that sets *its* address as a delegate over your token accounts, or reassigns your account with a set-authority instruction. On its own it looks harmless - nothing appears to leave your wallet. Then, later, the drainer uses the permission you already granted and moves the tokens out in one transaction, without asking you again.\n\nOn Solana that happens in a single block, and a single transaction can act on several accounts at once. One careless <Term id=\"signature\">signature</Term> can empty every token account you hold, in the same instant, with no pending state to notice and no window to react.\n\nSo the question at the signing screen isn't \"does this look like a good deal?\". It's \"what permission am I granting, and to whom?\". If a transaction asks to change an authority, add a delegate, or close an account to a destination you don't recognise, and you didn't come here to do exactly that, reject it."
     },
     {
       "id": "b3-quiz",
       "type": "quiz",
-      "title": "Phishing Detection Quiz",
+      "title": "Two questions",
       "questions": [
         {
           "id": "q1",
-          "prompt": "You see a sponsored Google search result for a popular decentralized exchange offering a 'bonus $500 reward'. What is the safest action?",
+          "prompt": "You see a sponsored Google result for a popular exchange offering a 'bonus $500 reward'. What is the safest action?",
           "options": [
             "Click the ad immediately to claim the bonus",
-            "Do not click sponsored ads; type the verified URL directly or use a saved bookmark",
-            "Connect a wallet containing your main savings",
-            "Approve all requested transactions without reading"
+            "Ignore the ad and reach the site from a bookmark you saved yourself",
+            "Connect a wallet that holds your main savings",
+            "Approve whatever the page asks without reading it"
           ],
           "correct": 1,
-          "explainRight": "Correct! Phishing ads frequently buy top search spots with counterfeit replica websites.",
-          "explainWrong": "Never click sponsored ads for crypto dapps. Phishing replicas frequently appear at the top of search engines."
+          "explainRight": "Ignore the ad. Ad slots are cheap to buy and easy to point at a lookalike domain - the real site comes from your own bookmark.",
+          "explainWrong": "Never open a crypto app through a sponsored ad. Lookalike domains sit at the top of search results on purpose."
         },
         {
           "id": "q2",
-          "prompt": "Your wallet popup says you are sending 5 SOL to an unknown address, but the website claims you are receiving an airdrop. What should you do?",
+          "prompt": "Your wallet popup says it is sending 5 SOL to an unknown address, but the webpage says you are claiming an airdrop. What do you do?",
           "options": [
-            "Approve the transaction anyway",
-            "Reject and cancel the transaction immediately",
-            "Wait 5 minutes and click approve",
-            "Refresh the browser and approve"
+            "Approve it anyway, the page knows what it is doing",
+            "Reject and cancel it immediately",
+            "Wait five minutes and approve it then",
+            "Refresh the browser and approve it again"
           ],
           "correct": 1,
-          "explainRight": "Always trust what your wallet extension's simulation shows over whatever text appears on a webpage!",
-          "explainWrong": "Reject it! The wallet extension shows the true on-chain instruction. The website is trying to trick you."
+          "explainRight": "Reject it. The popup describes the transaction you are actually authorising - it is the only version that matters.",
+          "explainWrong": "Reject. The popup shows the real on-chain instruction. The webpage is telling you a story."
         }
       ],
       "passScore": 2
@@ -63,7 +63,7 @@
     {
       "id": "b3-explore",
       "type": "explore",
-      "title": "Explore Safety Tools",
+      "title": "Check an app before you trust it",
       "cardIds": ["phantom", "solscan"]
     }
   ],

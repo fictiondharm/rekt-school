@@ -5,9 +5,9 @@
   "title": "Tokens and Token Accounts",
   "estMinutes": 10,
   "objectives": [
-    "Understand the SPL Token standard on Solana",
-    "Discover the difference between a Mint account and a Token Account",
-    "Learn why your wallet creates an Associated Token Account (ATA) for each new token"
+    "Why Solana keeps a token's definition and your balance in separate accounts",
+    "What the associated token account is and who pays to create it",
+    "Why every on-chain amount is a whole number, and what decimals really do"
   ],
   "requires": ["B4"],
   "freePreview": false,
@@ -17,51 +17,51 @@
     {
       "id": "b5-intro",
       "type": "read",
-      "title": "How Solana Handles Tokens",
-      "body": "On Ethereum, a smart contract maintains a giant internal ledger of every user's balance. Solana does things differently - it splits the concept into **two kinds of accounts**:\n\n1. **The Mint Account:** This is the master recipe account for the <Term id=\"spl_token\">SPL token</Term>. It defines the token's total supply, decimals, and who holds minting authority. There is exactly one mint per token.\n2. **Your Token Account:** Your main wallet does not hold tokens directly inside your SOL address. Instead, your wallet owns a separate child account called an Associated <Term id=\"token_account\">Token Account</Term> (ATA) dedicated to holding that specific token.\n\n**Why the split?** A single wallet can hold dozens of different tokens. Rather than stuffing them all into one account, Solana gives each token its own dedicated account that your wallet controls. The mint describes *the asset*; your ATA holds *your slice of it*.\n\nThis is why, the first time you receive a new token, your wallet quietly creates a fresh ATA for it - and why closing empty ATAs returns a little SOL."
+      "title": "How Solana holds a token balance",
+      "body": "The way Solana stores a token balance is a little unusual, and once it clicks, a lot of other behaviour makes sense.\n\nThere are two kinds of accounts involved, not one.\n\nThe <Term id=\"mint\">mint</Term> is the token itself - the definition. It records the total supply, the <Term id=\"decimals\">decimals</Term>, and which address is allowed to mint more. There is exactly one mint per token, ever. USDC has a single mint account, and every USDC in circulation is accounted for inside it.\n\nYour balance isn't in there. It lives in a separate <Term id=\"token_account\">token account</Term> that your wallet owns, one per token. Your wallet's main address holds SOL and nothing else. The first time you receive USDC, your wallet quietly creates a dedicated account to hold it.\n\nWhy split it? Because a wallet can hold hundreds of tokens with different supply rules and different authorities. Giving each one its own account keeps them isolated. Simply put: the mint describes *the asset*, and your token account holds *your slice of it*.\n\nWhen you receive a new token for the first time, someone pays a small deposit in SOL to create that account - usually the sender. Keep the account and the deposit stays parked. Close it and the SOL comes back."
     },
     {
       "id": "b5-decimals",
       "type": "read",
-      "title": "Decimals: Why Blockchains Store Integers",
-      "body": "Blockchains do not support floating-point decimals (like 1.50) because rounding errors across thousands of validators would break consensus. Every amount must be an exact, whole integer.\n\nSo tokens declare a <Term id=\"decimals\">decimals</Term> value that sets how many base units make up one whole token:\n\n- **6 decimals** (like USDC): `1.50 USDC` is stored on-chain as the integer `1500000`.\n- **9 decimals** (like SOL): `1 SOL` is stored as `1000000000` lamports.\n\nThe decimals are really just a **display layer**. The blockchain only ever sees integers; your wallet divides by 10^decimals to show you a human-friendly number. This is also why 'amount must be an integer' errors appear when a dapp mishandles decimals - the chain simply refuses fractional base units."
+      "title": "Decimals: why the chain only counts integers",
+      "body": "Blockchains don't do decimals. Every validator has to agree on the exact same number, and floating-point arithmetic produces tiny disagreements - the 0.1 + 0.2 kind - that would be fatal at scale. So every balance is stored as a whole number, and a fixed <Term id=\"decimals\">decimals</Term> value tells you where the point goes.\n\n- USDC uses 6 decimals. `1.50 USDC` is stored as `1500000`.\n- SOL uses 9 decimals. `1 SOL` is stored as `1000000000` lamports.\n\nDecimals are a display layer. The chain only ever saw the integer, and your wallet does the division to show you something human-readable.\n\nThis is also where bizarre numbers come from. If a dapp divides by the wrong power of ten, it asks you to approve a 1,000× amount, or a 0.001× one - and the popup shows it faithfully. When a total looks impossible, the decimals are usually why."
     },
     {
       "id": "b5-under-the-hood",
       "type": "deepdive",
-      "title": "Under the Hood: Associated Token Account (ATA) Derivation",
-      "body": "How does an app know where to send your USDC? It derives your ATA address using a Program Derived Address (PDA). The formula seeds are: your wallet address, the SPL Token Program ID, and the token Mint address. Because this derivation is deterministic, anyone can calculate your token account address without asking you or searching the blockchain."
+      "title": "Where your token account address comes from",
+      "body": "How does an app know which account to send your USDC to, when you never told it? It works the address out.\n\nYour token account is an *associated* token account, and its address is computed from three inputs: your wallet address, the token's <Term id=\"mint\">mint</Term>, and the token program that governs it. Run those through a hash and you get one fixed address - the same for everyone, every time. Nothing is random and nothing is secret.\n\nTechnically that makes it a program-derived address (PDA): an address with no private key of its own, derived on demand rather than stored. Which is exactly the point. The app doesn't need a lookup table or a round trip to your wallet - it does the math and has your address.\n\nIt's also why you can receive a token you've never held before. The sender's wallet derives your associated account from your address alone, and creates it if it doesn't exist yet."
     },
     {
       "id": "b5-quiz",
       "type": "quiz",
-      "title": "Token Accounts Check",
+      "title": "Two questions",
       "questions": [
         {
           "id": "q1",
-          "prompt": "If a token has 6 decimals, how is an amount of 2.5 tokens stored on the blockchain ledger?",
+          "prompt": "If a token has 6 decimals, how is an amount of 2.5 tokens stored on-chain?",
           "options": [
-            "2.500000 (as a floating-point number)",
-            "2,500,000 (as an integer)",
-            "25 (as a string)",
+            "2.500000, as a floating-point number",
+            "2500000, as an integer",
+            "25, as a string",
             "0.0000025"
           ],
           "correct": 1,
-          "explainRight": "Correct! 2.5 multiplied by 10^6 equals 2,500,000 integer units.",
-          "explainWrong": "Incorrect. Blockchains store token balances as integers multiplied by 10^(decimals), so 2.5 becomes 2,500,000."
+          "explainRight": "2,500,000. Multiply by ten to the power of the decimals: 2.5 × 10^6.",
+          "explainWrong": "2,500,000. Balances are integers scaled by 10^decimals, so 2.5 × 10^6."
         },
         {
           "id": "q2",
-          "prompt": "What is an Associated Token Account (ATA) on Solana?",
+          "prompt": "What is an associated token account on Solana?",
           "options": [
             "A separate bank account in Switzerland",
-            "A child account owned by your wallet created specifically to store your balance for one token mint",
-            "A Discord username verification bot",
-            "A special validator node"
+            "An account your wallet controls that holds your balance for one specific token",
+            "A Discord verification bot",
+            "A type of validator node"
           ],
           "correct": 1,
-          "explainRight": "Spot on! On Solana, you have a distinct ATA for each SPL token you hold.",
-          "explainWrong": "Incorrect. An ATA is a deterministic on-chain account holding your balance for a specific token mint."
+          "explainRight": "One account per token, controlled by your wallet - the balance lives there, not in your main address.",
+          "explainWrong": "It is a dedicated on-chain account that holds your balance for one token mint."
         }
       ],
       "passScore": 2
@@ -69,7 +69,7 @@
     {
       "id": "b5-explore",
       "type": "explore",
-      "title": "Explore SPL Tokens",
+      "title": "Open a mint and follow the accounts",
       "cardIds": ["solscan"]
     }
   ],

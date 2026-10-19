@@ -5,9 +5,9 @@
   "title": "Meet TVL (Total Value Locked)",
   "estMinutes": 8,
   "objectives": [
-    "Understand what Total Value Locked (TVL) measures across pools and protocols",
-    "Identify why TVL can mislead users through double counting and circular backing",
-    "Evaluate real protocol liquidity depth vs superficial headline TVL"
+    "What TVL measures, and what it is a proxy for",
+    "The three ways a TVL number gets inflated without new money arriving",
+    "How to judge liquidity depth yourself instead of trusting a headline"
   ],
   "requires": ["B8"],
   "freePreview": false,
@@ -17,51 +17,51 @@
     {
       "id": "b9-intro",
       "type": "read",
-      "title": "What Total Value Locked (TVL) Means",
-      "body": "**Total Value Locked (TVL)** is the aggregate dollar value of all cryptocurrency assets currently deposited in a decentralized finance protocol's smart contracts. Add up everything sitting in the vaults and you get one headline number.\n\nInvestors track TVL on analytics dashboards like DeFiLlama because it serves as a rough proxy for three things:\n- **Trust:** how much real capital users are willing to park in the protocol.\n- **Usage:** how actively the protocol is actually being used, not just talked about.\n- **Liquidity depth:** how much value is available for trading, lending, or borrowing.\n\nBut a big number is not automatically a healthy one. TVL is easy to inflate, double-count, and misrepresent - which is exactly what the next section covers."
+      "title": "What TVL measures",
+      "body": "<Term id=\"tvl\">TVL</Term> stands for total value locked: the dollar value of everything deposited into a protocol's contracts. Add up the vaults, convert to dollars, and you get one headline number.\n\nPeople watch it on dashboards like DeFiLlama because it stands in for three things at once - how much capital users are willing to leave with a protocol, how much it's actually being used, and how deep the <Term id=\"liquidity_pool\">liquidity</Term> is for trading or borrowing.\n\nKeep it in proportion, though. TVL measures deposits, not quality. A protocol can be stuffed with TVL and still be a bad place to leave money. And, as the next section shows, that number is easier to inflate than it looks."
     },
     {
       "id": "b9-misleading",
       "type": "read",
-      "title": "Why TVL Can Mislead You",
-      "body": "While TVL is widely cited, it has major traps:\n\n1. **Double Counting:** If you deposit 10 SOL into Marinade to get mSOL, and then deposit that mSOL into Kamino as lending collateral, the same $1,500 of capital gets counted twice in aggregate stats!\n2. **Inflated Token Valuations:** If a protocol locks 1 billion of its own illiquid governance tokens priced at $1 each on paper, headline TVL might say $1 Billion, even though selling $5,000 would crash the token to zero.\n3. **Mercenary Capital:** Yield-farming mercenaries can deposit $50M for 3 days to harvest tokens and withdraw everything immediately."
+      "title": "Three ways TVL lies",
+      "body": "The number is real. It's what goes into it that causes trouble.\n\n**Double counting.** Deposit 10 SOL into a liquid staking protocol and you get a receipt token. Deposit that receipt into a lending market and the same capital now sits in two protocols' TVL at once. Stack a few layers and the same dollar can appear four times on a dashboard that's simply summing everything up.\n\n**Self-priced assets.** A protocol locks a billion of its own governance token and values each one at the last traded price. If that price holds only because nobody is selling, \"TVL\" can be enormous and entirely illiquid. Sell $5,000 of it and you find out what it was really worth.\n\n**Mercenary capital.** Yield hunters will park $50M in a farm for three days to collect emissions, then leave the instant the rewards slow. The TVL is high, the activity is real, and all of it is temporary.\n\nNone of that is necessarily fraud. It's that TVL measures a number the protocol controls, not a fact the chain forces on it."
     },
     {
       "id": "b9-under-the-hood",
       "type": "deepdive",
-      "title": "Under the Hood: How DefiLlama Computes TVL",
-      "body": "TVL adapters query on-chain token account balances for each smart contract vault: `TVL = Σ (token_balance × spot_price)`. Reputable aggregators explicitly provide toggles to exclude double counting, staked governance tokens, and borrowed debt so users see genuine backing liquidity."
+      "title": "How the number is built",
+      "body": "TVL isn't one on-chain value you can read off a contract. It's computed by an adapter - a small piece of code that knows where a given protocol keeps its funds.\n\nFor each vault, the adapter finds the token accounts, reads their balances, and multiplies by a price:\n\n`TVL = sum of (token balance × price)`\n\nThe balances are hard data, and you can verify them yourself. The price is an assumption, and for a thinly traded token that assumption is doing most of the work.\n\nReputable dashboards let you toggle off double counting, staked governance tokens, and borrowed debt, so you can see how much of the headline survives. The habit worth building is small: when you see a TVL figure, ask what's inside it and who priced it."
     },
     {
       "id": "b9-quiz",
       "type": "quiz",
-      "title": "TVL Reality Check",
+      "title": "Two questions",
       "questions": [
         {
           "id": "q1",
-          "prompt": "How can a protocol artificially inflate its TVL without having real user deposits?",
+          "prompt": "How can a protocol inflate its TVL without any real user money arriving?",
           "options": [
-            "By setting up an RPC node",
-            "By minting billions of unbacked tokens with no market liquidity and locking them in its own contracts",
+            "By running its own RPC node",
+            "By minting unbacked tokens, pricing them on paper, and locking them in its own vaults",
             "By deploying on Solana instead of Ethereum",
-            "By verifying contract code on an explorer"
+            "By verifying its contract on an explorer"
           ],
           "correct": 1,
-          "explainRight": "Correct! Paper valuations on illiquid self-minted tokens can create illusionary TVL.",
-          "explainWrong": "Incorrect. Illiquid self-minted tokens locked in vaults are the classic method used to inflate superficial TVL."
+          "explainRight": "Self-minted tokens with no market, valued on paper and parked in the protocol's own contracts.",
+          "explainWrong": "Mint tokens nobody can sell, lock them in your own vaults, and let the paper price do the rest."
         },
         {
           "id": "q2",
-          "prompt": "What is 'double counting' in DeFi TVL metrics?",
+          "prompt": "What is 'double counting' in a TVL figure?",
           "options": [
             "Sending two transactions at once",
-            "Counting the same underlying capital multiple times as it moves through recursive yield and lending layers",
-            "Paying double transaction fees",
-            "Having two wallets connected"
+            "The same capital counted again each time it is deposited further down a stack of protocols",
+            "Paying double fees",
+            "Connecting two wallets"
           ],
           "correct": 1,
-          "explainRight": "Spot on! When wrapped or yield-bearing tokens are deposited into subsequent protocols, the same dollars can be counted repeatedly.",
-          "explainWrong": "Incorrect. Double counting refers to capital that is deposited into one protocol, converted to a derivative, and deposited into another."
+          "explainRight": "The same money counted once per protocol as it moves through wrapped and yield-bearing layers.",
+          "explainWrong": "It's one pile of capital appearing in several protocols' totals as it gets redeposited."
         }
       ],
       "passScore": 2
@@ -69,7 +69,7 @@
     {
       "id": "b9-explore",
       "type": "explore",
-      "title": "Explore Real TVL on DeFiLlama",
+      "title": "See real TVL, then read the fine print",
       "cardIds": ["kamino", "raydium"]
     }
   ],

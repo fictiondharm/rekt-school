@@ -5,9 +5,9 @@
   "title": "Create Your Own Token",
   "estMinutes": 10,
   "objectives": [
-    "Learn what mint authority and freeze authority mean",
-    "Discover why anyone can launch a token on a permissionless blockchain",
-    "Understand the security implications of revoking mint authority"
+    "What mint authority is, and why its status decides everything",
+    "Why anyone can launch a token, and what that means when you buy one",
+    "That revoking mint authority fixes supply but doesn't make a project honest"
   ],
   "requires": ["B5"],
   "freePreview": false,
@@ -17,51 +17,51 @@
     {
       "id": "b6-intro",
       "type": "read",
-      "title": "Anyone Can Mint a Token",
-      "body": "Blockchains are permissionless: you do not need permission from a government, bank, or corporation to invent a new token. There is no application form and no gatekeeper - just code.\n\nTo create a token, you instruct the Solana Token Program to initialize a new <Term id=\"mint\">Mint account</Term>. You choose the name, ticker symbol, decimals, and initial <Term id=\"total_supply\">total supply</Term>.\n\n**The flip side of freedom.** The exact same 30-second process is available to scammers, meme-coin factories, and rug-pull artists. Nobody audits a token before it goes live; nobody approves it. That means the burden of checking a token's settings falls entirely on *you*, the buyer. Permissionlessness is why crypto is open - and why you must learn to read what a token is really allowed to do."
+      "title": "Anyone can mint a token",
+      "body": "No permission needed. No application, no gatekeeper, no reviewer. You instruct the Solana Token program to create a <Term id=\"mint\">mint</Term>, and you choose the name, the ticker, the decimals, and the starting <Term id=\"total_supply\">total supply</Term>. The whole thing takes about thirty seconds and costs a few cents in fees and rent.\n\nThat is the feature. Permissionless means anyone can create an asset and a market for it, and no bank decides who gets to build.\n\nWhich is also why those same thirty seconds belong to scammers. Nobody audits a token before it launches, because there is no before. The token is live the moment the transaction lands. So the burden of checking what a token is allowed to do falls on the buyer, and there is no authority standing behind it. The rest of this lesson is about reading those settings."
     },
     {
       "id": "b6-authorities",
       "type": "read",
-      "title": "Mint Authority: The Printing Press",
-      "body": "When a token is created, an address is assigned as the **Mint Authority** - think of it as the printing press.\n\n**What it can do:** whoever controls that address can print brand-new tokens at any time, at zero cost. Each new token dilutes every existing holder and can be dumped on the market, crashing the price. An active mint authority is one of the most common <Term id=\"rug_pull\">rug pull</Term> risks in new launches.\n\n**The honest move - revoke it.** In trustworthy projects, the creator permanently **revokes** (sets to `null`) the mint authority right after launch. This is a cryptographic promise: because the Token Program code cannot be changed, the maximum supply is now frozen forever. No one - not even the original developer - can ever print another token.\n\nSo when you inspect a token, the first question is simple: **is mint authority revoked?** If not, you are trusting a stranger not to print money out of thin air."
+      "title": "Mint authority: the printing press",
+      "body": "When a mint is created it names a <Term id=\"mint_authority\">mint authority</Term>: a single address that can create new tokens at any time, out of nothing.\n\nWhoever holds that address holds the printing press. Every token they mint dilutes every existing holder, and they can sell the new supply into the market for free money. An active mint authority is one of the most common <Term id=\"rug_pull\">rug pull</Term> setups in a new launch, precisely because it's invisible unless you look for it.\n\nThe honest move is to take it away. Revoking sets the mint authority to `None`, and because the Token program's code can't be changed, that's permanent: from that point the supply can never grow again. Not by the developer, not by anyone.\n\nHold onto one caveat, though. Revoking fixes the *maximum* supply. It does nothing about the tokens the creator already minted and kept - they can still sell those. Supply and distribution are two separate checks.\n\nThere's also a second switch on every mint, the freeze authority. If it's live, that address can freeze your token account and stop you transferring or selling. A launch that revoked mint authority but kept freeze authority has not actually given up control. That's the subject of B10."
     },
     {
       "id": "b6-under-the-hood",
       "type": "deepdive",
-      "title": "Under the Hood: Mint Authority in Account State",
-      "body": "A Solana mint account holds a 82-byte data structure containing: `mint_authority` (Option<Pubkey>), `supply` (u64), `decimals` (u8), `is_initialized` (bool), and `freeze_authority` (Option<Pubkey>). When authority is revoked, the `COption::None` tag is written to memory. Because the Token Program code cannot be modified, no one, not even the original creator, can ever print another token."
+      "title": "What is inside a mint account",
+      "body": "A mint account is tiny - 82 bytes. That's the token's entire definition:\n\n- `mint_authority`: an address, or `None`\n- `supply`: the current total, as an integer\n- `decimals`: how many places the integer scales by\n- `is_initialized`: whether the account is set up\n- `freeze_authority`: another address, or `None`\n\nRevoking authority writes a `None` tag into those bytes. There's no admin panel and no override switch: the Token program will only mint when a valid authority signature is provided, and a `None` authority can never produce one.\n\nSo 'revoked' is a verifiable fact, not a founder's promise. Any block explorer shows you the same 82 bytes the program reads, and they either contain an address or they don't."
     },
     {
       "id": "b6-quiz",
       "type": "quiz",
-      "title": "Token Creation & Mint Authority Quiz",
+      "title": "Two questions",
       "questions": [
         {
           "id": "q1",
-          "prompt": "What does 'Revoking Mint Authority' do for a token?",
+          "prompt": "What does revoking mint authority do to a token?",
           "options": [
-            "Destroys all existing tokens in holders' wallets",
-            "Permanently fixes the maximum supply so no new tokens can ever be printed",
-            "Changes the token name to Bitcoin",
+            "Destroys all tokens already in holders' wallets",
+            "Permanently fixes the maximum supply so no new tokens can ever be minted",
+            "Renames the token to Bitcoin",
             "Transfers ownership to Solana validators"
           ],
           "correct": 1,
-          "explainRight": "Correct! Revoking mint authority proves to investors that the creators cannot inflate or print more tokens.",
-          "explainWrong": "Incorrect. Revoking mint authority locks the supply so nobody can ever print new tokens in the future."
+          "explainRight": "The maximum supply is fixed for good. No signature can ever mint another token.",
+          "explainWrong": "It locks the supply permanently. After that, nobody can print more."
         },
         {
           "id": "q2",
-          "prompt": "If a memecoin creator keeps the mint authority active, what risk do buyers face?",
+          "prompt": "If a memecoin creator keeps the mint authority active, what is the risk to buyers?",
           "options": [
-            "The creator could mint billions of free tokens for themselves and dump them on the market",
-            "The blockchain will shut down",
-            "Gas fees will become negative",
+            "They can mint unlimited new tokens and sell them, diluting everyone",
+            "The blockchain shuts down",
+            "Gas fees turn negative",
             "Holders lose their private keys"
           ],
           "correct": 0,
-          "explainRight": "Spot on! An un-revoked mint authority is a common rug-pull risk in newly launched tokens.",
-          "explainWrong": "Incorrect. An active mint authority allows the creator to print unlimited tokens and crash the price."
+          "explainRight": "Unlimited minting. That is why an active mint authority is treated as a rug risk.",
+          "explainWrong": "Free printing. An active mint authority lets the creator create unlimited supply and sell it."
         }
       ],
       "passScore": 2
@@ -69,7 +69,7 @@
     {
       "id": "b6-explore",
       "type": "explore",
-      "title": "Explore Token Creation",
+      "title": "Read a mint's authorities",
       "cardIds": ["solscan"]
     }
   ],

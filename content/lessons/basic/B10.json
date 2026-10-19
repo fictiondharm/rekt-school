@@ -5,9 +5,9 @@
   "title": "Scam Awareness 101 & Basic Review",
   "estMinutes": 10,
   "objectives": [
-    "Spot the top 4 token scam vectors on Solana: Honeypots, Freeze Authority, Mint Traps, and Liquidity Pulls",
-    "Inspect on-chain token authorities before swapping",
-    "Consolidate core Tier 1 skills before advancing to intermediate liquidity labs"
+    "The four on-chain checks that catch most new-token scams",
+    "How to read a mint's authorities yourself, and what a snapshot can't promise",
+    "The whole basic layer, seen as one picture before Tier 2"
   ],
   "requires": ["B9"],
   "freePreview": false,
@@ -17,59 +17,65 @@
     {
       "id": "b10-intro",
       "type": "read",
-      "title": "The Dark Side of Permissionless Finance",
-      "body": "Because anyone can deploy a token and pool on Solana in seconds, scammers have a near-infinite supply of fresh traps. Their weapon is not a server hack or a stolen password - it is *your* ignorance of on-chain parameters. They count on beginners who never read the fine print.\n\nLearning how to identify malicious token contracts is the single most valuable protective skill in Web3. Everything a token can do to you - freeze your balance, print infinite supply, drain the pool - is written in **public** account data you can inspect in seconds.\n\n**The mindset shift:** stop asking *'is this token a good investment?'* and start asking *'what is this token allowed to do to me?'* The second question has an objectively correct, on-chain answer."
+      "title": "The dark side of permissionless",
+      "body": "Anything you can build on Solana in thirty seconds, a scammer can build too. The weapon isn't a server hack or a stolen password - it's a new wallet's habit of not reading, and a token that's been quietly left able to do something ugly.\n\nThe good news is that everything a token can do to you is written in public account data. Freeze a balance, print new supply, pull the pool - each one is a switch, and switches are either on or off where anyone can look.\n\nThat's the mindset this lesson is really about. Stop asking \"is this a good investment?\" and start asking \"what is this token allowed to do to me?\". The second question has a factual answer, on-chain, right now, and it's the one that keeps you out of the traps."
     },
     {
       "id": "b10-red-flags",
       "type": "read",
-      "title": "The 4 Essential Solana Red Flags",
-      "body": "Before buying any newly launched token, verify these 4 parameters on a block explorer:\n\n1. **Freeze Authority:** If not revoked (`None`), the creator can freeze your token account so you can never sell or transfer!\n2. **Mint Authority:** If not revoked (`None`), the creator can print billions of new tokens at zero cost and dump them into the pool.\n3. **LP Token Burn / Lock:** If the creator still owns 100% of the pool's LP tokens, they can withdraw all SOL at any moment (Classic Rug Pull).\n4. **Holder Concentration:** If the top 5 non-pool wallets hold 70%+ of the supply, insider dumping is inevitable."
+      "title": "The four checks that matter",
+      "body": "Before buying any brand-new token, four checks take about two minutes and catch most of what's waiting for you.\n\n**1. Freeze authority.** If it's still active, the creator can freeze your token account, which means you can hold the token but never sell or move it. The only safe state is revoked.\n\n**2. Mint authority.** If it's still active, the creator can print unlimited supply and sell it. This is the plainest <Term id=\"rug_pull\">rug pull</Term> there is, and the only safe state is revoked.\n\n**3. Who holds the pool.** Whoever holds the <Term id=\"lp_token\">LP tokens</Term> controls the liquidity. If the creator still holds them, they can pull the entire pool in one transaction and leave you with a token nobody can buy. Look for a burn or a lock - and if it's a lock, check the date, not just the fact of it.\n\n**4. Holder concentration.** If a handful of non-pool wallets hold most of the supply, the price is really a countdown to whenever they decide to sell. Concentration isn't proof of a scam, but it does mean a few people can end the token whenever they choose.\n\nNo single flag here is conclusive. Together they're a filter - and a launch that fails two of them is one you didn't need to buy."
     },
     {
       "id": "b10-under-the-hood",
       "type": "deepdive",
-      "title": "Under the Hood: Checking Authorities in Solana CLI",
-      "body": "In the SPL Token standard, authorities are stored in the token Mint account state: `spl-token authorize <MINT_ADDRESS> mint --disable` and `spl-token authorize <MINT_ADDRESS> freeze --disable`. A legitimate token project explicitly executes these two commands upon launch to cryptographically guarantee no more tokens can be minted or frozen."
+      "title": "Checking authorities yourself",
+      "body": "None of this needs a special tool. A block explorer shows a mint's authorities in plain text, and the Token program exposes them on the command line:\n\n`spl-token authorize <MINT_ADDRESS> mint --disable`\n\n`spl-token authorize <MINT_ADDRESS> freeze --disable`\n\nThose two commands are what \"revoked\" means underneath. Run them and the authority fields become `None`, permanently.\n\nThe catch is that a check is only as good as the address you checked. Revoked can't be un-revoked, but a scam can also ship a second mint with the same name and ticker to catch people who verify the wrong thing. Copy the mint address from a source you trust and check that - never the name."
     },
     {
       "id": "b10-quiz",
       "type": "quiz",
-      "title": "Scam Detection Certification",
+      "title": "Two questions",
       "questions": [
         {
           "id": "q1",
-          "prompt": "You inspect a new token on Solana Explorer and see 'Freeze Authority: Active (Creator Wallet)'. What does this mean?",
+          "prompt": "You inspect a new token and see 'Freeze Authority: Active'. What does that mean for you?",
           "options": [
-            "Your funds earn daily staking yield",
-            "The token is federally insured",
-            "The creator has the cryptographic power to block your wallet from selling or transferring tokens",
-            "The transaction fee is locked at 0.000005 SOL"
+            "Your funds earn staking yield",
+            "The token is insured",
+            "The creator can block your account from selling or transferring the token",
+            "The fee is fixed at 0.000005 SOL"
           ],
           "correct": 2,
-          "explainRight": "Spot on! An active freeze authority allows the creator to blacklist wallets at will, a massive scam indicator.",
-          "explainWrong": "Incorrect. Active Freeze Authority gives the creator permission to freeze token accounts, preventing sales."
+          "explainRight": "It can freeze your account, so you could hold the token and never be able to sell it.",
+          "explainWrong": "An active freeze authority lets the creator block your account from selling or transferring."
         },
         {
           "id": "q2",
-          "prompt": "What must a creator do to prove they cannot mint infinite new tokens and dilute holders?",
+          "prompt": "What actually proves a creator cannot mint infinite new tokens?",
           "options": [
-            "Post a verification badge on X / Twitter",
-            "Permanently revoke (set to None) the Mint Authority on-chain",
-            "Stake 1 SOL in a validator",
-            "Transfer tokens to an exchange"
+            "A verification badge on a social profile",
+            "Permanently revoking the mint authority on-chain, so it reads None",
+            "Staking 1 SOL in a validator",
+            "Sending tokens to an exchange"
           ],
           "correct": 1,
-          "explainRight": "Correct! Setting the Mint Authority to null/None cryptographically locks the maximum supply forever.",
-          "explainWrong": "Incorrect. Only revoking the on-chain Mint Authority guarantees supply cannot be inflated."
+          "explainRight": "Revoking on-chain is the only proof. A badge on a profile proves nothing about the mint.",
+          "explainWrong": "Only revoking the mint authority guarantees the supply can't grow."
         }
       ],
       "passScore": 2
     },
     {
+      "id": "b10-review",
+      "type": "read",
+      "title": "The whole basic layer, in one pass",
+      "body": "You've covered all of Tier 1. Worth a minute to see it as one picture.\n\nA <Term id=\"wallet\">wallet</Term> has an <Term id=\"address\">address</Term> you share and a key you never do, and a <Term id=\"signature\">signature</Term> is you approving one specific action and nothing else. Fees are 5,000 lamports per signature; <Term id=\"rent\">rent</Term> is a refundable deposit you get back when you close an account. Tokens live in their own accounts - the <Term id=\"mint\">mint</Term> defines the asset, your account holds your slice - and every balance is an integer scaled by <Term id=\"decimals\">decimals</Term>.\n\nMarkets are pools running constant-product maths, so your own order moves the price and <Term id=\"slippage\">slippage</Term> is the floor you refuse to fill below. Two tokens with the same price can be completely different sizes once you multiply by supply, and <Term id=\"fdv\">FDV</Term> is the whole thing including what's still locked. <Term id=\"tvl\">TVL</Term> is a deposit figure the protocol partly controls, so treat it as a signal, not a fact.\n\nAnd the four checks from this lesson are the practical version of all of it: mint authority, freeze authority, who holds the pool, and who holds the supply.\n\nTier 2 starts where the money actually moves - liquidity, lending, and the ways those two break."
+    },
+    {
       "id": "b10-explore",
       "type": "explore",
-      "title": "Token Safety Tools",
+      "title": "Run the four checks on something real",
       "cardIds": ["solana-explorer", "rugcheck"]
     }
   ],

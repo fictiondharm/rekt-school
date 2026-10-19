@@ -5,9 +5,9 @@
   "title": "Market Cap, Supply, and FDV",
   "estMinutes": 7,
   "objectives": [
-    "Differentiate circulating supply from total and max supply",
-    "Calculate Market Capitalization and Fully Diluted Valuation (FDV)",
-    "Discover why low float tokens with high FDV represent heavy dilution risks"
+    "Why price per coin tells you nothing, and market cap tells you the size",
+    "What FDV is and what the gap between it and market cap means",
+    "Why the circulating supply figure is the least trustworthy number on the page"
   ],
   "requires": ["B7"],
   "freePreview": false,
@@ -17,51 +17,51 @@
     {
       "id": "b8-intro",
       "type": "read",
-      "title": "Token Valuation Fundamentals",
-      "body": "Beginners often look only at a token's unit price (e.g. *'$0.0001 must be cheap; $200 must be expensive!'*). This is an illusion. Price per coin tells you nothing without knowing how many coins exist.\n\nA token's true scale is measured by its **Market Cap**:\n`Market Cap = Unit Price × Circulating Supply`\n\nCompare two tokens:\n- Token A: `$0.0001` × 10,000,000,000,000 supply = **$1,000,000,000** market cap.\n- Token B: `$200` × 10,000 supply = **$2,000,000** market cap.\n\nToken A *looks* dirt-cheap per coin, but it is a billion-dollar asset - 500× bigger than Token B. **Unit price is a vanity metric; market cap is the real score.** Always multiply before you judge."
+      "title": "The number that actually sizes a token",
+      "body": "\"$0.0001, that's cheap. $200, that's expensive.\" Almost everyone starts here, and it's the wrong number, because price per coin means nothing on its own. Ten trillion coins at a tenth of a cent is a billion-dollar asset.\n\nThe number that sizes a token is <Term id=\"market_cap\">market cap</Term>:\n\n`market cap = price × circulating supply`\n\nTwo tokens, same maths:\n\n- Token A: $0.0001 per coin, 10,000,000,000,000 coins → **$1,000,000,000**.\n- Token B: $200 per coin, 10,000 coins → **$2,000,000**.\n\nToken A looks two million times cheaper per coin. It is actually 500 times larger. Simply put: unit price is a vanity metric, market cap is the size. Multiply before you judge."
     },
     {
       "id": "b8-fdv",
       "type": "read",
-      "title": "FDV: Fully Diluted Valuation & Low Float",
-      "body": "Many crypto projects launch with only 5% to 10% of their tokens circulating, while the remaining 90% are locked for the team, venture investors, or future rewards. That gap is the single most underrated trap in crypto.\n\n<Term id=\"fdv\">FDV (Fully Diluted Valuation)</Term> measures the hypothetical value if 100% of tokens were unlocked today:\n`FDV = Unit Price × Total Supply`\n\nCompare the two numbers a project shows you:\n- **Market Cap** = price × **circulating** supply (what exists today)\n- **FDV** = price × **total** supply (what will exist after unlocks)\n\nIf a project has a `$50M` Market Cap but a `$1B` FDV, that means **95% of the supply is still waiting to unlock and sell** into the market over the coming years. Each unlock adds fresh sell pressure that must be absorbed by new buyers. This is what people mean by a **low float, high FDV** token - a heavily diluted asset dressed up as a small one."
+      "title": "FDV, and the low-float trap",
+      "body": "Most launches don't release all their tokens at once. A typical project starts with 5-10% <Term id=\"float\">float</Term> and locks the rest for the team, the investors, and future rewards, handing them out on a schedule that runs for years.\n\nSo there are two sizes to know, not one:\n\n- **Market cap** = price × <Term id=\"circulating_supply\">circulating supply</Term>: what exists and can trade today.\n- **<Term id=\"fdv\">FDV</Term>** = price × <Term id=\"total_supply\">total supply</Term>: what the whole thing would be worth if every locked token counted at today's price.\n\nTake a project with a $50M market cap and a $1B FDV. That gap says 95% of the supply is still outside the market. Every <Term id=\"unlock\">unlock</Term> releases new coins that someone has to buy just to keep the price flat, and the people receiving them usually paid far below market for them. That's what \"low float, high FDV\" means: a small-looking asset that is mostly still in the pipeline.\n\nFDV is not automatically a red flag - plenty of serious projects lock supply on purpose. But an FDV without an unlock schedule attached is a headline, not a valuation."
     },
     {
       "id": "b8-under-the-hood",
       "type": "deepdive",
-      "title": "Under the Hood: Supply Discrepancies",
-      "body": "Where do circulating supply numbers on CoinGecko or CoinMarketCap come from? Projects provide self-reported wallet addresses containing locked or treasury tokens, which data aggregators subtract from the on-chain total supply. However, dispute arises when projects stake treasury tokens or lend them to market makers, blurring the boundary of what is truly 'circulating'."
+      "title": "Where the circulating number comes from",
+      "body": "Market cap is only as good as its supply figure, and that figure isn't read straight off the chain.\n\nThe token's total supply *is* on-chain and exact. The circulating supply is not. It's assembled from addresses the project itself reports as locked - team wallets, treasury, vesting contracts - which data providers subtract from the total. The project writes the list.\n\nThat's fine when it's honest, and slippery when it isn't. Treasury tokens can be staked or lent to market makers, which quietly blurs the line between locked and circulating. Two dashboards can disagree about the same token because they were handed different lists.\n\nWhich is why the useful habit isn't to trust a number but to check the pieces: the unlock schedule, and who holds what. A single figure on a single site is a starting point, not an answer."
     },
     {
       "id": "b8-quiz",
       "type": "quiz",
-      "title": "Valuation & FDV Quiz",
+      "title": "Two questions",
       "questions": [
         {
           "id": "q1",
-          "prompt": "Token XYZ has a unit price of $2.00, 10 Million circulating tokens, and a total supply of 100 Million tokens. What is its Market Cap and FDV?",
+          "prompt": "Token XYZ trades at $2.00, with 10 million circulating and 100 million total supply. What are its market cap and FDV?",
           "options": [
-            "Market Cap: $20 Million, FDV: $200 Million",
-            "Market Cap: $200 Million, FDV: $20 Million",
-            "Market Cap: $2 Million, FDV: $10 Million",
-            "Market Cap and FDV are both $20 Million"
+            "Market cap $20M, FDV $200M",
+            "Market cap $200M, FDV $20M",
+            "Market cap $2M, FDV $10M",
+            "Both $20M"
           ],
           "correct": 0,
-          "explainRight": "Correct! Market Cap is 10M × $2 = $20M. FDV is 100M × $2 = $200M.",
-          "explainWrong": "Incorrect. Market Cap = price × circulating supply ($2 × 10M = $20M), while FDV = price × total supply ($2 × 100M = $200M)."
+          "explainRight": "$20M market cap (10M × $2), $200M FDV (100M × $2).",
+          "explainWrong": "Market cap is price × circulating, FDV is price × total: $20M and $200M."
         },
         {
           "id": "q2",
-          "prompt": "Why is a 'low float, high FDV' token considered risky for long-term holders?",
+          "prompt": "Why is a 'low float, high FDV' token risky for someone holding it long?",
           "options": [
-            "The blockchain will stop producing blocks",
-            "Large future token unlocks from early investors and team can create overwhelming sell pressure",
-            "Transactions become 100x slower",
-            "Decimals will change automatically"
+            "The chain stops producing blocks",
+            "Future unlocks release early holders' tokens, and that selling needs fresh buyers to absorb",
+            "Transactions get 100× slower",
+            "Decimals change on their own"
           ],
           "correct": 1,
-          "explainRight": "Spot on! Future unlocks increase circulating supply, creating continuous downward sell pressure unless matched by new buying demand.",
-          "explainWrong": "Incorrect. When locked tokens vest, early investors and teams often sell, diluting existing holders."
+          "explainRight": "Unlocks add supply that has to be bought to hold the price flat, and early holders usually sell.",
+          "explainWrong": "Locked tokens vest to teams and investors, who sell into the market over time."
         }
       ],
       "passScore": 2
@@ -69,7 +69,7 @@
     {
       "id": "b8-explore",
       "type": "explore",
-      "title": "Explore Token Metrics",
+      "title": "Compare a cap and an FDV",
       "cardIds": ["solscan"]
     }
   ],

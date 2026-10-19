@@ -5,9 +5,9 @@
   "title": "Gas, Fees, and Rent on Solana",
   "estMinutes": 8,
   "objectives": [
-    "Learn why blockchain transactions require network fees",
-    "Discover how Solana's rent-exemption mechanism stores data on-chain",
-    "Understand the transaction lifecycle: sign → send → confirmed → finalized"
+    "Why every transaction carries a fee, and how Solana prices it",
+    "What rent is, and why closing an empty account gives you SOL back",
+    "The path a transaction takes from your click to final"
   ],
   "requires": ["B3"],
   "freePreview": false,
@@ -17,51 +17,51 @@
     {
       "id": "b4-intro",
       "type": "read",
-      "title": "Why Fees Exist: The Postage Stamp",
-      "body": "Every transaction on a blockchain requires a small network <Term id=\"gas_fee\">fee</Term> paid in the native currency (SOL on Solana). Think of it as a postage stamp: your message does not travel for free.\n\nFees serve two critical purposes:\n1. **Validator compensation:** They reward the thousands of global computers validating and securing blocks. Without a fee, there is no incentive to keep the network honest.\n2. **Spam prevention:** If transactions were 100% free, malicious bots could flood the network with billions of useless requests and grind it to a halt.\n\n**How cheap is Solana?** A typical transaction fee is a fraction of a cent (approx. `0.000005 SOL`, known as 5,000 lamports). That predictability is a big reason Solana is popular for high-frequency DeFi: you can make hundreds of transactions and still spend less than a single dollar in fees."
+      "title": "The fee is a postage stamp",
+      "body": "Every <Term id=\"transaction\">transaction</Term> carries a small <Term id=\"gas_fee\">fee</Term>, paid in SOL. A postage stamp is the right mental model: your message doesn't travel for free, but it travels cheap.\n\nThe base fee on Solana is 5,000 lamports per signature. That's 0.000005 SOL, a fraction of a cent. Read the unit carefully, though - *per signature*. A plain transfer has one signer and costs one stamp. A transaction with three signers pays for three.\n\nThe fee does two jobs. It pays the validators running the network, and it makes spam expensive - if a transaction were free, anyone could flood the network with garbage at no cost.\n\nThe part that surprises people coming from Ethereum: the base fee is flat. It doesn't bid up with congestion. What rises when the network gets busy is the optional priority fee, which is a Pro-tier topic. The base fee stays at 5,000 lamports no matter how loud the chain gets."
     },
     {
       "id": "b4-rent",
       "type": "read",
-      "title": "What is Rent on Solana?",
-      "body": "On Solana, accounts hold both token balances and executable program data. To keep this data stored permanently in validator memory, Solana requires a small refundable deposit called <Term id=\"rent\">rent</Term> (usually ~`0.002 SOL` for a token account).\n\nThink of rent as a **security deposit on a storage locker**. Two things follow from that:\n\n- Once an account holds enough SOL to be **rent-exempt**, the network keeps it on-chain forever. Validators will never delete your data.\n- When you **close the account**, the entire SOL deposit is refunded straight back to your wallet. You are not paying the network - you are parking collateral against storage space.\n\nThis is why cleaning up empty token accounts is a real habit for power users: each closed account returns a little rent-exempt SOL to your balance."
+      "title": "What rent actually is",
+      "body": "On Solana, data lives in accounts, and an account costs the network memory forever. So the network asks for a deposit up front: enough SOL to make the account *rent-exempt*. For a token account, that works out to about 0.00203928 SOL.\n\nTwo things follow, and both catch people out.\n\n- You never pay it over time. Rent collection was switched off. The requirement is simply that an account is funded above the exempt threshold when it's created. Fund it and it stays on-chain indefinitely.\n- Closing the account returns the whole deposit to your wallet. You are not paying the network for storage. You are parking collateral against it, and getting it back when you leave.\n\nThat's why cleaning up empty accounts is a real habit rather than a ritual. Each one you close returns about 0.002 SOL. It's also why creating a brand-new token account costs a little: somebody is funding that deposit, and for the first time you receive a token, it's usually the sender who pays it."
     },
     {
       "id": "b4-under-the-hood",
       "type": "deepdive",
-      "title": "Under the Hood: Transaction Lifecycle",
-      "body": "When you sign a transaction, it contains: a list of instructions, required account addresses, a recent blockhash (which expires after ~60–90 seconds to prevent replay attacks), and your cryptographic signature. The transaction is forwarded directly to the current block leader validator, executed in parallel via Solana's Sealevel runtime, and confirmed across the network within 400 milliseconds."
+      "title": "From click to final",
+      "body": "A signed transaction is a small package: a list of instructions, every account address those instructions will touch, a recent blockhash, and your <Term id=\"signature\">signature</Term>.\n\nThe blockhash is there to stop replays. It expires after about 150 blocks - roughly a minute - so a transaction can't be captured and resubmitted later by someone else. If you've ever seen a transaction fail with an expired blockhash, this is why.\n\nFrom there your RPC provider forwards it to the current leader, the validator whose turn it is to produce a block. Solana executes transactions in parallel through a runtime called Sealevel, using the account list to know which transactions can't touch the same data at once. A slot lasts about 400 milliseconds.\n\nYou'll see three words for the outcome. *Processed* means a validator ran it. *Confirmed* means a supermajority of stake has voted on it. *Finalized* means it's rooted and cannot be reverted. For anything you care about, wait for finalized - it arrives a few seconds after you sign."
     },
     {
       "id": "b4-quiz",
       "type": "quiz",
-      "title": "Transaction Fee Check",
+      "title": "Two questions",
       "questions": [
         {
           "id": "q1",
-          "prompt": "What currency is used to pay network transaction fees on Solana?",
+          "prompt": "What currency is used to pay the base transaction fee on Solana?",
           "options": [
             "US Dollar cash",
-            "SOL (the native token of Solana)",
+            "SOL, the native token of Solana",
             "Bitcoin",
             "Credit card rewards"
           ],
           "correct": 1,
-          "explainRight": "Correct! All base transaction fees on Solana are paid in native SOL.",
-          "explainWrong": "Incorrect. SOL is the native gas token of the Solana blockchain."
+          "explainRight": "SOL. Every base fee on Solana is denominated in it.",
+          "explainWrong": "SOL. The native token is the only thing the network accepts for fees."
         },
         {
           "id": "q2",
-          "prompt": "What happens to your rent deposit when you close a token account on Solana?",
+          "prompt": "What happens to the rent deposit when you close an empty token account?",
           "options": [
-            "The validators keep it permanently",
-            "The SOL deposit is refunded back to your wallet",
+            "The validators keep it",
+            "It is refunded to your wallet",
             "It turns into an NFT",
             "It is destroyed"
           ],
           "correct": 1,
-          "explainRight": "Spot on! Rent is just a storage deposit. Closing an unused token account returns the SOL back to you.",
-          "explainWrong": "Incorrect. Closing an account reclaims the rent-exempt SOL deposit directly back to your wallet balance."
+          "explainRight": "You get it back. Rent is a refundable deposit, not a payment - closing the account returns the SOL.",
+          "explainWrong": "It comes back. The deposit returns to your wallet when the account closes."
         }
       ],
       "passScore": 2
@@ -69,7 +69,7 @@
     {
       "id": "b4-explore",
       "type": "explore",
-      "title": "Explore Solana Block Explorers",
+      "title": "Watch a transaction land",
       "cardIds": ["solscan"]
     }
   ],
