@@ -127,7 +127,7 @@
   "researchMethod": [
     {
       "step": "Turn the headline into three questions",
-      "detail": "A headline is a claim, not evidence. 'A bridge lost $326M' tells you almost nothing. Pin down WHAT moved, WHEN, and WHICH address touched it - then ask the real question: who was supposed to authorize that move?",
+      "detail": "Start with the claim, not the conclusion. 'A bridge lost $326M' tells you almost nothing. Pin down WHAT moved, WHEN, and WHICH address touched it - then ask the real question: who was supposed to authorize that move?",
       "doThis": "Open the bridge's official statement next to the Solana explorer. Write down the exact date/time in UTC, the asset, and the chain(s) involved.",
       "lookFor": "The one word that reframes everything. Here it was 'minted'. A bridge can only mint a wrapped token against a real deposit - so the whole case becomes: who faked the deposit?",
       "example": "Wormhole, February 2 2022. The 120,000 wETH (~$326M) was MINTED on Solana - not stolen from a wallet. That one word points straight at the bridge's verification logic.",

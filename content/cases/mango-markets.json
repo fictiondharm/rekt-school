@@ -147,7 +147,7 @@
   "researchMethod": [
     {
       "step": "Turn the headline into three questions",
-      "detail": "A headline is a claim, not evidence. 'Mango was hacked for $114M' tells you almost nothing. Your very first move is always the same: pin down WHAT moved, WHEN it moved, and WHICH address touched it. Convert the story into questions you can actually answer on a block explorer.",
+      "detail": "The headline is a starting point, not an answer. 'Mango was hacked for $114M' tells you almost nothing. Your very first move is always the same: pin down WHAT moved, WHEN it moved, and WHICH address touched it. Convert the story into questions you can actually answer on a block explorer.",
       "doThis": "Open the protocol's official statement (their X/Twitter post or blog) next to a block explorer. Write down three facts: the exact date and time in UTC, the asset that left, and the chain it was on.",
       "lookFor": "Vague wording. If the team says 'funds were drained' but never says how, that gap is exactly where your investigation starts.",
       "example": "Mango, October 11 2022, Solana. The twist: the attacker did not steal one token - he walked out with ~$116M of real BTC, USDT, SOL and mSOL. So the real question became: 'how were those real assets unlocked?'",

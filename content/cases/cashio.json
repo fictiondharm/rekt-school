@@ -146,7 +146,7 @@
   "researchMethod": [
     {
       "step": "Turn the headline into three questions",
-      "detail": "A headline is a claim, not evidence. 'A stablecoin printed $2 billion of fake money' tells you almost nothing by itself. Pin down WHAT moved, WHEN, and WHICH account touched it - then ask the real question: what was supposed to stop this?",
+      "detail": "Skepticism first: a headline sells the story, not the facts. 'A stablecoin printed $2 billion of fake money' tells you almost nothing by itself. Pin down WHAT moved, WHEN, and WHICH account touched it - then ask the real question: what was supposed to stop this?",
       "doThis": "Open Cashio's official warning next to the CASH token page on Solscan. Write down the exact date/time in UTC, the asset, and the chain involved.",
       "lookFor": "The word that reframes everything: 'mint'. A stablecoin can only print CASH against real collateral - so the whole case becomes: how did fake collateral pass the check?",
       "example": "Cashio, March 23 2022. 2,000,000,000 CASH were MINTED, not stolen from a wallet. That one word points straight at the minting program's collateral validation.",
