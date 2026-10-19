@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   icons: { icon: '/brand/logo-icon.png' },
   title: 'Rekt School - Master Solana DeFi by Doing It Live',
   description:
-    'Interactive, non-custodial Solana DeFi Academy. Learn AMMs, liquidity provision, lending protocols, token minting, and wallet security — Tier 1 live on Solana Devnet, Tier 2 in zero-risk sandbox labs.',
+    'Interactive, non-custodial Solana DeFi Academy. Learn AMMs, liquidity provision, lending protocols, token minting, and wallet security - Tier 1 live on Solana Devnet, Tier 2 in zero-risk sandbox labs.',
 };
 
 import { SolanaWalletProvider } from '@/components/onchain/SolanaWalletProvider';

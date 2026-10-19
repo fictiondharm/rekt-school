@@ -45,7 +45,7 @@ export default function ProPage() {
           </h1>
           <p className="text-ink-soft max-w-2xl mx-auto leading-relaxed">
             Order types, perps, oracle attacks, MEV sandwiches, bridges, bonding curves, auditing and
-            more — each built around an interactive sandbox that shows you exactly what just happened
+            more - each built around an interactive sandbox that shows you exactly what just happened
             and why. No real funds, ever.
           </p>
           <div className="flex items-center justify-center gap-2 text-xs font-mono text-ink-faint">
@@ -100,7 +100,7 @@ export default function ProPage() {
 
         <section className="text-center space-y-4 pb-8">
           <p className="text-sm text-ink-soft">
-            Finish all 12 and you will have survived every attack in the playbook — from the inside.
+            Finish all 12 and you will have survived every attack in the playbook - from the inside.
           </p>
           <div className="flex gap-3 justify-center flex-wrap">
             <Link href="/learn/p1">

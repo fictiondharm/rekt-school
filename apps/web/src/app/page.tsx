@@ -100,7 +100,7 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
             <div className="lg:col-span-7 space-y-6">
               <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-white border-2 border-ink rounded-full text-[11px] font-bold uppercase tracking-widest shadow-pop-sm">
                 <span className="w-2 h-2 rounded-full bg-quaternary" />
-                Rekt Academy
+                Rekt School
               </span>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold tracking-tight text-ink leading-[1.05]">
@@ -114,10 +114,10 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
 
               <p className="text-base sm:text-lg text-ink-soft leading-relaxed max-w-2xl">
                 Three tiers, zero real risk. <strong className="text-ink">Tier 1 (Basic)</strong> puts
-                you live on Solana Devnet with a real wallet and free faucet money.{' '}
+                you on live Solana Devnet with a real wallet and free faucet money.{' '}
                 <strong className="text-ink">Tier 2 (Intermediate)</strong> drops you into pure
                 simulation labs. <strong className="text-ink">Tier 3 (Pro)</strong> hands you the scary
-                stuff — flash loans, oracle attacks, MEV. Break AMMs, trigger liquidations, mint tokens,
+                stuff - flash loans, oracle attacks, MEV. Break AMMs, trigger liquidations, mint tokens,
                 spot scams: no real cash ever touches it.
               </p>
 
@@ -221,7 +221,7 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
               {
                 n: '03',
                 title: 'Real chain, zero risk',
-                body: 'Tier 1 fires real transactions on Solana Devnet — connect Solflare or Phantom, mint tokens, verify it on a block explorer. Tiers 2 and 3 stress-test protocols in a safe sandbox.',
+                body: 'Tier 1 fires real transactions on Solana Devnet - connect Solflare or Phantom, mint tokens, verify it on a block explorer. Tiers 2 and 3 stress-test protocols in a safe sandbox.',
                 color: 'bg-tertiary',
                 iconBg: 'bg-tertiary',
               },
@@ -249,7 +249,7 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
                 <Badge variant="mint">No wallet needed</Badge>
               </div>
               <p className="text-sm text-ink-soft mt-2">
-                One free lesson from every tier. Play all three right in your browser — no sign-up, no wallet.
+                One free lesson from every tier. Play all three right in your browser - no sign-up, no wallet.
               </p>
             </div>
           </div>
@@ -316,7 +316,7 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
                   Oracles &amp; flash loan attacks
                 </h3>
                 <p className="text-sm text-ink-soft leading-relaxed">
-                  Watch a single bad price feed let an attacker drain a protocol in one block — then see
+                  Watch a single bad price feed let an attacker drain a protocol in one block - then see
                   how a real oracle shuts the attack down.
                 </p>
               </div>
@@ -340,7 +340,7 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
             </h2>
             <p className="text-sm text-ink-soft">
               This plays on its own the moment it scrolls into view. Drag the slider or flip the pool
-              any time to take over — and watch price impact explode in a thin pool.
+              any time to take over - and watch price impact explode in a thin pool.
             </p>
           </div>
 
@@ -359,7 +359,7 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
               Start easy. Finish dangerous.
             </h2>
             <p className="text-sm text-ink-soft">
-              Every lesson shows a badge so you always know where you&apos;re practising — real Solana
+              Every lesson shows a badge so you always know where you&apos;re practising - real Solana
               Devnet, or a pure sandbox.
             </p>
           </div>
@@ -376,7 +376,7 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
               <Badge variant="sandbox">SANDBOX</Badge>
               <h3 className="font-heading font-bold text-lg text-ink">Tier 2 · Intermediate</h3>
               <p className="text-sm text-ink-soft leading-relaxed">
-                The mechanics, hands-on. AMMs, impermanent loss, yield, lending and liquidations — in a
+                The mechanics, hands-on. AMMs, impermanent loss, yield, lending and liquidations - in a
                 pure sandbox where instant, zero-risk results let you push every curve to its breaking
                 point.
               </p>
@@ -386,7 +386,7 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
               <h3 className="font-heading font-bold text-lg text-ink">Tier 3 · Pro</h3>
               <p className="text-sm text-ink-soft leading-relaxed">
                 The stuff that actually gets people rekt. Flash loans, oracle manipulation, MEV
-                sandwiches, concentrated liquidity and a full smart-contract audit — finishing with a
+                sandwiches, concentrated liquidity and a full smart-contract audit - finishing with a
                 capstone where you architect a protocol.
               </p>
             </Card>
@@ -414,7 +414,7 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
               <div className="space-y-2">
                 <h3 className="font-heading font-bold text-lg text-ink">War Stories: real exploits</h3>
                 <p className="text-sm text-ink-soft leading-relaxed">
-                  Wormhole, Mango, Cashio — walk through the actual attacks that drained millions. What
+                  Wormhole, Mango, Cashio - walk through the actual attacks that drained millions. What
                   broke, why it broke, and the exact red flags to spot before it happens to you.
                 </p>
               </div>
@@ -432,7 +432,7 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
               <div className="space-y-2">
                 <h3 className="font-heading font-bold text-lg text-ink">The DeFi glossary, in plain English</h3>
                 <p className="text-sm text-ink-soft leading-relaxed">
-                  Every term you&apos;ll meet — TVL, slippage, health factor, MEV — explained without the
+                  Every term you&apos;ll meet - TVL, slippage, health factor, MEV - explained without the
                   jargon. Tap any underlined word inside a lesson to see it defined, and never lose your place.
                 </p>
               </div>
@@ -547,7 +547,7 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
                   </h3>
                 </div>
                 <p className="text-sm text-ink-soft leading-relaxed">
-                  Have a code from us? Enter it to unlock the full course for free — no payment
+                  Have a code from us? Enter it to unlock the full course for free - no payment
                   needed. Otherwise, get instant access for $1 USDC on Solana or Base.
                 </p>
                 <p className="text-xs text-ink-faint">

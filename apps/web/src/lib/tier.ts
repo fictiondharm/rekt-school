@@ -21,7 +21,7 @@ function baseMeta(tier: Tier, isDevnet: boolean): NetworkMeta {
       badgeVariant: 'sandbox',
       networkName: 'Sandbox',
       clusterLine: 'Environment: Sandbox · simulated',
-      blurb: 'Pure simulation — no wallet, no real chain, no real funds.',
+      blurb: 'Pure simulation - no wallet, no real chain, no real funds.',
     };
   }
   return {
@@ -31,7 +31,7 @@ function baseMeta(tier: Tier, isDevnet: boolean): NetworkMeta {
     badgeVariant: 'devnet',
     networkName: 'Solana Devnet',
     clusterLine: 'Cluster: Solana Devnet · free testnet gas',
-    blurb: 'Live on Solana Devnet — real testnet transactions, 100% free play money.',
+    blurb: 'Live on Solana Devnet - real testnet transactions, 100% free play money.',
   };
 }
 
