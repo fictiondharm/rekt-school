@@ -28,7 +28,7 @@ const LESSON_ADVICE: LessonAdviceMap = {
         'Read through the core philosophy: in DeFi you hold your own keys, not a centralized bank or exchange.',
         'Hover over any highlighted words like "Devnet" or "Private Key" to see quick glossary tooltips without losing your spot.',
       ],
-      'b1-ui-tour': [
+      'b1-tour': [
         'Notice the layout: the interactive practice panel stays pinned on your right while the curriculum guides you on the left.',
         'You can collapse the sidebar using the arrow button anytime you need extra screen space for complex charts.',
       ],
@@ -43,15 +43,13 @@ const LESSON_ADVICE: LessonAdviceMap = {
       'Always switch your wallet extension (Solflare or Backpack) to Developer / Devnet mode before testing.',
     ],
     steps: {
-      'b2-keys': [
+      'b2-intro': [
         'Think of your public address as your email or Twitter handle, and your private key as the master password.',
         'CT slang check: sharing your private key or signing a blind transaction is how people get "drained" in the trenches.',
       ],
-      'b2-wallet-install': [
+      'b2-explore': [
         'Use the direct download links in the right panel to install Solflare or Backpack from official browser web stores.',
         'Once installed, toggle Network Settings from "Mainnet-Beta" to "Devnet" so you can claim free test tokens.',
-      ],
-      'b2-connect-task': [
         'Click the "Connect & Sign Welcome" button on the right. We sign a real Solana Memo Program message on Devnet!',
         'This proves your wallet can talk directly to Solana validators without spending a single cent of real money.',
       ],
@@ -63,11 +61,11 @@ const LESSON_ADVICE: LessonAdviceMap = {
       'Hardware wallets (Ledger/Keystone) keep your private keys physically isolated from internet-connected browser malware.',
     ],
     steps: {
-      'b3-seed-vault': [
+      'b3-intro': [
         'Click the security reveal button on the right to inspect what a 12-word recovery phrase looks like.',
         'Notice the emergency red alert: seed phrases generate ALL your private keys mathematically. Never screenshot or cloud-backup them.',
       ],
-      'b3-phishing-quiz': [
+      'b3-under-the-hood': [
         'Drainer sites clone legitimate frontend UIs (like Uniswap or Raydium) and ask you to approve "setAuthority" or input your seed. Always verify the domain URL!',
       ],
     },
@@ -78,14 +76,12 @@ const LESSON_ADVICE: LessonAdviceMap = {
       'If your transaction fails with an error, check if your wallet has at least 0.01 SOL on Devnet to pay validator compute fees.',
     ],
     steps: {
-      'b4-gas-basics': [
+      'b4-intro': [
         'Unlike Ethereum where gas spikes to $50 during meme coin mania, Solana uses localized fee markets to keep base fees fractions of a penny.',
       ],
-      'b4-faucet-guide': [
+      'b4-explore': [
         'Use the Faucet Guide on the right: copy your wallet address and paste it into faucet.solana.com or QuickNode for 1 free Devnet SOL.',
         'Our balance tracker will auto-detect your new balance as soon as the Solana validator cluster confirms the airdrop!',
-      ],
-      'b4-onchain-tx': [
         'Click "Execute Devnet Self-Transfer" to send 0.001 SOL to yourself and measure the exact network fee deducted on-chain.',
       ],
     },
@@ -96,10 +92,10 @@ const LESSON_ADVICE: LessonAdviceMap = {
       'Each token you hold (like USDC or BONK) gets its own separate on-chain account owned by the SPL Token Program.',
     ],
     steps: {
-      'b5-ata-concept': [
+      'b5-under-the-hood': [
         'Your ATA address is derived deterministically from your wallet address + the Token Mint address using Program Derived Addresses (PDAs).',
       ],
-      'b5-claim-tokens': [
+      'b5-explore': [
         'Claim fUSDC using the faucet card on the right. Notice how the transaction creates your fUSDC ATA and funds it with tokens.',
       ],
     },
@@ -110,10 +106,10 @@ const LESSON_ADVICE: LessonAdviceMap = {
       'Contract Address (CA) is the unique on-chain public key of the Token Mint account.',
     ],
     steps: {
-      'b6-mint-basics': [
+      'b6-under-the-hood': [
         'A Token Mint account stores total supply, decimal precision (usually 6 for USDC, 9 for SOL), and the mint authority public key.',
       ],
-      'b6-mint-action': [
+      'b6-explore': [
         'Click "Mint 10,000 Custom Tokens" on the right. We initialize a real on-chain mint account on Devnet and mint supply directly to your wallet ATA!',
         'Copy your new Token CA and inspect it on Solana Explorer to see the live on-chain mint authority.',
       ],
@@ -125,10 +121,10 @@ const LESSON_ADVICE: LessonAdviceMap = {
       'Constant product formula x * y = k ensures liquidity is available at every single price point along the curve.',
     ],
     steps: {
-      'b7-swap-basics': [
+      'b7-under-the-hood': [
         'When you sell SOL for fUSDC, you add SOL to the pool and take out fUSDC. This increases the pool ratio and moves the spot price.',
       ],
-      'b7-execute-swap': [
+      'b7-explore': [
         'Test a swap using the simulator or the on-chain Memo trade logger on the right to see execution slippage in action.',
       ],
     },
@@ -140,7 +136,7 @@ const LESSON_ADVICE: LessonAdviceMap = {
       'CT Trench Rule: If Circulating Supply is 5% and FDV is $2 Billion, beware of massive insider token unlocks dumping on retail!',
     ],
     steps: {
-      'b8-fdv-slider': [
+      'b8-fdv': [
         'Drag the circulating supply slider on the right to observe how low-float tokens create an illusion of high market cap.',
       ],
     },
@@ -151,7 +147,7 @@ const LESSON_ADVICE: LessonAdviceMap = {
       'Beware of double-counting: if SOL is staked into mSOL and deposited into Kamino, headline TVL counts the same capital twice!',
     ],
     steps: {
-      'b9-tvl-analysis': [
+      'b9-misleading': [
         'Mercenary yield farmers deposit millions for short-term incentives and pull their liquidity the moment reward emissions dry up.',
       ],
     },
@@ -162,7 +158,7 @@ const LESSON_ADVICE: LessonAdviceMap = {
       'If Freeze Authority is active, the creator can blacklist your wallet and prevent you from ever selling your tokens (honeypot)!',
     ],
     steps: {
-      'b10-scam-audit': [
+      'b10-red-flags': [
         'Legitimate DeFi tokens revoke both mint and freeze authorities so no one can print infinite tokens or freeze user balances.',
       ],
     },
@@ -173,7 +169,7 @@ const LESSON_ADVICE: LessonAdviceMap = {
       'Compare execution price against the initial spot price to measure true price impact.',
     ],
     steps: {
-      'i1-amm-curve': [
+      'i1-simulator': [
         'Notice how a 50 SOL trade in a 100 SOL pool produces massive price impact, whereas in a 10,000 SOL pool it executes almost seamlessly.',
       ],
     },
