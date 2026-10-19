@@ -2,73 +2,73 @@
   {
     "id": "wallet",
     "term": "Wallet",
-    "definition": "An app that holds your private keys and lets you approve transactions on the blockchain.",
+    "definition": "The app that holds your private keys and signs transactions for you. It does not hold your coins - the coins live on-chain - so the real asset is the key, and whoever holds the key controls the wallet.",
     "category": "basics"
   },
   {
     "id": "address",
     "term": "Address",
-    "definition": "A unique public identifier on the blockchain where people can send you tokens, like an email address.",
+    "definition": "Your public identifier on-chain, like an email address people can send tokens to. Anyone can see it; that is fine. It is paired with a private key that only you should hold.",
     "category": "basics"
   },
   {
     "id": "public_key",
     "term": "Public Key",
-    "definition": "The cryptographic code corresponding to your address that anyone can safely see.",
+    "definition": "The safe half of your key pair - the part that generates your address and can be shared freely. It proves things about your private key without ever revealing it.",
     "category": "basics"
   },
   {
     "id": "private_key",
     "term": "Private Key",
-    "definition": "The secret digital password that controls your wallet and signs transactions; never share it.",
+    "definition": "The secret half of your key pair. Whoever holds it controls the wallet, so it is the one thing you never share, paste, or screenshot.",
     "category": "basics"
   },
   {
     "id": "seed_phrase",
     "term": "Seed Phrase",
-    "definition": "A sequence of 12 or 24 secret words that backs up your entire wallet and can restore all your private keys.",
+    "definition": "Twelve or twenty-four words that can regenerate every private key in your wallet. It is the master backup: lose it and you lose the wallet, leak it and someone else owns it.",
     "category": "basics"
   },
   {
     "id": "signature",
     "term": "Signature",
-    "definition": "A mathematical proof created by your private key verifying that you approved a specific action.",
+    "definition": "A cryptographic proof that you approved a specific transaction, produced with your private key. It lets the network verify the approval without ever seeing the key itself.",
     "category": "basics"
   },
   {
     "id": "transaction",
     "term": "Transaction",
-    "definition": "A recorded instruction submitted to the blockchain network to transfer tokens or run a program.",
+    "definition": "An instruction sent to the blockchain - send tokens, swap, call a program - bundled, signed, and recorded permanently once confirmed.",
     "category": "basics"
   },
   {
     "id": "gas_fee",
     "term": "Gas / Fee",
-    "definition": "A tiny amount of native cryptocurrency (like SOL) paid to network validators to process your transaction.",
+    "definition": "The small fee, paid in the chain's native coin (SOL on Solana), that validators collect to process your transaction. It is the price of getting included.",
     "category": "basics"
   },
   {
     "id": "rent",
     "term": "Rent",
-    "definition": "A small deposit of SOL required by Solana to keep data stored in an account on the blockchain.",
+    "definition": "A small SOL deposit Solana requires to keep data stored in an on-chain account. You generally get most of it back when the account is closed.",
     "category": "basics"
   },
   {
     "id": "block_explorer",
     "term": "Block Explorer",
-    "definition": "A public website that lets you search and view transactions, accounts, and tokens on the blockchain.",
+    "definition": "A public website for reading the blockchain - search any transaction, account, or token and see exactly what happened. Solscan is the one most people use for Solana.",
     "category": "basics"
   },
   {
     "id": "token",
     "term": "Token",
-    "definition": "A digital asset or currency created and traded on top of a blockchain network.",
+    "definition": "A digital asset issued on top of a blockchain. On Solana these follow the SPL standard, and anyone can create one - which is exactly why checking the real mint matters.",
     "category": "tokens"
   },
   {
     "id": "spl_token",
     "term": "SPL Token",
-    "definition": "The standard format for all fungible and non-fungible tokens created on the Solana blockchain.",
+    "definition": "The Solana standard that defines every fungible and non-fungible token on the chain. Same rules for all of them, so wallets and tools can handle any token the same way.",
     "category": "tokens"
   },
   {
@@ -86,85 +86,85 @@
   {
     "id": "mint",
     "term": "Mint",
-    "definition": "The master smart contract account on Solana that defines a token, its decimals, and total supply.",
+    "definition": "The on-chain account that defines a token: its decimals and total supply. Everything about 'which token is this' traces back to its mint address.",
     "category": "tokens"
   },
   {
     "id": "token_account",
     "term": "Token Account",
-    "definition": "A separate on-chain account created specifically to hold your balance for one particular token type.",
+    "definition": "A separate account that holds your balance for one specific token. You do not have one giant balance - you have one token account per token you hold.",
     "category": "tokens"
   },
   {
     "id": "decimals",
     "term": "Decimals",
-    "definition": "How many decimal places a token can be divided into, turning big whole numbers into units like cents.",
+    "definition": "How many places a token can be divided into. SOL has 9 decimals and USDC has 6, which is why '1 USDC' is stored as 1,000,000 base units on-chain.",
     "category": "tokens"
   },
   {
     "id": "circulating_supply",
     "term": "Circulating Supply",
-    "definition": "The amount of a token currently unlocked and available to trade in the open market.",
+    "definition": "The tokens unlocked and actually tradable right now. It is the number behind market cap, and it grows every time a vesting unlock or emission releases more.",
     "category": "tokens"
   },
   {
     "id": "total_supply",
     "term": "Total Supply",
-    "definition": "The complete number of tokens that exist right now, including locked, vested, and circulating tokens.",
+    "definition": "Every token that exists at this moment - locked, vested, and circulating alike. It shrinks only when tokens are burned.",
     "category": "tokens"
   },
   {
     "id": "max_supply",
     "term": "Max Supply",
-    "definition": "The absolute maximum cap of tokens that will ever exist for a project.",
+    "definition": "The hard cap on how many tokens will ever exist. If there is no cap and the mint authority is still live, supply can be inflated at will.",
     "category": "tokens"
   },
   {
     "id": "market_cap",
     "term": "Market Cap",
-    "definition": "The total value of circulating tokens, calculated as current price multiplied by circulating supply.",
+    "definition": "Price times circulating supply - the market's rough price tag on the float. It is not what the project is worth, and it says nothing about how much token is still locked.",
     "category": "tokens"
   },
   {
     "id": "fdv",
     "term": "FDV (Fully Diluted Valuation)",
-    "definition": "The hypothetical value of a project if all tokens that will ever exist were in circulation at current price.",
+    "definition": "Fully diluted valuation: price times max (or total) supply, as if every locked token were already tradable. When FDV towers over market cap, future unlocks are a looming overhang.",
     "category": "tokens"
   },
   {
     "id": "float",
     "term": "Float",
-    "definition": "The percentage of a token's total supply that is actively circulating in the market.",
+    "definition": "The share of total supply that is actually circulating. A low float means little is trading today - and a lot is waiting to be unlocked.",
     "category": "tokens"
   },
   {
     "id": "tvl",
     "term": "TVL (Total Value Locked)",
-    "definition": "The combined dollar value of all cryptocurrency deposited and held inside a DeFi protocol or pool.",
+    "definition": "Total Value Locked - the dollar value sitting inside a protocol or pool. It measures size and tells attackers how big the prize is; it does not measure safety.",
     "category": "defi"
   },
   {
     "id": "swap",
     "term": "Swap",
-    "definition": "Trading one cryptocurrency token directly for another without going through a central middleman.",
+    "definition": "Trading one token for another directly, usually against a pool rather than a counterparty. On Solana, Jupiter routes a swap across many venues to find the best price.",
     "category": "defi"
   },
   {
     "id": "quote",
     "term": "Quote",
-    "definition": "The estimated rate and output amount you will receive before executing a token swap.",
+    "definition": "The price and output a venue shows you before you confirm a trade. Always read the quote - the executed price can differ once slippage and fees land.",
     "category": "defi"
   },
   {
     "id": "slippage",
     "term": "Slippage",
-    "definition": "The difference between the expected price when you submit a trade and the actual price when executed.",
+    "definition": "The difference between the price you expected and the price you actually got. Your tolerance is the ceiling you accept - set it too wide and you invite sandwich attacks.",
     "category": "defi"
   },
   {
     "id": "price_impact",
     "term": "Price Impact",
-    "definition": "How much your own trade shifts the pool's price due to the size of your order relative to pool liquidity.",
+    "definition": "How much your own order moves the pool's price. It grows with your size relative to the pool's liquidity - the reason big trades get worse fills.",
     "category": "defi"
   },
   {
@@ -188,271 +188,271 @@
   {
     "id": "apr",
     "term": "APR (Annual Percentage Rate)",
-    "definition": "The annual rate of return earned on deposited assets, without factoring in compound interest.",
+    "definition": "The yearly return on deposited assets, without compounding. It is the simpler headline number - the one that flatters a yield before reinvestment is counted.",
     "category": "yield"
   },
   {
     "id": "apy",
     "term": "APY (Annual Percentage Yield)",
-    "definition": "The annual rate of return earned on deposited assets that includes the effect of reinvesting compound interest.",
+    "definition": "The yearly return including compounding, so it is always at least as high as APR. The bigger the gap between APY and APR, the more often the yield is being reinvested.",
     "category": "yield"
   },
   {
     "id": "impermanent_loss",
     "term": "Impermanent Loss",
-    "definition": "The difference in value between holding tokens in a pool versus simply keeping them in your wallet.",
+    "definition": "The gap between holding tokens in a pool versus simply holding them in your wallet. It appears whenever the two tokens' prices diverge, and it becomes permanent the moment you withdraw.",
     "category": "yield"
   },
   {
     "id": "stablecoin",
     "term": "Stablecoin",
-    "definition": "A cryptocurrency designed to maintain a stable value pegged to an asset like the US Dollar.",
+    "definition": "A token designed to hold a steady value, usually $1. Backing varies wildly - real reserves (USDC), over-collateralized crypto (DAI), or algorithms and hope (UST). The peg is only as strong as the backing behind it.",
     "category": "defi"
   },
   {
     "id": "peg",
     "term": "Peg",
-    "definition": "The targeted fixed exchange rate between a stablecoin and its underlying reference asset.",
+    "definition": "The target price a stablecoin tries to hold, normally $1. It holds only as long as people believe they can redeem for the real thing.",
     "category": "defi"
   },
   {
     "id": "depeg",
     "term": "Depeg",
-    "definition": "An event where a stablecoin loses its targeted price and drops away from its intended peg value.",
+    "definition": "When a stablecoin slips away from its target price. A small wobble is noise; a sustained break usually means the market has lost faith in the backing.",
     "category": "defi"
   },
   {
     "id": "collateral",
     "term": "Collateral",
-    "definition": "Assets deposited as security that a lender can seize if you fail to repay your loan.",
+    "definition": "The assets you lock as security for a loan. If you fail to repay or the value falls too far, the protocol seizes them - that is the lender's protection.",
     "category": "lending"
   },
   {
     "id": "ltv",
     "term": "LTV (Loan-to-Value)",
-    "definition": "The maximum ratio of debt you can borrow against the value of your deposited collateral.",
+    "definition": "Loan-to-Value: the maximum you can borrow against your collateral, set by the protocol. A 75% LTV on $100 of collateral means at most $75 of debt, leaving a cushion before liquidation.",
     "category": "lending"
   },
   {
     "id": "health_factor",
     "term": "Health Factor",
-    "definition": "A safety score measuring how safe your loan is; if it drops below 1.0, your loan is liquidated.",
+    "definition": "A live safety score for your loan. Above 1.0 you are fine; at or below 1.0 the protocol liquidates you. It falls as your collateral loses value or your debt grows.",
     "category": "lending"
   },
   {
     "id": "liquidation",
     "term": "Liquidation",
-    "definition": "When a smart contract automatically sells your collateral to repay a loan because its value dropped too much.",
+    "definition": "The automatic sale of your collateral to repay a too-risky loan. It is not a punishment - it is the mechanism that keeps a lending protocol solvent.",
     "category": "lending"
   },
   {
     "id": "utilisation",
     "term": "Utilisation",
-    "definition": "The percentage of deposited funds in a lending pool that is currently borrowed by users.",
+    "definition": "The share of a lending pool that is currently borrowed. High utilisation means most funds are out on loan, which pushes interest rates up until borrowers repay or new deposits arrive.",
     "category": "lending"
   },
   {
     "id": "staking",
     "term": "Staking",
-    "definition": "Locking tokens to help secure a proof-of-stake blockchain network in exchange for rewards.",
+    "definition": "Locking tokens to help secure a proof-of-stake network in return for rewards. On Solana you usually delegate to a validator; the tokens stay yours but are illiquid until you unstake.",
     "category": "staking"
   },
   {
     "id": "validator",
     "term": "Validator",
-    "definition": "A computer node that checks, confirms, and votes on new transactions to add to the blockchain.",
+    "definition": "A node that proposes and votes on blocks to keep the chain running. Delegating to a reliable, low-commission validator is how stakers keep their rewards intact.",
     "category": "staking"
   },
   {
     "id": "liquid_staking",
     "term": "Liquid Staking",
-    "definition": "Staking tokens while receiving a liquid derivative token (like mSOL or JitoSOL) that you can still use in DeFi.",
+    "definition": "Staking through a protocol that hands you a tradable receipt (like mSOL or JitoSOL) for your deposit. You keep earning rewards while the receipt stays usable in DeFi - at the cost of taking on the protocol's own risk.",
     "category": "staking"
   },
   {
     "id": "vesting",
     "term": "Vesting",
-    "definition": "A scheduled timeline over which locked tokens are gradually unlocked and given to team or investors.",
+    "definition": "The schedule that releases locked team and investor tokens over time. It exists to stop insiders dumping on day one - and its calendar is where future sell pressure is written.",
     "category": "tokenomics"
   },
   {
     "id": "cliff",
     "term": "Cliff",
-    "definition": "A waiting period before any locked tokens begin unlocking, after which a large chunk unlocks at once.",
+    "definition": "A waiting period before any of a locked allocation unlocks. After the cliff, the first big chunk releases at once, which is often the heaviest sell-pressure day.",
     "category": "tokenomics"
   },
   {
     "id": "unlock",
     "term": "Unlock",
-    "definition": "The release of previously restricted tokens into circulating supply, often creating sell pressure.",
+    "definition": "The release of previously locked tokens into circulation. Unlocks expand supply and add sell pressure, so a heavy calendar is a real headwind, not background noise.",
     "category": "tokenomics"
   },
   {
     "id": "emissions",
     "term": "Emissions",
-    "definition": "New tokens created and distributed over time to reward liquidity providers, stakers, or users.",
+    "definition": "New tokens minted and handed out over time to reward users, LPs, or stakers. They bootstrap activity but dilute holders - and when they stop, mercenary liquidity often leaves with them.",
     "category": "tokenomics"
   },
   {
     "id": "burn",
     "term": "Burn",
-    "definition": "Permanently destroying tokens by sending them to an unusable address, reducing total supply.",
+    "definition": "Permanently destroying tokens by sending them to an address no one can spend from. Burning cuts supply; whether that lifts the price depends on demand actually existing.",
     "category": "tokenomics"
   },
   {
     "id": "airdrop",
     "term": "Airdrop",
-    "definition": "Free distribution of tokens directly into early users' wallets to promote adoption or reward loyalty.",
+    "definition": "Free tokens distributed to wallets, usually to reward early users or seed a community. Often a marketing tool, and increasingly a target for sybil farming.",
     "category": "tokenomics"
   },
   {
     "id": "governance",
     "term": "Governance",
-    "definition": "The democratic process where token holders vote on proposals to change protocol rules or fees.",
+    "definition": "The voting system where token holders decide protocol changes and spending. It only means control if the votes are not quietly dominated by insiders and whales.",
     "category": "dao"
   },
   {
     "id": "dao",
     "term": "DAO",
-    "definition": "Decentralized Autonomous Organization; an online community managed by code and member votes.",
+    "definition": "Decentralized Autonomous Organization - a group run by code and token-holder votes instead of a company. The autonomy is real; so is the risk that a few large holders control the vote.",
     "category": "dao"
   },
   {
     "id": "oracle",
     "term": "Oracle",
-    "definition": "A trusted service that feeds external real-world data, like token prices, onto the blockchain.",
+    "definition": "The service that feeds outside data - most importantly prices - onto the blockchain. A protocol is only as safe as its oracle, because a manipulable price can be made to lie.",
     "category": "pro"
   },
   {
     "id": "twap",
     "term": "TWAP (Time-Weighted Average Price)",
-    "definition": "A price average calculated over a specific time window to prevent single-moment price manipulation.",
+    "definition": "Time-Weighted Average Price: a price averaged over a window instead of one instant. Averaging makes a one-block spike nearly worthless, which is what shuts down most oracle manipulation.",
     "category": "pro"
   },
   {
     "id": "flash_loan",
     "term": "Flash Loan",
-    "definition": "An uncollateralized loan that must be borrowed and fully repaid within the very same transaction block.",
+    "definition": "An uncollateralized loan that must be borrowed and repaid within the same transaction. It is not free money and not a hack - it is a tool that scales whatever weakness a protocol already has.",
     "category": "pro"
   },
   {
     "id": "mev",
     "term": "MEV (Maximal Extractable Value)",
-    "definition": "Profit extracted by miners or searchers by choosing the order in which transactions are processed.",
+    "definition": "Maximal Extractable Value - profit made purely from choosing the order transactions execute in. Arbitrage is the benign kind; sandwiching your trade is the hostile kind.",
     "category": "pro"
   },
   {
     "id": "sandwich_attack",
     "term": "Sandwich Attack",
-    "definition": "A bot trade that buys right before your swap and sells right after it to profit off your slippage.",
+    "definition": "A bot that buys right before your swap and sells right after, pocketing the price move your own order caused. Tight slippage tolerance is what starves it.",
     "category": "pro"
   },
   {
     "id": "priority_fee",
     "term": "Priority Fee",
-    "definition": "An extra fee paid to validators to encourage them to process your transaction faster during congestion.",
+    "definition": "An optional tip added to a transaction to jump the queue when the network is busy. It buys inclusion speed, not safety.",
     "category": "basics"
   },
   {
     "id": "order_book",
     "term": "Order Book",
-    "definition": "A live list of buy orders (bids) and sell orders (asks) organized by price levels.",
+    "definition": "A live list of resting buy orders (bids) and sell orders (asks) at each price level. It shows exactly where liquidity sits - unlike an AMM, which hides it inside a formula.",
     "category": "pro"
   },
   {
     "id": "bid_ask",
     "term": "Bid / Ask",
-    "definition": "The highest price someone is willing to pay (bid) and the lowest price someone is willing to accept (ask).",
+    "definition": "The bid is the highest price a buyer will pay; the ask is the lowest a seller will accept. The gap between them is the spread.",
     "category": "pro"
   },
   {
     "id": "spread",
     "term": "Spread",
-    "definition": "The difference between the lowest asking sell price and the highest bidding buy price.",
+    "definition": "The gap between the best bid and the best ask. You pay it on the way in and again on the way out - a guaranteed round-trip cost even if the price never moves.",
     "category": "pro"
   },
   {
     "id": "market_order",
     "term": "Market Order",
-    "definition": "An order to buy or sell immediately at the best currently available market price.",
+    "definition": "An order to trade immediately at whatever the market offers. It always fills, but in a thin market the average price can land far from the one you saw.",
     "category": "pro"
   },
   {
     "id": "limit_order",
     "term": "Limit Order",
-    "definition": "An order to buy or sell only at a specific designated price or better.",
+    "definition": "An order to trade only at your chosen price or better. It might never fill, but you never pay worse than you asked - and by resting in the book, you often earn the cheaper maker fee.",
     "category": "pro"
   },
   {
     "id": "stop_loss",
     "term": "Stop-Loss",
-    "definition": "An automatic order set to sell an asset if its price falls to a specific floor to limit losses.",
+    "definition": "An order that waits for a trigger price, then exits. It guarantees an attempt to get out, not the price you get out at - in a fast move it can slip badly.",
     "category": "pro"
   },
   {
     "id": "perpetual",
     "term": "Perpetual (Perp)",
-    "definition": "A derivative contract allowing you to speculate on an asset's future price without an expiry date.",
+    "definition": "A derivative that tracks an asset's price and never expires. With no expiry, a funding rate is what keeps it glued to spot.",
     "category": "pro"
   },
   {
     "id": "leverage",
     "term": "Leverage",
-    "definition": "Borrowing extra funds to amplify the potential profit or loss of a trading position.",
+    "definition": "Using borrowed money to control a bigger position than your capital alone. It multiplies gains and losses equally - and it decides how much ordinary noise you can survive before liquidation.",
     "category": "pro"
   },
   {
     "id": "margin",
     "term": "Margin",
-    "definition": "The initial collateral deposit required to open and maintain a leveraged trading position.",
+    "definition": "The collateral you post to open a leveraged position. It is the buffer the venue seizes when the trade goes against you - the smaller it is, the closer liquidation sits.",
     "category": "pro"
   },
   {
     "id": "funding_rate",
     "term": "Funding Rate",
-    "definition": "Periodic payments exchanged between long and short traders to keep perpetual contract prices pegged to spot.",
+    "definition": "The periodic payment between longs and shorts that tethers a perpetual to spot. Positive funding means the crowd is long and the longs are paying to stay long.",
     "category": "pro"
   },
   {
     "id": "mark_price",
     "term": "Mark Price",
-    "definition": "An estimated fair benchmark price derived from multiple spot exchanges used to calculate liquidations.",
+    "definition": "The fair-price benchmark used for PnL and liquidations, blended from the perp and a spot index and smoothed. It is deliberately not the last traded price, so a one-second spike cannot liquidate everyone.",
     "category": "pro"
   },
   {
     "id": "bridge",
     "term": "Bridge",
-    "definition": "A protocol enabling the transfer of cryptocurrencies and data between two different blockchains.",
+    "definition": "A protocol that moves value between chains by locking it on one and minting a claim on the other. Bridges hold huge value behind a few privileged functions, which is why they are the most-hacked category in crypto.",
     "category": "pro"
   },
   {
     "id": "bonding_curve",
     "term": "Bonding Curve",
-    "definition": "A mathematical formula where a token's price increases automatically as more tokens are purchased.",
+    "definition": "A formula that sets a token's price from its supply alone. Buying walks the price up the curve, selling walks it back down - the mechanism behind fair-launch memecoins.",
     "category": "pro"
   },
   {
     "id": "rug_pull",
     "term": "Rug Pull",
-    "definition": "A malicious exit scam where creators remove all liquidity or dump tokens, leaving investors with worthless coins.",
+    "definition": "A malicious exit where the creators drain the liquidity or dump their bag, leaving everyone else with worthless tokens. The whole downside lands in one transaction.",
     "category": "safety"
   },
   {
     "id": "honeypot",
     "term": "Honeypot",
-    "definition": "A fraudulent smart contract configured so buyers can deposit money but are code-blocked from selling.",
+    "definition": "A contract built so you can buy but not sell - selling is blocked or taxed to near zero. It looks tradable right up until you try to exit.",
     "category": "safety"
   },
   {
     "id": "audit",
     "term": "Audit",
-    "definition": "A security review conducted by specialized engineers to identify bugs and vulnerabilities in code.",
+    "definition": "A security review by trained engineers hunting for known bug classes. It is a snapshot of one code version, not a guarantee - the code and the keys can change the day after.",
     "category": "safety"
   },
   {
     "id": "upgrade_authority",
     "term": "Upgrade Authority",
-    "definition": "A designated master wallet with permissions to rewrite a smart contract's code in the future.",
+    "definition": "The key allowed to rewrite a contract's code later. If a single wallet holds it with no timelock, the audited code you trusted can be swapped for a malicious version in one transaction.",
     "category": "safety"
   },
   {
@@ -470,7 +470,7 @@
   {
     "id": "position_sizing",
     "term": "Position Sizing",
-    "definition": "Calculating what percentage of your capital to allocate to any single trade to control risk.",
+    "definition": "Deciding how much of your capital to risk on a single trade. It is the one variable fully in your control, and it matters more than any prediction - size too big and one bad streak ends the game.",
     "category": "safety"
   },
   {
