@@ -46,7 +46,7 @@ import { FaucetWidget, PaymentModal, StuckChecklistCard, RaydiumSwapCard } from 
 import { canAccess, isAccessGateEnabled } from '@/lib/access';
 import { getLocalAura } from '@/lib/progress';
 import { Button, Card, Badge } from '@/components/ui';
-import { Lock, KeyRound, CheckCircle2, ArrowLeft, Lightbulb, Coins } from 'lucide-react';
+import { Lock, KeyRound, CheckCircle2, ArrowLeft, Lightbulb, Coins, BookOpen, X } from 'lucide-react';
 
 interface PageProps {
   params: Promise<{ lessonId: string }>;
@@ -58,6 +58,7 @@ export default function DynamicLessonPage({ params }: PageProps) {
   const lesson = getLesson(lessonId);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [aura, setAura] = useState(0);
   const [hasUnlockedAll, setHasUnlockedAll] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -78,6 +79,10 @@ export default function DynamicLessonPage({ params }: PageProps) {
     window.addEventListener('storage', checkUnlock);
     return () => window.removeEventListener('storage', checkUnlock);
   }, []);
+
+  useEffect(() => {
+    setMobileSidebarOpen(false);
+  }, [lessonId]);
 
   if (!lesson) {
     return (
@@ -234,11 +239,14 @@ export default function DynamicLessonPage({ params }: PageProps) {
       />
 
       <div className="flex-1 flex min-h-0">
-        <CourseSidebar
-          currentLessonId={lesson.id}
-          isCollapsed={sidebarCollapsed}
-          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-        />
+        {/* Desktop curriculum rail */}
+        <div className="hidden lg:block">
+          <CourseSidebar
+            currentLessonId={lesson.id}
+            isCollapsed={sidebarCollapsed}
+            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          />
+        </div>
 
         {/* If locked, render Lock Wall */}
         {!access.allowed ? (
@@ -326,6 +334,48 @@ export default function DynamicLessonPage({ params }: PageProps) {
           />
         )}
       </div>
+
+      {/* Mobile curriculum trigger */}
+      <button
+        type="button"
+        onClick={() => setMobileSidebarOpen(true)}
+        aria-label="Open course map"
+        className="lg:hidden fixed bottom-4 left-4 z-40 flex items-center gap-2 bg-accent text-white border-2 border-ink rounded-full px-4 py-3 font-heading font-bold text-sm shadow-pop active:translate-x-[1px] active:translate-y-[1px]"
+      >
+        <BookOpen className="w-4 h-4" /> Course Map
+      </button>
+
+      {/* Mobile curriculum drawer */}
+      {mobileSidebarOpen && (
+        <div className="lg:hidden fixed inset-0 z-50">
+          <div
+            className="absolute inset-0 bg-ink/50"
+            onClick={() => setMobileSidebarOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-surface shadow-pop-lg flex flex-col">
+            <div className="flex items-center justify-between p-2 border-b-2 border-ink bg-white">
+              <span className="font-heading font-bold text-sm text-ink pl-2">Course Map</span>
+              <button
+                type="button"
+                onClick={() => setMobileSidebarOpen(false)}
+                aria-label="Close course map"
+                className="p-1.5 rounded-lg border-2 border-ink bg-white hover:bg-accent/10"
+              >
+                <X className="w-4 h-4 text-ink" />
+              </button>
+            </div>
+            <div className="flex-1 min-h-0">
+              <CourseSidebar
+                currentLessonId={lesson.id}
+                isCollapsed={false}
+                onToggleCollapse={() => setMobileSidebarOpen(false)}
+                inOverlay
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Payment Modal */}
       <PaymentModal

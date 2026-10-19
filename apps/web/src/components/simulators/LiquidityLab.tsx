@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Card, Button, Slider, Badge } from '@/components/ui';
 import { simulateSwap, getSpotPrice } from '@defi-mommy/sim-core';
 import {
@@ -19,15 +19,55 @@ import { TourWrapper } from '@/components/tour/TourWrapper';
 export interface LiquidityLabProps {
   onGoalAchieved?: () => void;
   className?: string;
+  /** When true, the lab auto-plays a demo while it is on screen, until the user takes over. */
+  autoPlay?: boolean;
 }
 
-export function LiquidityLab({ onGoalAchieved, className }: LiquidityLabProps) {
+export function LiquidityLab({ onGoalAchieved, className, autoPlay = false }: LiquidityLabProps) {
   // Pool mode: 'shallow' (low liquidity) or 'deep' (high liquidity)
   const [poolType, setPoolType] = useState<'shallow' | 'deep'>('shallow');
   const [tradeAmount, setTradeAmount] = useState<number>(50); // fUSDC
   const [showComparison, setShowComparison] = useState<boolean>(true);
   const [hasInteracted, setHasInteracted] = useState<boolean>(false);
   const [isTourActive, setIsTourActive] = useState<boolean>(false);
+
+  // Auto-play (homepage demo): runs while in view, stops the moment the user touches a control.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const userTookOver = useRef(false);
+  const [autoPlaying, setAutoPlaying] = useState(false);
+
+  useEffect(() => {
+    if (!autoPlay || typeof IntersectionObserver === 'undefined') return;
+    const el = rootRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) setAutoPlaying(entry.isIntersecting);
+      },
+      { threshold: 0.4 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [autoPlay]);
+
+  useEffect(() => {
+    if (!autoPlay || !autoPlaying || userTookOver.current) return;
+    setHasInteracted(true);
+    let step = 0;
+    const id = setInterval(() => {
+      if (userTookOver.current) {
+        clearInterval(id);
+        return;
+      }
+      step += 1;
+      const wave = (Math.sin(step / 8) + 1) / 2; // 0..1
+      setTradeAmount(Math.max(10, Math.round((10 + wave * 490) / 10) * 10));
+      if (step % 28 === 0) {
+        setPoolType((p) => (p === 'shallow' ? 'deep' : 'shallow'));
+      }
+    }, 110);
+    return () => clearInterval(id);
+  }, [autoPlay, autoPlaying]);
 
   // Pool configurations:
   // Shallow Pool: 10 SOL, 2,000 fUSDC ($200/SOL spot price, $4,000 total TVL)
@@ -65,6 +105,7 @@ export function LiquidityLab({ onGoalAchieved, className }: LiquidityLabProps) {
   const impactPct = swapResult.priceImpact * 100;
 
   const handlePoolToggle = (type: 'shallow' | 'deep') => {
+    userTookOver.current = true;
     setPoolType(type);
     setHasInteracted(true);
     if (type === 'deep' && onGoalAchieved) {
@@ -73,6 +114,7 @@ export function LiquidityLab({ onGoalAchieved, className }: LiquidityLabProps) {
   };
 
   const handleReset = () => {
+    userTookOver.current = true;
     setPoolType('shallow');
     setTradeAmount(50);
     setShowComparison(true);
@@ -142,7 +184,7 @@ export function LiquidityLab({ onGoalAchieved, className }: LiquidityLabProps) {
   ];
 
   return (
-    <div className={`w-full max-w-2xl mx-auto space-y-5 ${className || ''}`}>
+    <div ref={rootRef} className={`w-full max-w-2xl mx-auto space-y-5 ${className || ''}`}>
       <TourWrapper
         steps={tourSteps}
         isActive={isTourActive}
@@ -232,6 +274,7 @@ export function LiquidityLab({ onGoalAchieved, className }: LiquidityLabProps) {
               step={10}
               unit="fUSDC"
               onChange={(val) => {
+                userTookOver.current = true;
                 setTradeAmount(val);
                 setHasInteracted(true);
               }}

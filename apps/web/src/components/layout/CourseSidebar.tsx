@@ -10,12 +10,15 @@ export interface CourseSidebarProps {
   currentLessonId?: string;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  /** Rendered inside a full-screen mobile drawer instead of the desktop rail. */
+  inOverlay?: boolean;
 }
 
 export function CourseSidebar({
   currentLessonId = 'B1',
   isCollapsed,
   onToggleCollapse,
+  inOverlay = false,
 }: CourseSidebarProps) {
   const [hasUnlockedAll, setHasUnlockedAll] = React.useState(false);
   const [gateEnabled, setGateEnabled] = React.useState(true);
@@ -100,22 +103,26 @@ export function CourseSidebar({
   return (
     <aside
       data-tour="course-map"
-      className="w-72 border-r border-border bg-surface flex flex-col h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto select-none transition-all"
+      className={`border-r border-border bg-surface flex flex-col overflow-y-auto select-none transition-all ${
+        inOverlay ? 'w-full h-full' : 'w-72 h-[calc(100vh-4rem)] sticky top-16'
+      }`}
     >
-      <div className="p-4 border-b border-border flex justify-between items-center">
-        <div>
+      <div className="p-4 border-b border-border flex justify-between items-center gap-2">
+        <div className="min-w-0">
           <h3 className="font-heading font-bold text-sm text-ink flex items-center gap-1.5">
             Rekt School Curriculum
           </h3>
-          <p className="text-xs text-ink-soft">Tier 1: Basic · Tier 2: Intermediate · Tier 3: Pro</p>
+          <p className="text-xs text-ink-soft">Basic · Intermediate · Pro</p>
         </div>
-        <button
-          onClick={onToggleCollapse}
-          className="p-1.5 hover:bg-accent/10 text-ink-soft hover:text-accent rounded-lg transition-colors"
-          title="Collapse Course Map"
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
+        {!inOverlay && (
+          <button
+            onClick={onToggleCollapse}
+            className="p-1.5 hover:bg-accent/10 text-ink-soft hover:text-accent rounded-lg transition-colors shrink-0"
+            title="Collapse Course Map"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       <div className="p-4 space-y-6 flex-1">

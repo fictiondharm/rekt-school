@@ -19,7 +19,8 @@ import {
   CheckCircle2,
   Play,
   FlaskConical,
-  Wallet,
+  BookOpen,
+  Skull,
 } from 'lucide-react';
 
 const basicLessons = getAllLessons()
@@ -89,11 +90,11 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
         {/* HERO */}
         <section className="pt-14 sm:pt-24 pb-16 relative overflow-hidden">
           {/* Massive yellow circle behind text */}
-          <div className="absolute -top-20 -left-40 w-[500px] h-[500px] rounded-full bg-tertiary/30 pointer-events-none" aria-hidden="true" />
-          {/* Confetti shapes */}
-          <div className="absolute top-8 right-10 w-6 h-6 bg-secondary rounded-full border-2 border-ink pointer-events-none" aria-hidden="true" />
-          <div className="absolute top-32 right-40 w-0 h-0 border-l-[10px] border-r-[10px] border-b-[18px] border-l-transparent border-r-transparent border-b-accent pointer-events-none" aria-hidden="true" />
-          <div className="absolute bottom-20 left-1/4 w-5 h-5 bg-quaternary border-2 border-ink rotate-45 pointer-events-none" aria-hidden="true" />
+          <div className="hidden sm:block absolute -top-20 -left-40 w-[500px] h-[500px] rounded-full bg-tertiary/30 pointer-events-none" aria-hidden="true" />
+          {/* Confetti shapes (desktop only — kept off the mobile text column) */}
+          <div className="hidden sm:block absolute top-8 right-10 w-6 h-6 bg-secondary rounded-full border-2 border-ink pointer-events-none" aria-hidden="true" />
+          <div className="hidden sm:block absolute top-32 right-40 w-0 h-0 border-l-[10px] border-r-[10px] border-b-[18px] border-l-transparent border-r-transparent border-b-accent pointer-events-none" aria-hidden="true" />
+          <div className="hidden sm:block absolute bottom-20 left-1/4 w-5 h-5 bg-quaternary border-2 border-ink rotate-45 pointer-events-none" aria-hidden="true" />
 
           <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-7 space-y-6">
@@ -112,11 +113,12 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
               </h1>
 
               <p className="text-base sm:text-lg text-ink-soft leading-relaxed max-w-2xl">
-                Two tiers, two networks. <strong className="text-ink">Tier 1 (Basic)</strong> runs live on
-                Solana Devnet with a real wallet and free faucet money, while{' '}
-                <strong className="text-ink">Tier 2 (Intermediate)</strong> drops you into pure simulation
-                labs. Break constant-product AMMs, liquidation stress tests, token minting and wallet
-                security — all with zero real cash at risk.
+                Three tiers, zero real risk. <strong className="text-ink">Tier 1 (Basic)</strong> puts
+                you live on Solana Devnet with a real wallet and free faucet money.{' '}
+                <strong className="text-ink">Tier 2 (Intermediate)</strong> drops you into pure
+                simulation labs. <strong className="text-ink">Tier 3 (Pro)</strong> hands you the scary
+                stuff — flash loans, oracle attacks, MEV. Break AMMs, trigger liquidations, mint tokens,
+                spot scams: no real cash ever touches it.
               </p>
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
@@ -143,7 +145,7 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
 
               <div className="flex flex-wrap items-center gap-3 pt-3">
                 {[
-                  { icon: ShieldCheck, text: 'Tier 1 Devnet · Tier 2 Sandbox', color: 'text-quaternary' },
+                  { icon: ShieldCheck, text: 'Real Solana · Free test money', color: 'text-quaternary' },
                   { icon: Coins, text: '10,000 fUSDC faucet included', color: 'text-tertiary' },
                   { icon: KeyRound, text: 'Aura progress tracking', color: 'text-secondary' },
                 ].map(({ icon: Icon, text, color }) => (
@@ -185,7 +187,7 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
                 <span className="text-ink font-bold">
                   do it, see what happened, break it safely.
                 </span>{' '}
-                Tier 1 runs live on free Solana Devnet; Tier 2 runs in a pure sandbox. Either way: zero real funds.
+                Tier 1 runs live on free Solana Devnet; Tiers 2 and 3 run in a pure sandbox. Either way: zero real funds.
               </p>
             </div>
             {/* Speech bubble tail */}
@@ -218,8 +220,8 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
               },
               {
                 n: '03',
-                title: 'Devnet + Sandbox mastery',
-                body: 'Tier 1 fires real transactions on Solana Devnet (connect Solflare or Phantom, mint tokens, verify on a block explorer). Tier 2 stress-tests protocols in a safe sandbox.',
+                title: 'Real chain, zero risk',
+                body: 'Tier 1 fires real transactions on Solana Devnet — connect Solflare or Phantom, mint tokens, verify it on a block explorer. Tiers 2 and 3 stress-test protocols in a safe sandbox.',
                 color: 'bg-tertiary',
                 iconBg: 'bg-tertiary',
               },
@@ -247,12 +249,12 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
                 <Badge variant="mint">No wallet needed</Badge>
               </div>
               <p className="text-sm text-ink-soft mt-2">
-                Two full lessons you can play immediately in your browser.
+                One free lesson from every tier. Play all three right in your browser — no sign-up, no wallet.
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="p-6 flex flex-col justify-between gap-6 hover:rotate-[-1deg] hover:scale-[1.02] transition-all duration-300 ease-bounce">
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
@@ -266,8 +268,8 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
                   Welcome: how this course works
                 </h3>
                 <p className="text-sm text-ink-soft leading-relaxed">
-                  Master the dual-panel layout: guided curriculum on the left, live Devnet
-                  sandbox on the right, plus spotlight tours and term definitions.
+                  A guided walkthrough of the layout: guided steps on the left, a live practice lab on
+                  the right, spotlight tours, and tappable term definitions.
                 </p>
               </div>
               <Link href="/learn/b1">
@@ -290,13 +292,37 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
                   The Liquidity Lab: how pools really work
                 </h3>
                 <p className="text-sm text-ink-soft leading-relaxed">
-                  Toggle between shallow and ocean-deep pools, drag the trade size slider,
-                  and watch the constant product curve (x*y=k) compute price impact live.
+                  Toggle between shallow and ocean-deep pools, drag the trade size slider, and watch the
+                  constant product curve (x · y = k) compute price impact live.
                 </p>
               </div>
               <Link href="/learn/i1">
                 <Button variant="yellow" className="w-full gap-2">
                   <FlaskConical className="w-4 h-4" /> Launch the Liquidity Lab
+                </Button>
+              </Link>
+            </Card>
+
+            <Card className="p-6 flex flex-col justify-between gap-6 hover:rotate-[-1deg] hover:scale-[1.02] transition-all duration-300 ease-bounce">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 bg-tertiary text-ink text-xs font-bold rounded-full border-2 border-ink">P5</span>
+                    <Badge variant="sandbox" className="text-[9px] px-2 py-0.5">Sandbox</Badge>
+                  </div>
+                  <span className="text-xs text-ink-faint font-mono">~18 min</span>
+                </div>
+                <h3 className="text-lg font-heading font-bold text-ink">
+                  Oracles &amp; flash loan attacks
+                </h3>
+                <p className="text-sm text-ink-soft leading-relaxed">
+                  Watch a single bad price feed let an attacker drain a protocol in one block — then see
+                  how a real oracle shuts the attack down.
+                </p>
+              </div>
+              <Link href="/learn/p5">
+                <Button variant="accent" className="w-full gap-2">
+                  <Skull className="w-4 h-4" /> Launch P5
                 </Button>
               </Link>
             </Card>
@@ -307,110 +333,114 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
         <section className="py-16 border-t-2 border-ink">
           <div className="max-w-2xl space-y-3 mb-8">
             <span className="inline-flex px-4 py-1.5 bg-tertiary text-ink text-[11px] font-bold uppercase tracking-widest border-2 border-ink rounded-full shadow-pop-sm">
-              Interactive preview
+              Live demo
             </span>
             <h2 className="text-2xl sm:text-3xl font-heading font-extrabold text-ink">
-              Feel price impact before it costs you money
+              Watch price impact, live
             </h2>
             <p className="text-sm text-ink-soft">
-              Drag the trade slider to see how price impact escalates in thin pools.
+              This plays on its own the moment it scrolls into view. Drag the slider or flip the pool
+              any time to take over — and watch price impact explode in a thin pool.
             </p>
           </div>
 
           <div className="border-2 border-ink rounded-xl shadow-pop-lg overflow-hidden bg-white p-5 sm:p-8">
-            <LiquidityLab />
+            <LiquidityLab autoPlay />
           </div>
         </section>
 
-        {/* WALLET SETUP */}
-        <section className="py-16 border-t-2 border-ink">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-full bg-quaternary border-2 border-ink flex items-center justify-center">
-              <Wallet className="w-5 h-5 text-ink" />
-            </div>
-            <h2 className="text-2xl font-heading font-extrabold text-ink">
-              New to Web3? A free Devnet wallet in 3 steps
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                title: 'Install Solflare or Phantom',
-                body: (
-                  <>
-                    Add <a href="https://solflare.com" target="_blank" rel="noopener noreferrer" className="text-accent font-bold hover:underline">Solflare</a> or{' '}
-                    <a href="https://phantom.app" target="_blank" rel="noopener noreferrer" className="text-accent font-bold hover:underline">Phantom</a>{' '}
-                    as a browser extension. Create a fresh test wallet and store the recovery
-                    phrase securely.
-                  </>
-                ),
-                color: 'bg-accent',
-              },
-              {
-                title: 'Switch the network to Solana Devnet',
-                body: (
-                  <>
-                    Open Settings, then Developer Settings in your wallet and set the network to{' '}
-                    <strong className="font-bold text-ink">Devnet</strong>. Every transaction
-                    you send from here uses free test money.
-                  </>
-                ),
-                color: 'bg-secondary',
-              },
-              {
-                title: 'Claim 10,000 fUSDC and test SOL',
-                body: (
-                  <>
-                    Connect your wallet, use the one-click faucet, copy the contract address
-                    into your wallet to see the balance, and start learning.
-                  </>
-                ),
-                color: 'bg-tertiary',
-              },
-            ].map((step, i) => (
-              <Card key={step.title} className="p-6 pt-8 relative hover:rotate-[-1deg] hover:scale-[1.02] transition-all duration-300 ease-bounce">
-                <div className={`absolute -top-4 left-6 w-8 h-8 rounded-full ${step.color} border-2 border-ink flex items-center justify-center`}>
-                  <span className="font-heading font-bold text-xs text-white">{String(i + 1).padStart(2, '0')}</span>
-                </div>
-                <h4 className="font-heading font-bold text-base text-ink mt-2 mb-3">{step.title}</h4>
-                <p className="text-sm text-ink-soft leading-relaxed">{step.body}</p>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        {/* TWO NETWORKS */}
+        {/* TWO NETWORKS / THREE TIERS */}
         <section className="py-16 border-t-2 border-ink">
           <div className="max-w-2xl space-y-3 mb-8">
             <span className="inline-flex px-4 py-1.5 bg-secondary text-white text-[11px] font-bold uppercase tracking-widest border-2 border-ink rounded-full shadow-pop-sm">
-              Two tiers, two networks
+              Three tiers, zero risk
             </span>
             <h2 className="text-2xl sm:text-3xl font-heading font-extrabold text-ink">
-              One course, two ways to practice
+              Start easy. Finish dangerous.
             </h2>
             <p className="text-sm text-ink-soft">
-              Every lesson shows a badge telling you exactly which environment you are in.
+              Every lesson shows a badge so you always know where you&apos;re practising — real Solana
+              Devnet, or a pure sandbox.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="p-6 space-y-3">
               <Badge variant="devnet">SOLANA DEVNET</Badge>
               <h3 className="font-heading font-bold text-lg text-ink">Tier 1 · Basic</h3>
               <p className="text-sm text-ink-soft leading-relaxed">
-                Live on the real <strong className="text-ink">Solana Devnet</strong> testnet. Connect Solflare or
-                Phantom, claim free faucet SOL and 10,000 fUSDC, and broadcast real (but free) transactions you
-                can verify on a block explorer.
+                Your first steps on the real thing. Connect Solflare or Phantom, claim free faucet SOL
+                and 10,000 fUSDC, and send real transactions you can check on a block explorer.
               </p>
             </Card>
             <Card className="p-6 space-y-3">
               <Badge variant="sandbox">SANDBOX</Badge>
               <h3 className="font-heading font-bold text-lg text-ink">Tier 2 · Intermediate</h3>
               <p className="text-sm text-ink-soft leading-relaxed">
-                A pure in-browser <strong className="text-ink">sandbox</strong>. No wallet and no real chain —
-                manipulate AMM curves, interest rates, liquidations and tokenomics with instant, zero-risk
-                results.
+                The mechanics, hands-on. AMMs, impermanent loss, yield, lending and liquidations — in a
+                pure sandbox where instant, zero-risk results let you push every curve to its breaking
+                point.
               </p>
+            </Card>
+            <Card className="p-6 space-y-3">
+              <Badge variant="sandbox">SANDBOX</Badge>
+              <h3 className="font-heading font-bold text-lg text-ink">Tier 3 · Pro</h3>
+              <p className="text-sm text-ink-soft leading-relaxed">
+                The stuff that actually gets people rekt. Flash loans, oracle manipulation, MEV
+                sandwiches, concentrated liquidity and a full smart-contract audit — finishing with a
+                capstone where you architect a protocol.
+              </p>
+            </Card>
+          </div>
+        </section>
+
+        {/* WAR STORIES + GLOSSARY */}
+        <section className="py-16 border-t-2 border-ink">
+          <div className="max-w-2xl space-y-3 mb-8">
+            <span className="inline-flex px-4 py-1.5 bg-accent text-white text-[11px] font-bold uppercase tracking-widest border-2 border-ink rounded-full shadow-pop-sm">
+              Beyond the lessons
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-heading font-extrabold text-ink">
+              Real hacks, decoded
+            </h2>
+            <p className="text-sm text-ink-soft">
+              The lessons teach the mechanics. These show you what happens when it all goes wrong.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="p-6 space-y-4 shadow-pop">
+              <div className="w-11 h-11 rounded-full bg-danger/10 border-2 border-ink flex items-center justify-center">
+                <Skull className="w-5 h-5 text-danger" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-heading font-bold text-lg text-ink">War Stories: real exploits</h3>
+                <p className="text-sm text-ink-soft leading-relaxed">
+                  Wormhole, Mango, Cashio — walk through the actual attacks that drained millions. What
+                  broke, why it broke, and the exact red flags to spot before it happens to you.
+                </p>
+              </div>
+              <Link href="/war-stories">
+                <Button variant="primary" className="w-full gap-2">
+                  <Skull className="w-4 h-4" /> Read the case files
+                </Button>
+              </Link>
+            </Card>
+
+            <Card className="p-6 space-y-4 shadow-pop">
+              <div className="w-11 h-11 rounded-full bg-accent/10 border-2 border-ink flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-accent" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-heading font-bold text-lg text-ink">The DeFi glossary, in plain English</h3>
+                <p className="text-sm text-ink-soft leading-relaxed">
+                  Every term you&apos;ll meet — TVL, slippage, health factor, MEV — explained without the
+                  jargon. Tap any underlined word inside a lesson to see it defined, and never lose your place.
+                </p>
+              </div>
+              <Link href="/glossary">
+                <Button variant="yellow" className="w-full gap-2">
+                  <BookOpen className="w-4 h-4" /> Open the glossary
+                </Button>
+              </Link>
             </Card>
           </div>
         </section>
@@ -492,7 +522,14 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
           </div>
 
           <p className="text-xs text-ink-faint mt-4">
-            Intermediate labs (I1 to I10) unlock with the full course.
+            Unlock the full course to open Tier 2 (I1–I14) and Tier 3 (P1–P12).{' '}
+            <Link href="/intermediate" className="text-accent font-semibold hover:underline">
+              Browse Intermediate
+            </Link>{' '}
+            ·{' '}
+            <Link href="/pro" className="text-accent font-semibold hover:underline">
+              Browse Pro
+            </Link>
           </p>
         </section>
 
