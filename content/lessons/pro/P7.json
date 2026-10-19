@@ -51,7 +51,7 @@
       "id": "p7-intro",
       "type": "read",
       "title": "Why Concentration Changes Everything",
-      "body": "A classic <Term id=\"amm\">AMM</Term> spreads your liquidity across **every possible price** from $0 to infinity - even prices the token will never trade at. Almost all of that capital sits idle, doing nothing, earning nothing.\n\nConcentrated liquidity (CLMM, as on Orca) lets you say: 'I only want to provide liquidity between $140 and $160.' Your entire deposit is now packed into that narrow band. Inside the range, your money is enormously dense - it captures a much larger share of every swap than the same capital spread across all prices.\n\n**The capital-efficiency idea in one image:**\n\n- Full-range LP: one drop of liquidity smeared over a football field.\n- Concentrated LP: that same drop focused into a square meter - where the game is actually being played.\n\nThe efficiency multiplier is roughly `fullRangeWidth / yourRangeWidth`. Provide a range that is 1/10th as wide, and you may earn ~10x the fees on the same deposit *while price stays inside*. That 'while' is the entire catch, and it is where concentration bites back.",
+      "body": "A classic <Term id=\"amm\">AMM</Term> spreads your liquidity across **every possible price** from $0 to infinity - even prices the token will never trade at. Almost all of that capital sits idle, doing nothing, earning nothing.\n\nConcentrated liquidity (CLMM, as on Orca) lets you say: 'I only want to provide liquidity between $140 and $160.' Your entire deposit is now packed into that narrow band. Inside the range, your money is enormously dense - it captures a much larger share of every swap than the same capital spread across all prices.\n\nOne image for the capital-efficiency idea:\n\n- Full-range LP: one drop of liquidity smeared over a football field.\n- Concentrated LP: that same drop focused into a square meter - where the game is actually being played.\n\nThe efficiency multiplier is roughly `fullRangeWidth / yourRangeWidth`. Provide a range that is 1/10th as wide, and you may earn ~10x the fees on the same deposit *while price stays inside*. That 'while' is the entire catch, and it is where concentration bites back.",
       "hints": [
         "Concentration = same money, far smaller price band, way more fee share. Efficiency ≈ fullWidth / yourWidth.",
         "The magic lasts ONLY while price is inside your chosen range."
@@ -61,7 +61,7 @@
       "id": "p7-range",
       "type": "read",
       "title": "When You Are Right, and When You Are Rekt",
-      "body": "A concentrated position is a bet that price will **stay inside your band**. Play the two outcomes:\n\n**Price stays in range:**\n\n- Your liquidity is active and dense, so you earn a large share of fees.\n- As price wiggles across the band, your position rebalances between the two tokens.\n- You outperform a full-range LP by a wide margin.\n\n**Price exits your range - and stays out:**\n\n- Your position stops earning fees entirely, because no swap crosses your band.\n- Your position becomes **100% one token**: all the token that fell, if price dropped below your range; all the token that rose, if price broke above.\n- You are now exactly like the person who simply held the losing asset - you missed the up-move because you converted into the wrong side and then sat frozen.\n\nThis is the deepest trap of CLMM. People chase the eye-popping APR in a narrow range, then price trends away, and they are left holding a lopsided bag that earns **zero** while the token runs without them. The fee yield and the <Term id=\"impermanent_loss\">impermanent loss</Term> are two faces of the same choice: the tighter the range, the more you earn when right and the more violently you are wrong when not. Concentration does not remove risk. It swaps a little-of-everything risk for an all-or-nothing risk at your chosen boundary.",
+      "body": "A concentrated position is a bet that price will **stay inside your band**. Play the two outcomes.\n\n**Price stays in range:**\n\n- Your liquidity is active and dense, so you earn a large share of fees.\n- As price wiggles across the band, your position rebalances between the two tokens.\n- You outperform a full-range LP by a wide margin.\n\n**Price exits your range - and stays out:**\n\n- Your position stops earning fees entirely, because no swap crosses your band.\n- Your position becomes **100% one token**: all the token that fell, if price dropped below your range; all the token that rose, if price broke above.\n- You are now exactly like the person who simply held the losing asset - you missed the up-move because you converted into the wrong side and then sat frozen.\n\nThis is the deepest trap of CLMM. People chase the eye-popping APR in a narrow range, then price trends away, and they are left holding a lopsided bag that earns **zero** while the token runs without them. Fee yield and <Term id=\"impermanent_loss\">impermanent loss</Term> are two faces of the same choice: the tighter the range, the more you earn when right and the more violently you are wrong when not. Concentration does not remove risk. It swaps a little-of-everything risk for an all-or-nothing risk at your chosen boundary.",
       "hints": [
         "In range = dense liquidity = big fee share. Out of range = zero fees + 100% exposure to one token.",
         "Tight ranges supercharge fees AND supercharge impermanent loss. There is no free efficiency."
@@ -71,7 +71,7 @@
       "id": "p7-under-the-hood",
       "type": "deepdive",
       "title": "Under the Hood: Ticks, Ranges, and Active Liquidity",
-      "body": "A CLMM does not store one giant `x * y = k` pool. It divides the price axis into **ticks**, and each position declares which ticks it covers. At any moment, only the liquidity whose range contains the *current* tick is 'active' - that is what the swap trades against.\n\nTwo consequences follow directly from this design:\n\n- **Fee share is per-tick.** When price passes through your range, your liquidity counts. When price is outside, your liquidity is invisible to the swap, so it earns nothing.\n- **Position composition is range-relative.** As price moves within your band, your position swaps between token A and token B to stay balanced at the edge of the curve. Push price to the top of your range and you are ~100% of the 'sold' token; push it to the bottom and you are ~100% of the other. This is why an out-of-range position behaves like a frozen spot holding.\n\nProfessionals treat range selection as a *market view*, not a settings screen. A wide range is a slow, steady, lower-yield position close to full-range LP. A razor-thin range is a high-conviction bet that pays spectacularly for a short window and can leave you holding the wrong asset the moment you are wrong. The <Term id=\"tvl\">TVL</Term> headline hides this: much of a CLMM's TVL may be inactive at the current price, earning nothing at all.",
+      "body": "A CLMM does not store one giant `x * y = k` pool. It divides the price axis into **ticks**, and each position declares which ticks it covers. At any moment, only the liquidity whose range contains the *current* tick is 'active' - that is what the swap trades against.\n\nTwo consequences follow directly:\n\n- **Fee share is per-tick.** When price passes through your range, your liquidity counts. When price is outside, your liquidity is invisible to the swap, so it earns nothing.\n- **Position composition is range-relative.** As price moves within your band, your position swaps between token A and token B to stay balanced at the edge of the curve. Push price to the top of your range and you are ~100% of the 'sold' token; push it to the bottom and you are ~100% of the other. This is why an out-of-range position behaves like a frozen spot holding.\n\nProfessionals treat range selection as a *market view*, not a settings screen. A wide range is a slow, steady, lower-yield position close to full-range LP. A razor-thin range is a high-conviction bet that pays spectacularly for a short window and can leave you holding the wrong asset the moment you are wrong. The <Term id=\"tvl\">TVL</Term> headline hides this: much of a CLMM's TVL may be inactive at the current price, earning nothing at all.",
       "hints": [
         "Only the liquidity covering the current tick trades. Outside your range = invisible capital.",
         "Out-of-range position ≈ 100% of one token, frozen, earning zero fees."
@@ -93,7 +93,7 @@
           ],
           "correct": 1,
           "difficulty": "basic",
-          "explainRight": "Correct. Full-range spreads capital thinly across all prices; concentration focuses it where trading actually happens. Inside the range, your money is dense - so it commands a much bigger share of fees. That efficiency scales inversely with range width.",
+          "explainRight": "Full-range spreads capital thinly across all prices; concentration focuses it where trading actually happens. Inside the range, your money is dense - so it commands a much bigger share of fees. That efficiency scales inversely with range width.",
           "explainWrong": "It is not about depositing more tokens - it is about density. Concentrating the SAME capital into a narrow band gives it a large share of swap fees within that band. The trade-off is that the advantage disappears once price leaves the range."
         },
         {
@@ -107,7 +107,7 @@
           ],
           "correct": 1,
           "difficulty": "intermediate",
-          "explainRight": "Correct. Out of range, no swap crosses your ticks, so you earn nothing. Your position has converted to ~100% of the token price moved against, meaning you missed the rally in the asset you wanted. You are frozen until price returns or you rebalance.",
+          "explainRight": "Out of range, no swap crosses your ticks, so you earn nothing. Your position has converted to ~100% of the token price moved against, meaning you missed the rally in the asset you wanted. You are frozen until price returns or you rebalance.",
           "explainWrong": "Concentration only pays while price is inside. Break above and your liquidity goes inactive: zero fees, and your holdings are skewed to ~100% of the weak side. You effectively sat out the move - the classic out-of-range frustration."
         },
         {
@@ -121,7 +121,7 @@
           ],
           "correct": 1,
           "difficulty": "intermediate",
-          "explainRight": "Correct. A tight range maximizes fee share and efficiency while price cooperates - but the moment price breaks out, you stop earning and your position is lopsided with elevated IL. High reward, high fragility. It is a directional bet dressed as yield.",
+          "explainRight": "A tight range maximizes fee share and efficiency while price cooperates - but the moment price breaks out, you stop earning and your position is lopsided with elevated IL. High reward, high fragility. It is a directional bet dressed as yield.",
           "explainWrong": "Maximum short-term yield comes from the tightest sensible range. The flip side is extreme fragility: any breakout puts you out of range with zero fees and concentrated impermanent loss. Wide ranges are the lower-yield, lower-variance choice."
         },
         {
@@ -135,8 +135,8 @@
           ],
           "correct": 1,
           "difficulty": "thinking",
-          "explainRight": "Correct. Headline TVL counts all deposited capital, but only the liquidity covering the current tick earns. A pool can show massive TVL while most of it sits inactive out of range. Real, achievable yield depends on in-range depth and your own range choice.",
-          "explainWrong": "TVL is a vanity-ish total that includes inactive liquidity. Because CLMM capital only earns while in range, the advertised APR can be far above what a new depositor actually realizes. The question to ask is: how much liquidity is active right here, right now?"
+          "explainRight": "Headline TVL counts all deposited capital, but only the liquidity covering the current tick earns. A pool can show massive TVL while most of it sits inactive out of range. Real, achievable yield depends on in-range depth and your own range choice.",
+          "explainWrong": "TVL is a broad total that includes inactive liquidity. Because CLMM capital only earns while in range, the advertised APR can be far above what a new depositor actually realizes. The question to ask is: how much liquidity is active right here, right now?"
         }
       ],
       "passScore": 3

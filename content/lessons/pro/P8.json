@@ -61,7 +61,7 @@
       "id": "p8-exploit",
       "type": "read",
       "title": "Anatomy of a Bridge Exploit",
-      "body": "Bridges have lost billions, and the stories rhyme. The attack surface is tiny but fatal:\n\n**Common failure modes:**\n\n- **Compromised validator keys** - the bridge's signers are tricked or breached, so they sign a fraudulent 'deposit' that never happened. The bridge mints free wrapped tokens.\n- **Signature verification bugs** - the contract accepts a signature it should have rejected, letting the attacker forge approvals.\n- **Uninitialized / upgradeable contract flaws** - an uninitialized proxy lets an attacker become the admin and simply print.\n- **Logic errors** - a check is missing, and the mint fires without a matching lock.\n\n**The drain, in steps:**\n\n1. Attacker forges or corrupts an authorization to mint.\n2. They mint a huge amount of the wrapped asset out of thin air.\n3. They swap it for the real assets sitting in the destination pool.\n4. They bridge or launder the proceeds out before anyone reacts.\n\n**The aftermath is uniquely brutal.** The wrapped token loses its backing, so its peg collapses - it becomes a printed IOU with nothing behind it. Holders of the wrapped asset are wiped out even though *they* did nothing wrong. The original locked tokens may still be fine on the source chain, but the destination side is now over-issued and worthless. Unlike a single-market hack, a bridge exploit poisons an entire asset across every app that accepted it as collateral or payment.",
+      "body": "Bridges have lost billions, and the stories rhyme. The attack surface is tiny but fatal.\n\n**Common failure modes:**\n\n- **Compromised validator keys** - the bridge's signers are tricked or breached, so they sign a fraudulent 'deposit' that never happened. The bridge mints free wrapped tokens.\n- **Signature verification bugs** - the contract accepts a signature it should have rejected, letting the attacker forge approvals.\n- **Uninitialized / upgradeable contract flaws** - an uninitialized proxy lets an attacker become the admin and simply print.\n- **Logic errors** - a check is missing, and the mint fires without a matching lock.\n\n**The drain, in steps:**\n\n1. Attacker forges or corrupts an authorization to mint.\n2. They mint a huge amount of the wrapped asset out of thin air.\n3. They swap it for the real assets sitting in the destination pool.\n4. They bridge or launder the proceeds out before anyone reacts.\n\nThe aftermath is uniquely brutal. The wrapped token loses its backing, so its peg collapses - it becomes a printed IOU with nothing behind it. Holders of the wrapped asset are wiped out even though *they* did nothing wrong. The original locked tokens may still be fine on the source chain, but the destination side is now over-issued and worthless. Unlike a single-market hack, a bridge exploit poisons an entire asset across every app that accepted it as collateral or payment.",
       "hints": [
         "Most bridge hacks trace to key compromise or a signature-verification bug - not exotic math.",
         "After the exploit, the wrapped token depegs because the mint ran ahead of the backing. Everyone holding it eats the loss."
@@ -71,7 +71,7 @@
       "id": "p8-under-the-hood",
       "type": "deepdive",
       "title": "Under the Hood: Trust Models and Defenses",
-      "body": "Not all bridges are created equal. The safest way to judge one is its **trust model** - the list of assumptions you must believe for your money to be safe.\n\n**The spectrum:**\n\n- **Centralized / federated** - a small set of validators or a multisig holds the keys. Fast and cheap, but a single compromise is catastrophic. Most mega-hacks hit this tier.\n- **Optimistic bridges** - transfers are assumed valid and can be challenged within a window. More secure, but slow and requires honest watchers to actually show up.\n- **Light-client / zk bridges** - the destination chain verifies cryptographic proofs of the source chain's state. The strongest model, but the most complex and expensive to run.\n\n**Defenses that actually matter:**\n\n- **Multisig + timelocks** on minting, so a single compromised key cannot act instantly.\n- **Rate limits and caps** - slow the bleed; a hacked bridge can only drain so much per hour.\n- **An independent <Term id=\"audit\">audit</Term>** and a review of who holds the <Term id=\"upgrade_authority\">upgrade authority</Term>.\n- **Proof verification** instead of trusted signers wherever possible.\n\nBefore bridging, ask three questions: Who can mint? How is that authority controlled? What stops an instant drain? If the honest answer is 'a small team with a hot key,' you are not using infrastructure - you are extending them trust. Bridges are the place where a small coding or key mistake costs the most, so treat the <Term id=\"tvl\">TVL</Term> locked in one as a target, not just a number. This lesson is simulated, but you can explore the real ones below - carefully.",
+      "body": "Not all bridges are created equal. The safest way to judge one is its **trust model** - the list of assumptions you must believe for your money to be safe.\n\n**The spectrum:**\n\n- **Centralized / federated** - a small set of validators or a multisig holds the keys. Fast and cheap, but a single compromise is catastrophic. Most mega-hacks hit this tier.\n- **Optimistic bridges** - transfers are assumed valid and can be challenged within a window. More secure, but slow and requires honest watchers to actually show up.\n- **Light-client / zk bridges** - the destination chain verifies cryptographic proofs of the source chain's state. The strongest model, but the most complex and expensive to run.\n\n**Defenses that actually matter:**\n\n- **Multisig plus timelocks** on minting, so a single compromised key cannot act instantly.\n- **Rate limits and caps** - slow the bleed; a hacked bridge can only drain so much per hour.\n- **An independent <Term id=\"audit\">audit</Term>** and a review of who holds the <Term id=\"upgrade_authority\">upgrade authority</Term>.\n- **Proof verification** instead of trusted signers wherever possible.\n\nBefore bridging, ask three questions: Who can mint? How is that authority controlled? What stops an instant drain? If the honest answer is 'a small team with a hot key,' you are not using infrastructure - you are extending them trust. Bridges are the place where a small coding or key mistake costs the most, so treat the <Term id=\"tvl\">TVL</Term> locked in one as a target, not just a number. This lesson is simulated, but you can explore the real ones below - carefully.",
       "hints": [
         "Rate limits and timelocks turn a catastrophic instant drain into a survivable slow bleed.",
         "Strongest model = the destination chain verifies proofs of the source chain. Weakest = a small multisig."
@@ -99,7 +99,7 @@
           ],
           "correct": 1,
           "difficulty": "basic",
-          "explainRight": "Correct. Lock on source, mint wrapped on destination. To return, the wrapped token is burned and the original is unlocked. The locked pool is the vault - and the mint authority is the printing press that guards it.",
+          "explainRight": "Lock on source, mint wrapped on destination. To return, the wrapped token is burned and the original is unlocked. The locked pool is the vault - and the mint authority is the printing press that guards it.",
           "explainWrong": "Lock-and-mint keeps the real tokens locked in a contract on the source chain while minting an equivalent wrapped token on the destination chain. The return trip burns the wrapped token and unlocks the original. No tokens are teleported directly."
         },
         {
@@ -113,7 +113,7 @@
           ],
           "correct": 1,
           "difficulty": "intermediate",
-          "explainRight": "Correct. A bridge is a giant vault guarded by a small number of keys or a single mint function. Any flaw in that concentration - key compromise, a signature check bug, an upgradeable-contract hole - lets an attacker print wrapped tokens and drain the vault in one shot.",
+          "explainRight": "A bridge is a giant vault guarded by a small number of keys or a single mint function. Any flaw in that concentration - key compromise, a signature check bug, an upgradeable-contract hole - lets an attacker print wrapped tokens and drain the vault in one shot.",
           "explainWrong": "The danger is structural: huge locked value behind a narrow set of privileged functions. Compromise or bypass one of them and the entire reserve is exposed instantly. It is not about user carelessness or fees."
         },
         {
@@ -127,7 +127,7 @@
           ],
           "correct": 1,
           "difficulty": "intermediate",
-          "explainRight": "Correct. The mint ran ahead of the lock, so wrapped supply is no longer matched by real reserves. The token stops being a claim on anything - it is a printed IOU. Anyone holding it, or accepting it as collateral, takes the loss through no fault of their own.",
+          "explainRight": "The mint ran ahead of the lock, so wrapped supply is no longer matched by real reserves. The token stops being a claim on anything - it is a printed IOU. Anyone holding it, or accepting it as collateral, takes the loss through no fault of their own.",
           "explainWrong": "A wrapped token's value comes from being redeemable for locked real tokens. If an exploit mints unbacked supply, redemption claims exceed reserves and the peg collapses. It is a backing failure, not a panic or a decay."
         },
         {
@@ -141,7 +141,7 @@
           ],
           "correct": 1,
           "difficulty": "thinking",
-          "explainRight": "Correct. Bridge risk is the risk of the mint authority. A small hot-key multisig can be compromised in an instant; a zk light-client verified by proofs is far harder to fake. Timelocks and rate limits decide whether a mistake is catastrophic or survivable. Branding tells you nothing.",
+          "explainRight": "Bridge risk is the risk of the mint authority. A small hot-key multisig can be compromised in an instant; a zk light-client verified by proofs is far harder to fake. Timelocks and rate limits decide whether a mistake is catastrophic or survivable. Branding tells you nothing.",
           "explainWrong": "The decisive question is the trust model - specifically who controls minting and how that is protected. Timelocks, multisig thresholds, rate limits, and proof-based verification are what separate a survivable design from a headline hack. Followers and block times are irrelevant to safety."
         }
       ],

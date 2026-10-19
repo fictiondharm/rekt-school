@@ -51,7 +51,7 @@
       "id": "p10-intro",
       "type": "read",
       "title": "Auditing Is Reading Trust, Not Code",
-      "body": "You will probably never read a protocol's 4,000 lines of code. But you can - and should - read its **trust surface**: the small list of powers that, if abused, let someone take everyone's money.\n\nAn <Term id=\"audit\">audit</Term> is a trained review that says: at the moment we looked, we did not find these known classes of bug. That is valuable, but it is a **snapshot**, not a guarantee. Code changes after the audit. Upgrades can introduce new bugs. And an audit does not inspect the *intent* of the team or the security of their keys.\n\n**The questions that matter, in order:**\n\n1. **Who can mint?** Unlimited mint = unlimited dilution or drain.\n2. **Who can pause, freeze, or block transfers?** That is a honeypot switch.\n3. **Who holds the <Term id=\"upgrade_authority\">upgrade authority</Term>?** Whoever can upgrade the contract can change the rules *after* you deposit - including to a malicious version.\n4. **Who can move the funds?** Is there a withdraw path guarded by a single key, or a multisig with a timelock?\n5. **Where does the price come from?** A single manipulable oracle means the whole protocol is only as safe as that price.\n\nIf any of these resolves to 'one anonymous wallet, controlled by the team,' you are not using a trustless protocol - you are lending the team money and hoping. Most DeFi disasters were not exotic zero-days. They were people ignoring that the keys were held by someone who turned out to be careless or malicious.",
+      "body": "You will probably never read a protocol's 4,000 lines of code. But you can - and should - read its **trust surface**: the short list of powers that, if abused, let someone take everyone's money.\n\nAn <Term id=\"audit\">audit</Term> is a trained review that says: at the moment we looked, we did not find these known classes of bug. That is valuable, but it is a **snapshot**, not a guarantee. Code changes after the audit. Upgrades can introduce new bugs. And an audit does not inspect the *intent* of the team or the security of their keys.\n\nThe questions that matter, in order:\n\n1. **Who can mint?** Unlimited mint = unlimited dilution or drain.\n2. **Who can pause, freeze, or block transfers?** That is a honeypot switch.\n3. **Who holds the <Term id=\"upgrade_authority\">upgrade authority</Term>?** Whoever can upgrade the contract can change the rules *after* you deposit - including to a malicious version.\n4. **Who can move the funds?** Is there a withdraw path guarded by a single key, or a multisig with a timelock?\n5. **Where does the price come from?** A single manipulable oracle means the whole protocol is only as safe as that price.\n\nIf any of these resolves to 'one anonymous wallet, controlled by the team,' you are not using a trustless protocol - you are lending the team money and hoping. Most DeFi disasters were not exotic zero-days. They were people ignoring that the keys were held by someone who turned out to be careless or malicious.",
       "hints": [
         "Start with powers, not code: mint, pause, upgrade, withdraw, price source.",
         "An audit is a point-in-time snapshot. Code and keys can change the day after."
@@ -99,7 +99,7 @@
           ],
           "correct": 1,
           "difficulty": "basic",
-          "explainRight": "Correct. An audit is a snapshot of a specific code version against known bug classes. It does not cover later changes, guarantee team intent, or make a protocol permanently safe. 'Audited' reduces risk; it does not remove it.",
+          "explainRight": "An audit is a snapshot of a specific code version against known bug classes. It does not cover later changes, guarantee team intent, or make a protocol permanently safe. 'Audited' reduces risk; it does not remove it.",
           "explainWrong": "An audit says 'at this time, on this code, we found no such bugs.' Code can change post-audit, upgrades can add new flaws, and audits do not judge the team's honesty or the safety of their keys. It is one input, not a guarantee."
         },
         {
@@ -113,7 +113,7 @@
           ],
           "correct": 1,
           "difficulty": "intermediate",
-          "explainRight": "Correct. Upgradeability is a live backdoor. If a single key can swap the logic, the code you audited is not the code you will be trusting tomorrow. A timelock + multisig makes this survivable; a lone EOA makes it a standing invitation.",
+          "explainRight": "Upgradeability is a live backdoor. If a single key can swap the logic, the code you audited is not the code you will be trusting tomorrow. A timelock plus multisig makes this survivable; a lone EOA makes it a standing invitation.",
           "explainWrong": "It is not about anonymity per se - it is the POWER. An unbounded upgrade function means the contract's behavior can be replaced at will. Your deposit is only as safe as that key. Timelocks and multisigs exist precisely to defang this."
         },
         {
@@ -127,7 +127,7 @@
           ],
           "correct": 1,
           "difficulty": "intermediate",
-          "explainRight": "Correct. Calling out before finishing state changes opens the door to reentrancy: the callee re-enters and re-executes against stale balances. The fix is the checks-effects-interactions pattern - update state before any external call.",
+          "explainRight": "Calling out before finishing state changes opens the door to reentrancy: the callee re-enters and re-executes against stale balances. The fix is the checks-effects-interactions pattern - update state before any external call.",
           "explainWrong": "Sending value/control out before updating state is the classic reentrancy setup. The recipient re-enters and acts on balances that have not yet been reduced, extracting funds repeatedly. Rounding and oracle issues are different bug families."
         },
         {
@@ -141,7 +141,7 @@
           ],
           "correct": 1,
           "difficulty": "thinking",
-          "explainRight": "Correct. You do not need to read every line to assess the powers that can take your money. Mint authority, pause/freeze, upgrade control, withdraw paths, oracle source, multisig thresholds, timelocks, and LP locks are all checkable - and they determine most catastrophic outcomes. TVL is the size of the prize, not the strength of the guard.",
+          "explainRight": "You do not need to read every line to assess the powers that can take your money. Mint authority, pause/freeze, upgrade control, withdraw paths, oracle source, multisig thresholds, timelocks, and LP locks are all checkable - and they determine most catastrophic outcomes. TVL is the size of the prize, not the strength of the guard.",
           "explainWrong": "The high-leverage move is auditing the trust surface, not the code: who can mint, pause, upgrade, withdraw, and where the price comes from. Pair that with multisig/timelock and LP-lock checks. Big TVL only means more to lose, and a test deposit proves nothing about long-term safety."
         }
       ],
