@@ -5,9 +5,9 @@
   "title": "Welcome: How This Course Works",
   "estMinutes": 5,
   "objectives": [
-    "Understand how guided lessons work",
-    "Discover the spotlight tour, glossary, and hints",
-    "Learn why Devnet play money keeps you safe"
+    "How a lesson actually works, start to finish",
+    "Where to find the tour, the glossary, and hints",
+    "Why none of this can cost you money"
   ],
   "requires": [],
   "freePreview": true,
@@ -17,43 +17,43 @@
     {
       "id": "b1-welcome",
       "type": "read",
-      "title": "Welcome to DeFi Maxi: Don't Get Rekt!",
-      "body": "Meet **Maxi** - a fictional character we created to guide you through the whole course. Maxi isn't real (no podcast, no wallet, no hot takes), think of Maxi as your personal DeFi coach, hype person, and safety buddy rolled into one.\n\nIn Web3, the golden rule is simple: **Don't get rekt. Maxi is here to guide you.**\n\n**How each lesson is built.**\n\nEvery lesson follows the same rhythm so your brain always knows what is coming next:\n\n- **Read** a short, plain-English explanation of one idea.\n- **See** it live in the interactive practice panel on the right.\n- **Prove** it with a quick quiz that earns you Aura points.\n- **Explore** a real product so the concept stops being abstract.\n\n**Why this is 100% risk-free.**\n\nThe safest way to learn DeFi is by doing it yourself with zero fear. So every lesson runs on **Solana Devnet** - a public test network where the SOL and tokens are free play money. You will connect a real <Term id=\"wallet\">wallet</Term>, sign real <Term id=\"transaction\">transactions</Term>, and even watch a swap execute on-chain, yet you can never lose a single cent of real value.\n\nBy the end of Tier 1 you will read a wallet, judge a token's safety, understand gas fees, and spot the scams that drain beginners. Let's go."
+      "title": "Welcome to Rekt School",
+      "body": "Five minutes before you touch anything.\n\nEvery lesson is a short loop. You read one idea, watch it happen in the panel next to you, answer two questions, then get links to the real product. Same loop every time:\n\n- **Read** - one idea, in plain English\n- **Deep dive** - the mechanics underneath, if you want them\n- **Quiz** - two questions, Aura points on the line\n- **Explore** - the actual product, not a diagram of it\n\nA couple of lessons open with a tour of the page instead. This one does.\n\n**Maxi** is the voice you'll hear along the way. Maxi is a character we wrote for the course - no real person behind it, no wallet, no bag to defend. When a number on screen doesn't make sense, hit **Hint** and Maxi explains that specific number, not the textbook version of it.\n\n**Why none of this can cost you money**\n\nEverything runs on **Solana Devnet**. That's a public test network running the same software as mainnet, with none of the money. The SOL you spend comes out of a faucet - no market for it, nothing to sell, nobody cares if you burn it.\n\nSo you'll connect a real <Term id=\"wallet\">wallet</Term>, sign real <Term id=\"transaction\">transactions</Term>, and watch them land on-chain. You'll also do it wrong at some point. The cost of wrong here is the ten seconds you spend reading the error.\n\nSimply put: the mechanics are identical to mainnet, and the bill isn't there.\n\nBy the end of Tier 1 you'll be able to open any wallet's history and tell what happened, decide whether a token is safe to touch, follow where a <Term id=\"gas_fee\">gas fee</Term> went, and recognise the pattern before a scam drains a fresh wallet."
     },
     {
       "id": "b1-tour",
       "type": "tour",
-      "title": "Interactive UI Tour",
+      "title": "A quick tour of this page",
       "tourId": "b1-ui-tour",
       "steps": [
         {
           "target": "[data-tour='topbar-cluster']",
-          "title": "Solana Devnet Badge",
-          "text": "This badge guarantees you are in a safe sandbox using free devnet money. We never touch mainnet.",
+          "title": "Which network you're on",
+          "text": "Says which network the page is talking to. Lessons never touch mainnet - the money comes from a faucet, so signing something you don't fully understand costs you nothing.",
           "side": "bottom"
         },
         {
           "target": "[data-tour='topbar-aura']",
-          "title": "Aura Points",
-          "text": "Your Aura score lives in the top bar. Answer quiz questions correctly to gain Aura, and wrong answers cost you Aura. Same for verified on-chain tasks - rewards flow straight into your Aura.",
+          "title": "Your Aura",
+          "text": "Your score. Quiz question right, it goes up. Wrong, it goes down. On-chain tasks pay in the same way.",
           "side": "bottom"
         },
         {
           "target": "[data-tour='learn-panel']",
-          "title": "The Learn Panel",
-          "text": "Your interactive guide is here on the left. Follow short, clear steps at your own pace.",
+          "title": "The reading side",
+          "text": "The current step and the explanation for it. Nothing here is timed - take as long as you want.",
           "side": "right"
         },
         {
           "target": "[data-tour='practice-panel']",
-          "title": "The Practice Panel",
-          "text": "Interactive simulators and on-chain tasks live here on the right. Try things and see instant results.",
+          "title": "The doing side",
+          "text": "Simulators and real on-chain transactions, results the moment you act. On your phone this sits behind the Practice tab.",
           "side": "left"
         },
         {
           "target": "[data-tour='hint-button']",
-          "title": "Need a Hint?",
-          "text": "If you ever get stuck, tap the Hint button to reveal progressive clues one by one.",
+          "title": "If you get stuck",
+          "text": "Maxi gives you one clue at a time. The first is a nudge, not the answer.",
           "side": "top"
         }
       ]
@@ -61,19 +61,19 @@
     {
       "id": "b1-interactive-preview",
       "type": "reveal",
-      "title": "Safe to Break Things",
-      "body": "In traditional crypto, mistakes cost real money: bad slippage, phishing drainers, or sudden liquidations. \n\nHere at Rekt School, our motto is: **Do it → See what happened → Break it safely before you lose real cash.** If a trade fails or you get simulated-liquidated, celebrate! You just learned an on-chain lesson that saved you thousands of real dollars."
+      "title": "Here, mistakes are reversible",
+      "body": "On mainnet the first time you set slippage too wide, it comes straight out of your balance. No refund, no support desk, no partial undo.\n\nThe order we use is: **do it, see what the chain actually did, then do it again.**\n\nA trade that fails in the simulator isn't a mark against you. It's the cheapest version of that mistake you'll ever get, and nobody's balance here is moving. So break things on purpose."
     },
     {
       "id": "b1-under-the-hood",
       "type": "deepdive",
-      "title": "Under the Hood: How Wallets and Web3 Apps Talk",
-      "body": "When you use a DeFi app, the website never holds your money or your keys. Instead, your wallet (like Phantom or Solflare) holds your private key securely in your browser extension. When you want to take an action, like claiming tokens or swapping, the website builds an unsigned transaction and hands it to your wallet. You inspect the details, click 'Approve', and your wallet signs it cryptographically before sending it directly to Solana validators."
+      "title": "What actually happens when you press a button",
+      "body": "The site doesn't touch your money. It can't.\n\nWhat happens instead: the site writes up an unsigned transaction - swap this for that, send here - and hands it to your <Term id=\"wallet\">wallet</Term>. Your wallet shows you the details. You approve. The wallet signs it with your private key and sends it to the validators.\n\nThe key never leaves your extension. Only the signature goes out, and the signature is public. Anyone can verify that you approved exactly this transaction without ever seeing how you approved it.\n\nThat's the whole trust model, and it's why nobody at Rekt School can move your funds even if they wanted to."
     },
     {
       "id": "b1-quiz",
       "type": "quiz",
-      "title": "Quick Knowledge Check",
+      "title": "Two questions",
       "questions": [
         {
           "id": "q1",
@@ -81,25 +81,25 @@
           "options": [
             "Real US Dollars from your bank account",
             "Real Solana mainnet cryptocurrency",
-            "Free Solana Devnet play tokens with zero real-world cost",
+            "Free Solana Devnet tokens issued from a faucet",
             "Credit card credits"
           ],
           "correct": 2,
-          "explainRight": "Exactly right! Everything in the course runs on Solana Devnet where tokens are free play money.",
-          "explainWrong": "Not quite. Rekt School uses Solana Devnet, so all tokens and gas are 100% free play money."
+          "explainRight": "Right - Devnet SOL comes out of a faucet. No market for it, nothing to lose.",
+          "explainWrong": "No. Lessons run on Devnet, where the SOL and the gas come out of a faucet. None of it has value."
         },
         {
           "id": "q2",
           "prompt": "Does the Rekt School website ever hold your private key or seed phrase?",
           "options": [
             "Yes, it stores them in an encrypted database",
-            "No, never. Your private key stays exclusively inside your own wallet extension",
+            "No. Your private key stays inside your wallet and the site never sees it",
             "Yes, but only when you click 'Swap'",
             "Yes, to pay for your gas fees"
           ],
           "correct": 1,
-          "explainRight": "Spot on! Your private key never leaves your wallet extension. The website only prepares transactions for you to review and sign.",
-          "explainWrong": "Incorrect. In Web3, non-custodial apps never hold or see your private keys or seed phrase."
+          "explainRight": "That's it. The site prepares the transaction, you sign it in your wallet, the key never moves.",
+          "explainWrong": "It can't. Non-custodial apps are built so they never see your key - and a site asking for your seed phrase is a drainer, not a wallet."
         }
       ],
       "passScore": 2
@@ -107,7 +107,7 @@
     {
       "id": "b1-explore",
       "type": "explore",
-      "title": "Explore the Real Thing",
+      "title": "Where to check this yourself",
       "cardIds": ["solscan", "phantom"]
     }
   ],
