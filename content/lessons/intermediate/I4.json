@@ -5,9 +5,9 @@
   "title": "Impermanent Loss Lab",
   "estMinutes": 15,
   "objectives": [
-    "Understand why liquidity providers experience Impermanent Loss when token prices diverge",
-    "Calculate the exact mathematical loss formula: 2·sqrt(r)/(1+r) - 1",
-    "Determine when earned trading fees outweigh impermanent loss"
+    "Understand why providing liquidity costs you when the two tokens diverge",
+    "Calculate the exact loss: 2·sqrt(r)/(1+r) - 1",
+    "Know the market conditions where fees actually beat the loss"
   ],
   "requires": ["I3"],
   "freePreview": false,
@@ -18,19 +18,19 @@
       "id": "i4-intro",
       "type": "read",
       "title": "The Hidden Cost of Providing Liquidity",
-      "body": "Imagine two **friends sharing a fruit basket**. They agree the basket must always hold exactly 50% apples and 50% oranges by value. The moment apples get expensive, the basket quietly sells some apples and buys oranges to stay balanced. That diligent rebalancer is your <Term id=\"amm\">AMM</Term>.\n\nWhen you deposit 50/50 into a <Term id=\"liquidity_pool\">liquidity pool</Term> - say SOL and USDC - arbitrageurs constantly trade against it as the market price moves.\n\n**What happens when SOL doubles in price:**\n\n- The AMM sells your SOL into the market on the way up and accumulates USDC in return.\n- You exit holding *less* SOL and *more* USDC than if you had simply left both tokens in your wallet.\n- That gap is called <Term id=\"impermanent_loss\">impermanent loss</Term> (IL).\n\nHere is the subtle sting: the pool did exactly what it was designed to do, and the arbitrageur's profit came straight out of your position. You are not being hacked - you are paying for a mechanism that always sells the winner and buys the loser. The trading fees your <Term id=\"lp_token\">LP tokens</Term> earn are the compensation for accepting that trade-off."
+      "body": "Two friends agree to share a fruit basket that must always hold equal value in apples and oranges. The moment apples get expensive, the basket quietly sells apples and buys oranges to stay balanced. That rebalancer is your <Term id=\"amm\">AMM</Term>.\n\nDeposit 50/50 into a <Term id=\"liquidity_pool\">liquidity pool</Term> — SOL and USDC, say — and arbitrageurs trade against it as the market price moves.\n\nWhen SOL doubles in price:\n\n- The pool sells your SOL into the market on the way up and collects USDC in return.\n- You exit holding less SOL and more USDC than if you had simply left both tokens in your wallet.\n\nThat gap is <Term id=\"impermanent_loss\">impermanent loss</Term>. The sting is that the pool did nothing wrong — it did exactly what it was designed to do. The arbitrageur's profit came out of your position. You are not being hacked; you are paying for a mechanism that always sells the winner and buys the loser.\n\nThe fees your <Term id=\"lp_token\">LP tokens</Term> collect are the compensation for accepting that trade-off."
     },
     {
       "id": "i4-formula",
       "type": "read",
       "title": "The Mathematical Reality of IL",
-      "body": "The divergence cost follows one elegant formula. For a price ratio `r = P_new / P_old`, the exact loss relative to simply holding is:\n\n`IL = 2 × sqrt(r) / (1 + r) - 1`\n\n**Reading the table like a pro:**\n\n- **1.25x price change:** about -0.6% IL\n- **1.50x price change:** about -2.0% IL\n- **2.00x price change:** about -5.7% IL\n- **5.00x price change:** about -25.5% IL\n\nThree things worth noticing:\n\n- Small moves barely hurt: under a 2x divergence the damage stays in single digits.\n- The loss is **symmetric** - a 0.5x crash hurts about as much as a 2x pump, because the formula only cares about the ratio, not the direction.\n- It is only 'impermanent' if the ratio actually returns to 1.0. Withdraw while prices are diverged and the loss becomes real and permanent.\n\nThat last point is the whole game: impermanent loss is a paper wound that heals only if you wait for the two prices to meet again."
+      "body": "The cost of divergence follows one formula. For a price ratio `r = P_new / P_old`, your loss relative to simply holding is:\n\n`IL = 2 × sqrt(r) / (1 + r) - 1`\n\nThe table worth memorising:\n\n- 1.25x price change: about -0.6% IL\n- 1.50x price change: about -2.0% IL\n- 2.00x price change: about -5.7% IL\n- 5.00x price change: about -25.5% IL\n\nThree things to notice:\n\n- Small moves barely hurt. Under a 2x divergence the damage stays in single digits.\n- The loss is symmetric. A 0.5x crash costs about the same as a 2x pump, because the formula only cares about the ratio, not the direction.\n- It is only 'impermanent' while the ratio can still return to 1.0. Withdraw while prices are diverged and the loss becomes real.\n\nThat last point is the whole game. Impermanent loss is a paper wound that heals only if you wait for the two prices to meet again."
     },
     {
       "id": "i4-under-the-hood",
       "type": "deepdive",
       "title": "Under the Hood: Fees vs. Impermanent Loss",
-      "body": "Being a profitable liquidity provider comes down to one inequality: `Trading Fees Earned > Impermanent Loss`. Everything else is commentary.\n\n**Where each side comes from:**\n\n- **Fees** grow with swap volume. Busy pools with tight spreads churn constantly, so the fee side of the ledger fills fast.\n- **Impermanent loss** grows with divergence. Sideways price action keeps it near zero; a one-way trend inflates it steadily.\n- The pool's <Term id=\"tvl\">TVL</Term> and the size of trades also matter: thin pools suffer larger <Term id=\"price_impact\">price impact</Term>, which shows up to traders as <Term id=\"slippage\">slippage</Term> and quietly makes the pool less attractive to trade against.\n\n**When each side usually wins:**\n\n- High-volume, range-bound markets (like SOL/USDC during consolidation) let fees outrun IL, so the position grows.\n- Violent one-way bull or bear trends do the opposite: the pool keeps selling the runner or catching the faller, and IL can devour a large slice of your capital.\n\nThe practical takeaway is that LPing is not 'free yield'. It is a bet that fee income will beat divergence - a bet won or lost almost entirely by how choppy versus how trending the market turns out to be."
+      "body": "Being a profitable liquidity provider comes down to one inequality: `Trading Fees Earned > Impermanent Loss`. Everything else is commentary.\n\nWhere each side comes from:\n\n- Fees grow with swap volume. Busy pools churn constantly, so this side fills fast.\n- Impermanent loss grows with divergence. Sideways action keeps it near zero; a one-way trend inflates it steadily.\n- Pool depth matters on both counts. Thin pools suffer larger <Term id=\"price_impact\">price impact</Term>, which shows up to traders as <Term id=\"slippage\">slippage</Term> and quietly makes the pool less attractive to trade against.\n\nWhen each side usually wins:\n\n- High-volume, range-bound markets let fees outrun the loss, so the position grows.\n- Violent one-way trends do the opposite. The pool keeps selling the runner or catching the faller, and the loss can devour a large slice of your capital.\n\nThe practical read is that providing liquidity is not free yield. It is a bet that fee income will beat divergence — a bet won or lost almost entirely by how choppy versus how trending the market turns out to be."
     },
     {
       "id": "i4-quiz",
@@ -48,8 +48,8 @@
           ],
           "correct": 2,
           "difficulty": "basic",
-          "explainRight": "Correct. The gap is a comparison against holding, and it narrows to zero if the two prices drift back to their original ratio. If you exit while the ratio is restored, you keep 100% of your capital plus all fees collected along the way. The name is a reminder that the loss is only locked in at the moment you withdraw.",
-          "explainWrong": "No blockchain reverses a trade because you complained, and this is not a testnet-only quirk. The loss is called impermanent because it is measured against holding and vanishes if the price ratio returns to its starting point before you exit. Withdraw while prices are still diverged and it becomes permanent in your wallet."
+          "explainRight": "The gap is measured against holding, and it closes to zero if the two prices drift back to their original ratio before you exit. The name is a reminder that the loss only locks in when you withdraw.",
+          "explainWrong": "No chain reverses a trade because you complained, and this is not a testnet quirk. The loss is called impermanent because it vanishes if the ratio returns to its starting point. Exit while prices are still diverged and it lands in your wallet for good."
         },
         {
           "id": "q2",
@@ -62,8 +62,8 @@
           ],
           "correct": 1,
           "difficulty": "basic",
-          "explainRight": "Correct. At r = 2, IL equals 2·sqrt(2)/(1+2) - 1, which works out to roughly -5.7% versus holding. It is a surprisingly small number for a doubling, which is exactly why fees can often cover it. The position still gains value; it just trails the pure-hold outcome by around 5.7%.",
-          "explainWrong": "A 2x divergence does not cost half your capital, and it certainly does not zero it out. Plugging r = 2 into the IL formula gives about -5.7% relative to holding. Rebalancing is real, but it does not erase the gap - it is the very mechanism that creates the measured shortfall in the first place."
+          "explainRight": "Plug r = 2 into the formula: 2·sqrt(2)/(1+2) − 1 ≈ −5.7%. It is a surprisingly small number for a doubling, which is exactly why fees can often cover it. The position still gains value; it just trails a plain hold.",
+          "explainWrong": "A 2x divergence does not cost half your capital and does not zero it out. Rebalancing is real — it is the mechanism that creates the shortfall in the first place, not the thing that erases it."
         },
         {
           "id": "q3",
@@ -76,8 +76,8 @@
           ],
           "correct": 1,
           "difficulty": "basic",
-          "explainRight": "Correct. IL is a relative measure: what your pooled position is worth versus what those same tokens would have been worth if you had just held them. It is not an absolute loss and it is not about fees or emissions. That HODL comparison is the yardstick the formula expresses in one variable, the price ratio r.",
-          "explainWrong": "Impermanent loss is not about gas, time-based price charts, or token supply. It compares two portfolios at the same instant: your share of the pool versus simply holding the same tokens yourself. Framing it as a relative HODL comparison is what makes the 2·sqrt(r)/(1+r) - 1 formula meaningful."
+          "explainRight": "It is a relative measure: what your pooled position is worth versus what those same tokens would be worth if you had just held them. That HODL comparison is the yardstick the formula expresses in one variable, the ratio r.",
+          "explainWrong": "Impermanent loss is not about gas, price charts, or token supply. It compares two portfolios at the same instant — your share of the pool versus holding the same tokens yourself."
         },
         {
           "id": "q4",
@@ -90,8 +90,8 @@
           ],
           "correct": 0,
           "difficulty": "intermediate",
-          "explainRight": "Correct. With r = 4, the formula gives 2·2/5 - 1 = 0.8 - 1 = -0.2, so about -20% versus holding. Notice how disproportionately the loss grows: doubling the divergence from 2x to 4x triples the shortfall from ~5.7% to ~20%. IL accelerates as the ratio drifts further from 1.",
-          "explainWrong": "Work the formula directly: sqrt(4) = 2, so 2·2/(1+4) - 1 = 4/5 - 1 = -0.2, which is about -20%. The tempting -40% assumes the loss scales linearly with the price move, but IL is convex and grows faster than that. Precision here is what separates a rough guess from a real LP calculation."
+          "explainRight": "sqrt(4) = 2, so 2·2/5 − 1 = −0.2, or about −20%. Notice how disproportionately the loss grows: doubling the divergence from 2x to 4x more than triples the shortfall. It accelerates as the ratio drifts from 1.",
+          "explainWrong": "Work the formula directly — −20%, not −40%. The tempting −40% assumes the loss scales linearly with the price move, but it is convex and grows faster than that."
         },
         {
           "id": "q5",
@@ -104,8 +104,8 @@
           ],
           "correct": 0,
           "difficulty": "intermediate",
-          "explainRight": "Correct. The entire LP business model is the inequality 'fees plus rewards > impermanent loss'. Fees and emissions are the income; IL is the cost of always selling the winner and buying the loser. When income outpaces that cost, the position grows; when divergence wins, it shrinks.",
-          "explainWrong": "There is no 24-hour fee lock, and prices never need to sit perfectly still. What decides whether an LP profits is whether accumulated fees and reward emissions outrun the divergence cost. That single inequality - income versus impermanent loss - is the whole scoreboard for any liquidity position."
+          "explainRight": "The entire LP business model is that one inequality. Fees and emissions are the income; the loss is the cost of always selling the winner and buying the loser. When income outpaces the cost the position grows, and when divergence wins it shrinks.",
+          "explainWrong": "There is no 24-hour fee lock, and prices never need to sit still. What decides it is whether accumulated fees and reward emissions outrun the divergence cost."
         },
         {
           "id": "q6",
@@ -118,8 +118,8 @@
           ],
           "correct": 2,
           "difficulty": "intermediate",
-          "explainRight": "Correct. LPs want lots of fees with little divergence, and range-bound markets with heavy volume deliver exactly that. Plenty of swaps pump income into the reserves while the price ratio hovers near 1, keeping IL near zero. It is the closest thing to the ideal LP environment.",
-          "explainWrong": "One-way trends - up or down - are the enemy because they push the price ratio far from 1 and inflate IL. A dead-quiet pool is nearly as bad, since it collects almost no fees. The sweet spot is high volume with sideways prices, where income is strong and divergence stays small."
+          "explainRight": "LPs want lots of fees with little divergence, and range-bound markets with heavy volume deliver exactly that. Plenty of swaps push income into the reserves while the ratio hovers near 1, keeping the loss near zero.",
+          "explainWrong": "One-way trends, up or down, push the ratio far from 1 and inflate the loss. A dead-quiet pool is nearly as bad because it collects almost no fees. The sweet spot is high volume with sideways prices."
         },
         {
           "id": "q7",
@@ -132,8 +132,8 @@
           ],
           "correct": 0,
           "difficulty": "thinking",
-          "explainRight": "Correct. Holding would give $2,000 of SOL (4x on $500) plus $500 of USDC, or $2,500. The pool kept rebalancing by selling SOL as it climbed, so its value is $2,500 × (2·sqrt(4)/(1+4)) = $2,500 × 0.8 = $2,000. The ~$500 difference is the impermanent loss - real money the pool left on the table relative to HODL.",
-          "explainWrong": "Start by pricing the hold path: $500 of SOL becomes $2,000 at 4x, plus $500 of USDC equals $2,500. The pool does not match that, because it sold SOL into strength the whole way up; applying the IL factor of 0.8 gives about $2,000. AMMs do not amplify gains - against a strong trend they lag a plain hold, and that ~20% gap is exactly what fees must overcome."
+          "explainRight": "A plain hold gives $2,000 of SOL plus $500 of USDC, so $2,500. The pool kept selling SOL as it climbed, so its value is $2,500 × 0.8 = $2,000. That ~$500 gap is the loss — real money left on the table relative to HODL.",
+          "explainWrong": "Price the hold path first: $500 of SOL becomes $2,000 at 4x, plus $500 of USDC is $2,500. The pool cannot match it because it sold into strength the whole way up. AMMs do not amplify gains; against a strong trend they lag a plain hold."
         }
       ],
       "passScore": 5

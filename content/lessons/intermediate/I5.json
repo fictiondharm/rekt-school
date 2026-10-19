@@ -5,9 +5,9 @@
   "title": "Stablecoins and Depegs (The Bank Run Simulator)",
   "estMinutes": 13,
   "objectives": [
-    "Differentiate Fiat-Backed, Crypto-Collateralized, and Algorithmic Stablecoins",
-    "Understand the Death Spiral reflexivity in unbacked or undercollateralized pegs",
-    "Analyze the historical Terra/UST collapse and modern stablecoin safety"
+    "Tell fiat-backed, crypto-collateralized, and algorithmic stablecoins apart",
+    "Understand the reflexive death spiral that breaks an unbacked peg",
+    "Walk through the Terra/UST collapse and what it taught the market"
   ],
   "requires": ["I4"],
   "freePreview": false,
@@ -18,19 +18,19 @@
       "id": "i5-intro",
       "type": "read",
       "title": "Not All Stablecoins Are Equal",
-      "body": "A <Term id=\"stablecoin\">stablecoin</Term> is like a taxi meter that is supposed to stay frozen at exactly $1.00. The meter only works while riders trust that the driver can always make change on demand. What actually keeps the meter at $1.00, though, depends entirely on what is parked in the garage.\n\n**There are three main designs, and the difference is the whole ballgame:**\n\n- **Fiat-Backed (USDC, USDT):** Real US dollars and short-term Treasury bills sit in custodial bank reserves, so the <Term id=\"peg\">peg</Term> is defended by a literal, audited bank account.\n- **Overcollateralized Crypto (DAI, USDH):** No dollars required - instead, users lock more than $1.00 of crypto <Term id=\"collateral\">collateral</Term> for every $1.00 minted, and <Term id=\"liquidation\">liquidation</Term> bots sell that backing if it ever weakens.\n- **Algorithmic (UST):** Nothing hard backs it at all. The peg rests on code and a volatile sister token (Luna) that is minted and burned to absorb supply and demand.\n\nThe same $1.00 label hides three completely different risk profiles. A fiat-backed coin can only <Term id=\"depeg\">depeg</Term> if its custodian fails; an algorithmic coin can depeg the moment confidence does."
+      "body": "A <Term id=\"stablecoin\">stablecoin</Term> is a price that is supposed to sit still at $1.00. What actually holds it there depends entirely on what sits behind it, and the difference between designs is the whole ballgame.\n\nThree designs dominate:\n\n- **Fiat-backed (USDC, USDT).** Real dollars and short-term Treasuries sit in custodial reserves. The <Term id=\"peg\">peg</Term> is defended by a literal, audited bank account.\n- **Overcollateralized crypto (DAI, USDH).** No dollars. Users lock more than $1.00 of crypto <Term id=\"collateral\">collateral</Term> for every $1.00 minted, and <Term id=\"liquidation\">liquidation</Term> bots sell that backing if it weakens.\n- **Algorithmic (UST).** Nothing hard backs it. The peg rests on code and a volatile sister token that is minted and burned to absorb supply and demand.\n\nThe same $1.00 label hides three very different risk profiles. A fiat-backed coin depegs if its custodian fails. An algorithmic coin can depeg the moment confidence does."
     },
     {
       "id": "i5-death-spiral",
       "type": "read",
       "title": "The Reflexive Death Spiral",
-      "body": "Picture a bank with no vault and no cash - only a printing press that churns out shares of its own stock. While people believe the stock is valuable, the bank can \"pay\" every withdrawal by printing more stock. The moment that belief cracks, printing more stock just makes each share worth less, which scares even more people into cashing out. That self-feeding loop is the **reflexive death spiral**.\n\n**How the loop tightens, step by step:**\n\n- Confidence slips and redemptions spike as holders rush to convert the coin into something safer.\n- To honor those redemptions, the protocol must mint astronomical quantities of its volatile sister token.\n- That flood of new supply hyperinflates the sister token and crashes its price.\n- Because the coin's backing *is* that sister token, its backing value falls further, so even more holders panic.\n- Everyone sprints for the exit before reserves hit zero - a textbook **digital bank run**, self-accelerating until the <Term id=\"peg\">peg</Term> is gone.\n\nThe cruel detail is that the escape hatch and the poison are the same mechanism. The mint-and-burn engine that holds the <Term id=\"stablecoin\">stablecoin</Term> steady on calm days is exactly what detonates it on panicked days - and once the crowd turns, no external shock is needed."
+      "body": "Picture a bank with no vault and no cash — only a printing press that churns out shares of its own stock. While people believe the stock is worth something, the bank can pay every withdrawal by printing more of it. The moment belief cracks, printing more just makes each share worth less, which sends even more people to the exit. That self-feeding loop is a reflexive death spiral.\n\nHow it tightens:\n\n- Confidence slips and redemptions spike as holders rush to convert into something safer.\n- To honour those redemptions the protocol mints enormous quantities of its sister token.\n- That flood hyperinflates the sister token and crashes its price.\n- Because the stablecoin's backing *is* that sister token, its backing falls further, so more holders panic.\n- Everyone sprints for the exit before reserves hit zero. A digital bank run, self-accelerating until the <Term id=\"peg\">peg</Term> is gone.\n\nThe cruel detail is that the escape hatch and the poison are the same mechanism. The mint-and-burn engine that holds the coin steady on calm days is what detonates it on panicked days — and once the crowd turns, no external shock is needed."
     },
     {
       "id": "i5-under-the-hood",
       "type": "deepdive",
       "title": "Case Study: The $40 Billion Terra/UST Wipeout",
-      "body": "**Case Study: The $40 Billion Terra/UST Wipeout (May 2022).**\n\nFor over a year UST looked like magic: it held $1.00 while paying roughly 20% yield through the Anchor protocol. That yield was the bait; an algorithmic peg with no hard <Term id=\"collateral\">collateral</Term> was the trap. The endgame played out over days, not months.\n\n**Timeline of the collapse:**\n\n- Large holders pull liquidity from the main Curve pool, thinning the market where UST could be swapped for other stablecoins.\n- A handful of big sellers dump UST, nudging it off its <Term id=\"peg\">peg</Term> and below the arbitrage-safe range.\n- The protocol fires its mint-and-burn mechanism, minting trillions of new LUNA tokens to absorb the UST being sold.\n- LUNA's price collapses under the fresh supply, so the backing evaporates; UST holders accelerate their exit and the loop compounds.\n- Within roughly 72 hours, LUNA falls from about $80 to $0.0001 and UST breaks down to about $0.05.\n\nOver **$40 billion** in value was destroyed. The lesson spread across the entire ecosystem: a <Term id=\"stablecoin\">stablecoin</Term> whose <Term id=\"depeg\">depeg</Term> defense depends on ongoing confidence in a floating token is fundamentally fragile, because the rescue mechanism only works while the market is calm - and redemption pressure is fastest exactly when you can least afford it."
+      "body": "For over a year UST looked like magic: it held $1.00 while paying roughly 20% yield through the Anchor protocol. That yield was the bait. An algorithmic peg with no hard <Term id=\"collateral\">collateral</Term> was the trap.\n\nThe endgame played out over days, not months.\n\n- Large holders pull liquidity from the main Curve pool, thinning the market where UST could be swapped for other stablecoins.\n- A handful of big sellers dump UST, nudging it off its <Term id=\"peg\">peg</Term> and below the arbitrage-safe range.\n- The protocol fires its mint-and-burn mechanism, minting trillions of new LUNA to absorb the UST being sold.\n- LUNA's price collapses under the fresh supply, so the backing evaporates. UST holders accelerate their exit and the loop compounds.\n- Within roughly 72 hours, LUNA falls from about $80 to $0.0001 and UST breaks down to about $0.05.\n\nOver $40 billion in value was destroyed in May 2022. The lesson spread across every chain: a <Term id=\"stablecoin\">stablecoin</Term> whose <Term id=\"depeg\">depeg</Term> defence depends on ongoing confidence in a floating token is fundamentally fragile, because redemption pressure arrives fastest exactly when you can least afford it."
     },
     {
       "id": "i5-quiz",
@@ -48,8 +48,8 @@
           ],
           "correct": 2,
           "difficulty": "basic",
-          "explainRight": "Correct. Algorithmic stablecoins like UST carry no hard reserves at all - their peg is maintained by minting and burning a sister token to absorb supply and demand. That works only while arbitrageurs keep the faith, which is precisely why it is the most fragile design.",
-          "explainWrong": "Not quite. Fiat-backed coins hold real dollars and T-bills, and overcollateralized coins lock more than $1.00 of crypto per $1.00 minted. The design with no hard backing and a volatile sister token doing all the work is the algorithmic one - and its fragility is the entire point of this lesson."
+          "explainRight": "Algorithmic coins carry no hard reserves at all. Their peg is maintained by minting and burning a sister token, which works only while arbitrageurs keep the faith — which is exactly why it is the most fragile design.",
+          "explainWrong": "Fiat-backed coins hold real dollars and Treasuries, and overcollateralized coins lock extra crypto per dollar minted. The design with no hard backing and a volatile sister token doing all the work is the algorithmic one."
         },
         {
           "id": "q2",
@@ -62,8 +62,8 @@
           ],
           "correct": 1,
           "difficulty": "basic",
-          "explainRight": "Correct. A fiat-backed coin is backed by actual dollars and short-term Treasuries held by a custodian, so its peg is only threatened if that custodian fails or the reserves turn out not to match the supply. There is no exotic mechanism - the defense is a literal bank account.",
-          "explainWrong": "The defense is boring but strong: real dollars and short-term Treasuries in a custodian's reserves. Interest-rate kinks belong to lending markets, sister tokens belong to algorithmic designs, and oracles report prices rather than back them. A fiat-backed coin depegs mainly when its custodian - not its code - breaks."
+          "explainRight": "The defence is boring but strong: real dollars and short-term Treasuries held by a custodian. The peg is only threatened if that custodian fails or the reserves turn out not to match the supply.",
+          "explainWrong": "Interest-rate kinks belong to lending markets, sister tokens to algorithmic designs, and oracles report prices rather than back them. A fiat-backed coin depegs mainly when its custodian — not its code — breaks."
         },
         {
           "id": "q3",
@@ -76,8 +76,8 @@
           ],
           "correct": 1,
           "difficulty": "intermediate",
-          "explainRight": "Correct. The extra $0.50 is a safety margin. If ETH drops, the collateral can fall meaningfully before it is worth less than the $1.00 of debt issued against it, giving <Term id=\"liquidation\">liquidation</Term> bots room to sell and recover the full value. Overcollateralization converts a fragile peg into a cushioned one.",
-          "explainWrong": "Overcollateralization is not a yield, not magic immunity, and not free money - it is a cushion. The extra collateral absorbs price drops before the system becomes underbacked, which is why <Term id=\"ltv\">LTV</Term> limits exist. ETH can absolutely fall, but with $1.50 backing $1.00 there is room to liquidate and still make depositors whole."
+          "explainRight": "The extra $0.50 is a safety margin. If ETH drops, the collateral can fall meaningfully before it is worth less than the $1.00 of debt issued against it, which gives <Term id=\"liquidation\">liquidation</Term> bots room to sell and recover the full value.",
+          "explainWrong": "Overcollateralization is not a yield and not magic immunity — it is a cushion. The extra collateral absorbs price drops before the system becomes underbacked, which is why <Term id=\"ltv\">LTV</Term> limits exist. ETH can still fall; there is simply room to liquidate and still make depositors whole."
         },
         {
           "id": "q4",
@@ -90,8 +90,8 @@
           ],
           "correct": 3,
           "difficulty": "intermediate",
-          "explainRight": "Correct. UST's \"backing\" was the ability to redeem into freshly minted LUNA. Printing trillions of tokens flooded the market and collapsed LUNA's price, so the asset meant to absorb demand was now worth almost nothing. The rescue mechanism was the very thing that accelerated the <Term id=\"depeg\">depeg</Term>.",
-          "explainWrong": "Mint-and-burn does not create value out of thin air. Dumping trillions of new LUNA onto the market pushed its price toward zero, which removed the backing UST needed. The two tokens are tightly coupled by design, transfers were never frozen, and the minting added supply rather than value."
+          "explainRight": "UST's backing was the ability to redeem into freshly minted LUNA. Printing trillions flooded the market and collapsed LUNA's price, so the asset meant to absorb demand was now worth almost nothing. The rescue mechanism accelerated the <Term id=\"depeg\">depeg</Term>.",
+          "explainWrong": "Mint-and-burn does not create value from thin air. Dumping trillions of new LUNA pushed its price toward zero and removed the backing UST needed. The two tokens are tightly coupled by design, and transfers were never frozen."
         },
         {
           "id": "q5",
@@ -104,8 +104,8 @@
           ],
           "correct": 0,
           "difficulty": "intermediate",
-          "explainRight": "Correct. Overcollateralization means the reserves exceed the outstanding debt, so <Term id=\"liquidation\">liquidation</Term> can always recover more than enough to honor redemptions. The value is real and on-chain, not a promise resting on sentiment - which is exactly why it does not depend on confidence to survive.",
-          "explainWrong": "There is no government insurance, and these coins are freely transferable and trade in pools like any other. Their strength is that more than $1.00 of real <Term id=\"collateral\">collateral</Term> stands behind every $1.00 issued, and liquidations guarantee that backing can be converted to repay holders even under stress."
+          "explainRight": "The reserves exceed the outstanding debt, so <Term id=\"liquidation\">liquidation</Term> can always recover more than enough to honour redemptions. The value is real and on-chain, not a promise resting on sentiment.",
+          "explainWrong": "There is no government insurance, and these coins trade freely in pools like any other. Their strength is that more than $1.00 of real <Term id=\"collateral\">collateral</Term> stands behind every $1.00 issued."
         },
         {
           "id": "q6",
@@ -118,8 +118,8 @@
           ],
           "correct": 3,
           "difficulty": "thinking",
-          "explainRight": "Exactly. Real collateral genuinely helps - it buys time and can fully cover modest redemptions. But if the selling pressure exceeds the collateral, the protocol falls back on the same reflexive mint-and-burn dynamic that failed for UST. Partial backing moves the cliff further out; it does not remove it.",
-          "explainWrong": "Partial collateral is far more than psychological - it truly absorbs early redemptions and slows the run. But nothing makes collateral grow when prices fall, and there is no founder payout mechanism at work here. The real weakness is that once hard collateral runs out, a purely reflexive loop becomes the last line of defense, and that loop has no floor."
+          "explainRight": "Real collateral genuinely helps — it buys time and can cover modest redemptions. But if selling pressure exceeds it, the protocol falls back on the same reflexive loop that failed for UST. Partial backing moves the cliff further out; it does not remove it.",
+          "explainWrong": "Partial collateral is far more than psychological — it absorbs early redemptions and slows the run. But nothing makes collateral grow when prices fall. The weakness is that once hard collateral runs out, a purely reflexive loop becomes the last line of defence, and that loop has no floor."
         },
         {
           "id": "q7",
@@ -132,8 +132,8 @@
           ],
           "correct": 0,
           "difficulty": "thinking",
-          "explainRight": "Correct. A one-cent dip in a fiat-backed coin is usually an arbitrage opportunity: buy at $0.99 and redeem or swap back toward $1.00, and real reserves anchor that trade. In an algorithmic coin, the same dip can trigger minting, dilution of the sister token, and a reflexive slide with no hard floor beneath it. The price is identical; the floor is not.",
-          "explainWrong": "A peg is not a peg - the mechanism behind it is everything. Fiat-backed dips are typically shallow arbitrage gaps that redeemability and real reserves close. An algorithmic dip, by contrast, can ignite the mint-and-burn spiral that destroyed UST, because there is no hard asset to catch a fall and no stable redemption backstop."
+          "explainRight": "A one-cent dip in a fiat-backed coin is usually an arbitrage opportunity — buy at $0.99 and redeem or swap back toward $1.00, anchored by real reserves. In an algorithmic coin the same dip can trigger minting, dilution of the sister token, and a slide with no hard floor beneath it. Same price, different floor.",
+          "explainWrong": "A peg is not a peg — the mechanism behind it is everything. Fiat-backed dips are typically shallow gaps that redeemability closes. An algorithmic dip can ignite the mint-and-burn spiral that destroyed UST, because there is no hard asset to catch the fall."
         }
       ],
       "passScore": 5

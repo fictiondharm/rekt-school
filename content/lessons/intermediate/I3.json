@@ -5,9 +5,9 @@
   "title": "APR, APY, and the 'More Users' Effect",
   "estMinutes": 15,
   "objectives": [
-    "Differentiate Fee APR from Reward Token Emissions APR",
-    "Understand why launch APRs of 10,000% quickly collapse as new users deposit",
-    "Calculate true APY with compounding interest"
+    "Tell fee income apart from reward-token emissions",
+    "See why a 10,000% launch APR collapses the moment money arrives",
+    "Calculate real APY with compounding instead of trusting a dashboard number"
   ],
   "requires": ["I2"],
   "freePreview": false,
@@ -18,19 +18,19 @@
       "id": "i3-intro",
       "type": "read",
       "title": "Why 10,000% APY is a Trap",
-      "body": "Picture a tiny **ice-cream stand** that gives away 100 free scoops every day. If only 5 people show up, each walks away stuffed. If 500 show up, everyone gets a lick. That is exactly how a farm's advertised yield behaves on launch day.\n\nWhen a protocol goes live it shouts a giant number - sometimes **10,000% APY!** - because it is spreading a fixed daily bucket of freshly printed tokens across a tiny amount of early deposits.\n\n**Where the eye-popping number really comes from:**\n\n- The protocol mints a fixed number of new tokens per day. This steady drip of new supply is called <Term id=\"emissions\">emissions</Term>.\n- That daily bucket is divided across however much money sits in the pool, its <Term id=\"tvl\">TVL</Term>.\n- With only $1,000 deposited, each dollar claims a fat slice of the bucket, so the quoted <Term id=\"apr\">APR</Term> looks absurd.\n\nThe trap in one sentence: the huge number is not a promise of profit, it is a photograph of how few people were there before you."
+      "body": "Picture an ice-cream stand that gives away 100 free scoops a day. Five customers get stuffed. Five hundred customers get a lick each. A farm's advertised yield behaves exactly the same way.\n\nWhen a protocol launches it quotes an enormous number — sometimes five figures — because it is splitting a fixed daily bucket of freshly printed tokens across a tiny pile of early deposits. Those printed tokens are <Term id=\"emissions\">emissions</Term>, and the pile they are split across is the pool's <Term id=\"tvl\">TVL</Term>.\n\nWith $1,000 in the pool, each dollar claims a fat slice of the bucket, so the annualised <Term id=\"apr\">APR</Term> looks absurd. Add $100,000 and the same bucket is shared a hundred ways more.\n\nThe trap in one sentence: that huge number is not a forecast of profit. It is a photograph of how few people were there before you showed up."
     },
     {
       "id": "i3-dilution",
       "type": "read",
       "title": "The 'More Users' Dilution Effect",
-      "body": "The **tour bus** pulls in. Word spreads, and 100 new users each deposit $1,000. TVL rockets from $1,000 to $101,000, yet the daily emissions bucket has not grown by a single token.\n\n**Same pie, one hundred more mouths:**\n\n- The fixed reward drip is now shared across roughly 100x more capital.\n- Overnight the quoted APR collapses from 10,000% toward 100%, and keeps sliding with every new deposit.\n- Your principal did not shrink - but the *rate* you were shown silently evaporated because the denominator exploded.\n\nThis is the **'more users' dilution effect**, and it is mathematically guaranteed, not a bug or a scam. A careful reader of any APR asks the very next question: *how big is the pool right now, and how fast is it filling?*\n\n**Two sanity checks every farmer should run:**\n\n- Compare today's APR with last week's. If it fell off a cliff, you are probably late to the party.\n- A falling APR is not automatically bad; a large, stable pool paying a modest rate can easily beat a tiny pool paying a fantasy rate.\n\nDilution is the tax every late arrival pays for joining after the crowd."
+      "body": "The tour bus pulls up. Word spreads and 100 new depositors put in $1,000 each. TVL jumps from $1,000 to $101,000. The daily emissions bucket has not changed by a single token.\n\nSame pie, a hundred more mouths:\n\n- The fixed drip is now spread across roughly 100 times more capital.\n- The quoted APR collapses from five figures toward something ordinary, and keeps sliding with every deposit.\n- Your principal did not shrink. The rate you were shown evaporated because the denominator exploded.\n\nThis is not a bug and it is not a scam. It is arithmetic, and it is guaranteed. The question to ask about any <Term id=\"apr\">APR</Term> is always the same: how big is the pool right now, and how fast is it filling?\n\nTwo checks worth running before you deposit anything:\n\n- Compare today's rate with last week's. If it fell off a cliff, you are probably late.\n- A falling APR is not automatically bad. A large, steady pool paying a modest rate routinely beats a tiny pool paying a fantasy one."
     },
     {
       "id": "i3-under-the-hood",
       "type": "deepdive",
       "title": "Under the Hood: Per-Share Reward Accounting",
-      "body": "A farm contract cannot loop over thousands of wallets every few seconds - that would burn a fortune in transaction fees on every update. Instead it uses MasterChef or Synthetix-style per-share accounting, whose core update is `accumulatedRewardPerShare += (dailyEmissions × deltaTime) / totalStaked`.\n\n**How the trick works:**\n\n- The contract keeps one running number: the reward owed per single staked unit.\n- When you deposit, it snapshots your `rewardDebt`, the value of that running number at your moment of entry.\n- When you claim, your payout is simply `yourShare × accumulatedRewardPerShare - yourRewardDebt`.\n\nSo the contract performs one cheap multiplication per user action instead of constantly touching everyone. It also explains dilution perfectly: `totalStaked` sits in the denominator, so each new deposit makes the increment smaller and automatically lowers everyone's future per-share rewards in real time. The math enforces the 'more users' effect without any admin pressing a button.\n\nOne subtlety worth keeping: the denominator is measured in staked value, not in wallets, so a single whale adding $1M dilutes you exactly as much as 1,000 users adding $1,000 each. It is the dollars that dilute, not the headcount - and compounding that per-share drip is what separates a quoted <Term id=\"apr\">APR</Term> from the real <Term id=\"apy\">APY</Term> you actually keep."
+      "body": "A farm contract cannot loop over thousands of wallets every few seconds — that would burn a fortune in fees on every update. Instead it uses per-share accounting, and the core update is one line:\n\n`accumulatedRewardPerShare += (dailyEmissions × deltaTime) / totalStaked`\n\nHow it works:\n\n- The contract keeps one running number: rewards owed per staked unit.\n- When you deposit, it snapshots that number as your `rewardDebt`.\n- When you claim, your payout is `yourShare × accumulatedRewardPerShare − yourRewardDebt`.\n\nOne cheap multiplication per user instead of touching everyone. It also explains dilution precisely: `totalStaked` sits in the denominator, so every new deposit shrinks the increment and lowers everyone's future per-share rewards in real time. No admin has to press a button.\n\nOne detail worth keeping: the denominator is measured in staked dollars, not in wallets. A single whale adding $1M dilutes you exactly as much as a thousand users adding $1,000 each. Dollars dilute, headcount does not — and the compounding of that per-share drip is the difference between the quoted <Term id=\"apr\">APR</Term> and the <Term id=\"apy\">APY</Term> you actually keep."
     },
     {
       "id": "i3-quiz",
@@ -48,8 +48,8 @@
           ],
           "correct": 2,
           "difficulty": "basic",
-          "explainRight": "Correct. Rewards per dollar equal fixed emissions divided by total capital, so multiplying the denominator by 10 divides each dollar's share by 10. The token drip never changed, but each unit of capital now competes with far more neighbours. This inverse relationship is the single most important instinct for reading any farm APR.",
-          "explainWrong": "Rewards are not paid per pool; they are paid per dollar of capital. When TVL grows 10x while emissions stay fixed, the numerator is constant and the denominator explodes, so the APR per dollar drops by roughly 90% - not up, not flat. Nothing is clawed back; the yield is simply sliced thinner across a bigger crowd."
+          "explainRight": "Rewards per dollar equal fixed emissions divided by total capital. Multiply the denominator by ten and each dollar's share drops by ten. That inverse relationship is the single most useful instinct for reading any farm APR.",
+          "explainWrong": "Rewards are not paid per pool, they are paid per dollar of capital. Ten times the TVL with unchanged emissions means each dollar receives roughly a tenth of what it used to. Nothing is clawed back — the yield is simply sliced thinner."
         },
         {
           "id": "q2",
@@ -62,8 +62,8 @@
           ],
           "correct": 1,
           "difficulty": "basic",
-          "explainRight": "Correct. APR is a flat, non-compounded rate, while APY assumes your earnings are reinvested so they themselves start earning. That is why a 100% APR that is frequently compounded works out to more than 200% APY. If you never claim and restake, your practical experience looks much closer to APR than to APY.",
-          "explainWrong": "It is the other way around: APR is simple and APY includes compounding. The two are not platform-specific, and APY is generally higher than the matching APR because compounding adds earnings on top of earnings. Mistaking one for the other is one of the most common ways beginners overestimate their real returns."
+          "explainRight": "APR is a flat rate that ignores reinvestment. APY assumes your earnings are put back to work and start earning on their own. Frequent compounding is why an APY always sits above the matching APR.",
+          "explainWrong": "It is the other way around. APR is the simple rate and APY includes compounding, so the APY is the higher figure. If you never claim and restake, your real result will look closer to APR."
         },
         {
           "id": "q3",
@@ -76,8 +76,8 @@
           ],
           "correct": 3,
           "difficulty": "basic",
-          "explainRight": "Correct. On day one the emissions bucket is fixed but the pool is nearly empty, so the ratio of rewards to capital is enormous and the annualised figure balloons. The instant more capital arrives, that same bucket is spread thinner and the rate collapses. The number describes how few depositors there are, not a durable income stream.",
-          "explainWrong": "No protocol can guarantee a year of 10,000% from thin air, and no oracle previews future token prices. The figure is pure arithmetic: fixed emissions divided by a minuscule early TVL. Treat a launch APR as a snapshot of how empty the pool is, never as a commitment about what you will actually earn."
+          "explainRight": "Fixed emissions over a nearly empty pool. The moment capital arrives, the same bucket is split more ways and the rate collapses. The number describes how empty the pool is, not a durable income stream.",
+          "explainWrong": "No protocol can commit a year of five-figure yields out of thin air, and no oracle forecasts token prices. The figure is pure arithmetic — treat a launch APR as a snapshot of how few depositors exist, never as a promise."
         },
         {
           "id": "q4",
@@ -90,8 +90,8 @@
           ],
           "correct": 2,
           "difficulty": "intermediate",
-          "explainRight": "Correct. TVL quadrupled from $500,000 to $2,000,000 while the reward stayed flat, so every dollar now receives one-quarter of its previous share. A fixed numerator with a 4x denominator means roughly a 75% drop in per-dollar APR. That is dilution captured in pure numbers.",
-          "explainWrong": "The reward amount is constant, so the only thing that changed is how many dollars compete for it. Going from $500k to $2M multiplies the denominator by 4, which divides each dollar's yield by 4 - not by 2, and certainly not up. Extra TVL does not create extra emissions; it only splits the existing flow more ways."
+          "explainRight": "TVL quadrupled while the reward stayed flat, so every dollar now receives a quarter of its previous share. A fixed numerator and a 4x denominator is a 75% cut in per-dollar APR.",
+          "explainWrong": "The reward amount is constant, so the only thing that moved is how many dollars compete for it. Going from $500k to $2M divides each dollar's yield by four. Extra TVL does not create extra emissions; it only splits the existing flow more ways."
         },
         {
           "id": "q5",
@@ -104,8 +104,8 @@
           ],
           "correct": 0,
           "difficulty": "intermediate",
-          "explainRight": "Correct. `rewardDebt` is a checkpoint: the value of the per-share counter at the moment you deposited. Subtracting it from the current counter means you only receive rewards that accrued during your stay, never before. This lets the contract pay everyone correctly with one multiplication per claim instead of looping over every user.",
-          "explainWrong": "`rewardDebt` is not a real debt, a lock, or a penalty - it is an accounting bookmark. It freezes the per-share counter at your entry so rewards accumulated before you arrived are excluded. Without it, a late depositor could instantly claim rewards the earlier crowd generated, which would be unfair and trivially exploitable."
+          "explainRight": "`rewardDebt` is a checkpoint taken at your deposit. Subtracting it from the current counter means you only collect rewards that accrued during your stay. That is what lets the contract pay everyone correctly with one multiplication per claim.",
+          "explainWrong": "It is not a real debt and not a lock. It is an accounting bookmark that excludes rewards generated before you arrived — without it, a late depositor could instantly claim the earlier crowd's earnings."
         },
         {
           "id": "q6",
@@ -118,8 +118,8 @@
           ],
           "correct": 1,
           "difficulty": "intermediate",
-          "explainRight": "Correct. When the emission schedule is fixed, the only lever left that collapses a rate this hard is the denominator - a rush of new capital. That is the 'more users' effect in its natural habitat: same bucket, many more hands. Reading APR without checking how TVL changed is reading only half the story.",
-          "explainWrong": "If emissions were unchanged, the numerator never shrank, so the drop must come from the denominator growing. Surging TVL dilutes each dollar's yield exactly like this. Impermanent loss affects the value of a position rather than the advertised reward rate, and a flat TVL could not produce this collapse on its own."
+          "explainRight": "If emissions never changed, the numerator never shrank — so the collapse has to come from the denominator. A rush of new capital is the usual culprit, and it is the 'more users' effect in its natural habitat.",
+          "explainWrong": "Surging TVL dilutes each dollar's yield exactly like this. Impermanent loss affects the value of your position, not the advertised reward rate, and a flat TVL could not produce this collapse on its own."
         },
         {
           "id": "q7",
@@ -132,8 +132,8 @@
           ],
           "correct": 0,
           "difficulty": "thinking",
-          "explainRight": "Correct. A 100% APR compounded continuously is not a simple 2x; the compounding itself adds extra return, pushing APY above 100%. The more frequently earnings are reinvested, the further the real multiple overshoots 2x. APR is the raw rate; APY captures what reinvestment actually does to it.",
-          "explainWrong": "APR is a raw rate that ignores compounding, so a 100% APR that is routinely reinvested grows faster than a flat double. APY lands slightly above 100%, not below, because earnings begin earning too. Whether the reward token holds its price is a separate risk - it changes your dollar value, not the APR-to-APY arithmetic."
+          "explainRight": "Compounding adds return on top of return, so a 100% APR that is routinely reinvested lands above 100% APY. The more often it compounds, the further the final multiple overshoots a simple double.",
+          "explainWrong": "APR ignores compounding, so a reinvested 100% APR grows faster than a flat 2x. APY sits above 100%, not below. Whether the reward token holds its price is a separate risk that changes your dollar value, not the arithmetic."
         }
       ],
       "passScore": 5

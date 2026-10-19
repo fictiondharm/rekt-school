@@ -5,10 +5,10 @@
   "title": "Lending, Borrowing, and Interest Rate Curves",
   "estMinutes": 13,
   "objectives": [
-    "Understand the Money Market Utilization Rate U = Borrows / Deposits",
-    "Master the piecewise Kinked Interest Rate Model used by Aave and Kamino",
-    "Calculate Supply APY from Borrow APR and protocol reserve factor",
-    "Learn why borrowing rates skyrocket during liquidity crunches"
+    "Read a money market from one number: utilisation = borrows / deposits",
+    "Understand the kinked rate curve that Aave and Kamino use",
+    "Turn a borrow APR into the supply APY a depositor actually earns",
+    "See why rates explode during a liquidity crunch"
   ],
   "requires": ["I3"],
   "freePreview": false,
@@ -19,19 +19,19 @@
       "id": "i6-intro",
       "type": "read",
       "title": "How Decentralized Money Markets Work",
-      "body": "A DeFi money market is a vending machine that never sleeps and never checks your credit. There is no loan officer, no paperwork, and no handshake - just a smart contract and one shared pile of tokens. Depositors drop tokens in to earn yield; borrowers pull tokens out by posting <Term id=\"collateral\">collateral</Term> worth more than the loan. Both sides trade against the very same <Term id=\"liquidity_pool\">liquidity pool</Term>.\n\n**Why this matters before you deposit a single dollar:**\n\n- **Depositors are the suppliers.** You lend your tokens into the pool and earn the interest paid by everyone who borrows from it.\n- **Borrowers are the demand.** They overcollateralize (for example, lock $1.50 of SOL to borrow $1.00 of USDC), which is what protects the depositors' funds.\n- **Nobody negotiates.** The interest rate is not decided by a committee; it is computed continuously from a single number called the <Term id=\"utilisation\">utilisation</Term> rate.\n\nThat one number - utilisation - is the thermostat of the entire market. Turn it up and borrowing gets expensive while lending gets rich; turn it down and the opposite happens. Almost everything else in this lesson is just a consequence of that one dial."
+      "body": "A DeFi money market is a vending machine that never sleeps and never checks your credit. No loan officer, no paperwork, no handshake — just a contract and one shared pile of tokens.\n\nThe roles, before you deposit a single dollar:\n\n- **Depositors are the suppliers.** You lend tokens into the pool and earn interest paid by everyone who borrows from it.\n- **Borrowers are the demand.** They overcollateralize — lock $1.50 of SOL to borrow $1.00 of USDC, say — which is what protects your deposit.\n- **Nobody negotiates.** The rate is not decided by a committee. It is computed continuously from one number: <Term id=\"utilisation\">utilisation</Term>.\n\nUtilisation is the thermostat of the entire market. Turn it up and borrowing gets expensive while lending pays more. Turn it down and the reverse happens. Almost everything else in this lesson is a consequence of that single dial."
     },
     {
       "id": "i6-kink-curve",
       "type": "read",
       "title": "The 80% Kink: Why Rates Explode",
-      "body": "Utilisation is simply `U = Total Borrows / Total Deposits`. If depositors have supplied $100 and borrowers have taken $80, utilisation is 80%. Now the catch that makes money markets so clever: if utilisation ever reached 100%, there would be literally nothing left for depositors to withdraw. To prevent that quiet bank run before it starts, protocols build a **piecewise kinked interest rate curve** - a rate path with a gentle slope, followed by a terrifying cliff.\n\n**Picture a ski slope that ends at a waterfall:**\n\n- **Below the kink (under ~80%):** Rates climb in a lazy, predictable line. Borrowing is cheap (think 2% to 8% <Term id=\"apr\">APR</Term>), so people happily borrow and depositors still earn a modest, safe yield.\n- **At the kink (~80%):** The slope snaps sharply upward. This is the warning line built into the math.\n- **Above the kink:** Borrow rates rocket toward 50%-80%+, punishing anyone still borrowing while making fresh deposits wildly attractive.\n\nThe genius is that the market self-corrects with no manager in sight. A surge in demand pushes <Term id=\"utilisation\">utilisation</Term> past the kink, which instantly rewards new deposits with a huge <Term id=\"apy\">APY</Term> while squeezing borrowers to repay. Liquidity floods back in long before the <Term id=\"liquidity_pool\">liquidity pool</Term> can be drained dry. The curve *is* the safety mechanism."
+      "body": "Utilisation is `U = Total Borrows / Total Deposits`. Deposit $100 and borrow $80, and utilisation is 80%.\n\nHere is the catch that makes money markets clever. At 100% utilisation there would be nothing left for depositors to withdraw. To prevent that quiet bank run before it starts, protocols build a **piecewise kinked rate curve** — a gentle slope, then a cliff.\n\n- **Below the kink (under ~80%).** Rates climb in a lazy line. Borrowing is cheap, think 2% to 8% <Term id=\"apr\">APR</Term>, so people borrow happily and depositors earn a modest yield.\n- **At the kink (~80%).** The slope snaps sharply upward. That is the warning line built into the maths.\n- **Above the kink.** Borrow rates rocket toward 50% to 80%+, punishing anyone still borrowing while making a fresh deposit wildly attractive.\n\nThe market self-corrects with no manager in sight. Demand pushes utilisation past the kink, new deposits are rewarded with a huge <Term id=\"apy\">APY</Term>, and borrowers are squeezed to repay. Liquidity floods back long before the <Term id=\"liquidity_pool\">pool</Term> can be drained dry. The curve *is* the safety mechanism."
     },
     {
       "id": "i6-under-the-hood",
       "type": "deepdive",
       "title": "Under the Hood: The Kink Interest Rate Equation",
-      "body": "**Under the hood: the two-slope equation.** Every borrow rate in a money market comes from the same piecewise formula, expressed as <Term id=\"apr\">APR</Term>, where `U_optimal` is the kink point (often 80%).\n\n`If U ≤ U_optimal:  R_borrow = BaseRate + (U / U_optimal) × Slope1`\n\n`If U > U_optimal:  R_borrow = BaseRate + Slope1 + ((U - U_optimal) / (1 - U_optimal)) × Slope2`\n\n**Read it like a market maker:**\n\n- `BaseRate` is the floor borrowers pay even at near-zero utilisation, so supplying is never completely unrewarded.\n- `Slope1` is the gentle pre-kink gradient. It rises smoothly with <Term id=\"utilisation\">utilisation</Term>, keeping borrowing attractive while the pool is healthy.\n- `Slope2` is the cliff after the kink. It is deliberately steep because it is a liquidity defense, not a pricing strategy - it exists to force repayment fast.\n- Depositor <Term id=\"apy\">APY</Term> is then derived from what borrowers actually pay, minus the protocol's cut: `SupplyAPR = U × R_borrow × (1 - ReserveFactor)`.\n\nThat last line explains why depositor yield rises with utilisation. The pool only earns interest on the fraction of deposits that is actually borrowed (`U`), and the reserve factor skims a small slice for the protocol and its insurance buffer. Higher utilisation means a bigger share of your deposit is out working - and, past the kink, working at a dramatically higher rate."
+      "body": "Every borrow rate in a money market comes from the same two-slope formula, expressed as <Term id=\"apr\">APR</Term>, where `U_optimal` is the kink (often 80%).\n\n`If U ≤ U_optimal:  R_borrow = BaseRate + (U / U_optimal) × Slope1`\n\n`If U > U_optimal:  R_borrow = BaseRate + Slope1 + ((U - U_optimal) / (1 - U_optimal)) × Slope2`\n\nReading it like a market maker:\n\n- `BaseRate` is the floor borrowers pay even at near-zero utilisation, so supplying is never completely unrewarded.\n- `Slope1` is the gentle pre-kink gradient. It rises smoothly with <Term id=\"utilisation\">utilisation</Term> while the pool is healthy.\n- `Slope2` is the cliff. It is deliberately steep because it is a liquidity defence, not a pricing strategy — it exists to force repayment fast.\n\nDepositor yield is then derived from what borrowers actually pay, minus the protocol's cut:\n\n`SupplyAPR = U × R_borrow × (1 - ReserveFactor)`\n\nThat last line explains why depositor yield rises with utilisation. The pool only earns interest on the fraction that is borrowed (`U`), and the reserve factor skims a slice for the protocol. Higher utilisation means more of your deposit is out working — and, past the kink, working at a dramatically higher rate."
     },
     {
       "id": "i6-quiz",
@@ -49,8 +49,8 @@
           ],
           "correct": 3,
           "difficulty": "basic",
-          "explainRight": "Correct. The kink is a liquidity defense, not a profit scheme. Past 80% utilisation the curve spikes, which simultaneously pressures borrowers to repay and tempts new depositors with high <Term id=\"apy\">APY</Term>. That two-sided push keeps the pool solvent and prevents a 100% drain.",
-          "explainWrong": "The kink is neither about founder profits nor gas fees, and it does not liquidate healthy borrowers. It is a self-correcting safety valve: steep rates above ~80% push borrowers to repay and pull fresh deposits in, refilling the <Term id=\"liquidity_pool\">liquidity pool</Term> before depositors are left unable to withdraw."
+          "explainRight": "The kink is a liquidity defence, not a profit scheme. Past ~80% the curve spikes, which pressures borrowers to repay and tempts new depositors with a high <Term id=\"apy\">APY</Term>. That two-sided push keeps the pool solvent.",
+          "explainWrong": "It is not about founder profits or gas fees, and it does not liquidate healthy borrowers. It is a self-correcting safety valve: steep rates above the kink refill the <Term id=\"liquidity_pool\">pool</Term> before depositors are left unable to withdraw."
         },
         {
           "id": "q2",
@@ -63,8 +63,8 @@
           ],
           "correct": 1,
           "difficulty": "basic",
-          "explainRight": "Correct. <Term id=\"utilisation\">Utilisation</Term> is borrows divided by deposits: $400,000 / $1,000,000 = 40%. That is comfortably below the kink, so borrowing here is still cheap and depositor yield is modest and safe.",
-          "explainWrong": "Do the division: utilisation equals borrows over deposits, so $400,000 / $1,000,000 = 40%. It cannot exceed 100% because you cannot borrow more than what has been deposited, and 25% would imply only $250,000 borrowed. Always anchor the formula before reading any dashboard."
+          "explainRight": "Borrows over deposits: $400,000 / $1,000,000 = 40%. Comfortably below the kink, so borrowing here is still cheap and depositor yield is modest and safe.",
+          "explainWrong": "Do the division first. Utilisation cannot exceed 100% because you cannot borrow more than has been deposited, and 25% would imply only $250,000 borrowed."
         },
         {
           "id": "q3",
@@ -77,8 +77,8 @@
           ],
           "correct": 0,
           "difficulty": "intermediate",
-          "explainRight": "Correct. Supply APR is roughly `U × R_borrow`, so 0.25 x 10% ≈ 2.5%. Only the borrowed portion of deposits generates interest, so low utilisation automatically produces lower depositor yield - which is exactly why the kink rewards higher utilisation with richer rates.",
-          "explainWrong": "Depositors do not earn the full borrow rate, because idle deposits are not lent out. The right approximation is `U × R_borrow` = 0.25 x 10% ≈ 2.5%. Supply yield is deeply dependent on <Term id=\"utilisation\">utilisation</Term>; the more of your deposit that is borrowed, the more of the borrow interest flows to you."
+          "explainRight": "Supply APR is roughly `U × R_borrow`, so 0.25 × 10% ≈ 2.5%. Only the borrowed portion generates interest, so low utilisation automatically produces lower depositor yield.",
+          "explainWrong": "Depositors never earn the full borrow rate, because idle deposits are not lent out. The right approximation is `U × R_borrow` ≈ 2.5%. Supply yield is deeply dependent on <Term id=\"utilisation\">utilisation</Term>."
         },
         {
           "id": "q4",
@@ -91,8 +91,8 @@
           ],
           "correct": 2,
           "difficulty": "intermediate",
-          "explainRight": "Correct. Below 80% the rate follows the gentle Slope1 line, but 92% is past the kink, so Slope2 kicks in and the <Term id=\"apr\">APR</Term> shoots upward. That violent jump is the whole point: it makes borrowing painful and depositing lucrative right when the pool most needs help.",
-          "explainWrong": "The rate does not stay flat, fall, or wait for 100%. Crossing the 80% kink switches the formula to the much steeper Slope2 segment, so the borrow APR spikes. That is how the curve defends the <Term id=\"liquidity_pool\">liquidity pool</Term>: it prices the last drops of liquidity very, very expensively."
+          "explainRight": "Below 80% the rate follows Slope1, but 92% is past the kink so Slope2 applies and the <Term id=\"apr\">APR</Term> shoots up. That jump is the point: it makes borrowing painful and depositing lucrative exactly when the pool needs help.",
+          "explainWrong": "The rate does not stay flat, fall, or wait for 100%. Crossing the kink switches the formula to the much steeper segment. The curve prices the last drops of liquidity very expensively on purpose."
         },
         {
           "id": "q5",
@@ -105,8 +105,8 @@
           ],
           "correct": 0,
           "difficulty": "intermediate",
-          "explainRight": "Correct. Two effects stack in Pool B's favor: a larger share of deposits (85% vs 20%) is actively earning, and being past the 80% kink means that borrowed capital is charged a much higher rate. Depositor yield rises on both counts - more capital working, at a richer rate.",
-          "explainWrong": "Pool B does not charge withdrawal fees or mint fake rewards, and higher utilisation, not idle liquidity, drives yield. The real explanation is combination: more of the deposit is lent out *and* the kink pushes the borrow <Term id=\"apr\">APR</Term> higher. Supply yield scales with utilisation and with the rate that utilisation triggers."
+          "explainRight": "Two effects stack. A larger share of deposits (85% vs 20%) is actively earning, and being past the kink means that borrowed capital is charged a much higher rate. More capital working, at a richer rate.",
+          "explainWrong": "Pool B does not charge withdrawal fees or mint fake rewards, and idle liquidity does not drive yield. The explanation is combination: more of the deposit is lent out *and* the kink raises the borrow <Term id=\"apr\">APR</Term>."
         },
         {
           "id": "q6",
@@ -119,8 +119,8 @@
           ],
           "correct": 3,
           "difficulty": "thinking",
-          "explainRight": "Exactly. Utilisation is borrows over deposits, so a large deposit raises the denominator and pushes U down. Coming back below the kink collapses the borrow rate, which lowers the very yield the whale came for. This is the self-correcting logic in reverse: liquidity arriving at a crunch automatically dilutes the rich rate.",
-          "explainWrong": "Adding deposits cannot push utilisation toward 100% - it moves it the other way. More deposits with the same borrows means U falls, which eases the rate back down below the kink. The subtle lesson is that the high yield at a crunch is a signal to supply liquidity, and supplying it is precisely what erases the premium."
+          "explainRight": "Utilisation is borrows over deposits, so a large deposit raises the denominator and pushes U down. Coming back below the kink collapses the borrow rate — and with it the very yield the whale came for. The premium erases itself.",
+          "explainWrong": "Adding deposits cannot push utilisation toward 100%; it moves it the other way. The subtle lesson is that a high yield at a crunch is a signal to supply liquidity, and supplying it is precisely what removes the premium."
         },
         {
           "id": "q7",
@@ -133,8 +133,8 @@
           ],
           "correct": 1,
           "difficulty": "thinking",
-          "explainRight": "Correct. The kink works both sides at once: borrowers face punishing rates that make repaying rational, and depositors see a huge <Term id=\"apy\">APY</Term> that pulls in new capital. Borrows fall and deposits rise, so utilisation naturally retreats below the kink - no admin, no pause, no forced liquidations required.",
-          "explainWrong": "There is no administrator, no withdrawal freeze, and no blanket liquidation of healthy loans. The curve heals itself by pricing the crunch: high borrow cost drives repayment while high supply yield attracts deposits, so both sides of the <Term id=\"utilisation\">utilisation</Term> ratio move in the right direction at the same time."
+          "explainRight": "The kink works both sides at once. Borrowers face punishing rates that make repaying rational, and depositors see a huge <Term id=\"apy\">APY</Term> that pulls in new capital. Borrows fall and deposits rise, so utilisation retreats below the kink on its own.",
+          "explainWrong": "There is no administrator, no withdrawal freeze, and no blanket liquidation of healthy loans. The curve heals itself by pricing the crunch: high borrow cost drives repayment while high supply yield attracts deposits."
         }
       ],
       "passScore": 5

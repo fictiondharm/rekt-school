@@ -5,10 +5,10 @@
   "title": "Read the Chain Yourself (Explorer & Holder Analysis)",
   "estMinutes": 12,
   "objectives": [
-    "Inspect any SPL token mint directly using Solana block explorers and JSON-RPC",
-    "Verify whether Mint Authority and Freeze Authority have been permanently revoked",
-    "Calculate Top 10 Holder Concentration % to identify dangerous insider control",
-    "Verify liquidity pool burn transactions to confirm authentic LP token lockup proofs"
+    "Inspect any SPL token mint yourself instead of trusting a website",
+    "Check whether mint and freeze authorities are still live",
+    "Measure top-holder concentration and spot sybil clustering",
+    "Verify LP burns and locks before you believe a liquidity claim"
   ],
   "requires": ["I12"],
   "freePreview": false,
@@ -19,31 +19,31 @@
       "id": "i13-intro",
       "type": "read",
       "title": "Don't Trust, Verify: The Explorer Mindset",
-      "body": "In Web3, marketing websites and Twitter threads can say anything. Founders can claim their token is '100% community-owned' and 'unruggable'.\n\nHowever, the Solana ledger never lies. Every token mint parameter, holder balance, authority key, and liquidity pool deposit is immutably recorded on-chain. Becoming a proficient DeFi participant requires knowing how to read this data directly via Solana Explorer, Solscan, and RPC queries without relying on third-party promises."
+      "body": "Marketing sites and Twitter threads can say anything. A founder can claim a token is 100% community-owned and completely unruggable, and you have no way to check that claim from the claim itself.\n\nThe Solana ledger can. Every mint parameter, holder balance, authority key, and liquidity deposit is recorded on-chain and readable by anyone. Becoming a competent DeFi participant mostly means learning to read that data directly — in Solscan, Solana Explorer, or an RPC call — instead of taking a third party's word for it."
     },
     {
       "id": "i13-authorities",
       "type": "read",
       "title": "The Two Critical Authorities: Mint & Freeze",
-      "body": "Every SPL Token on Solana is defined by a Mint Account with two optional privileged keys:\n\n1. **Mint Authority:** The wallet or program permitted to print new tokens into existence. If this authority is NOT set to `None` (revoked), the creator can secretly print billions of new tokens and dump them into DEX pools at any time.\n2. **Freeze Authority:** The wallet or program permitted to freeze token accounts, preventing holders from transferring or selling their tokens. If active, an unscrupulous deployer can create a 'honeypot' where buyers cannot sell.\n\nBefore trading any new token on Raydium or Jupiter, checking that both Mint and Freeze authorities are revoked (`None`) is non-negotiable."
+      "body": "Every <Term id=\"spl_token\">SPL token</Term> on Solana is defined by a Mint account with two optional privileged keys.\n\n- **Mint authority.** The wallet or program allowed to print new tokens into existence. If this is not set to `None`, the creator can silently mint billions more and dump them into DEX pools at any time.\n- **Freeze authority.** The wallet or program allowed to freeze <Term id=\"token_account\">token accounts</Term>, which stops holders from transferring or selling. If this is live, a deployer can build a honeypot: buyers get in, and then cannot get out.\n\nBefore trading any new token on Raydium or Jupiter, check both. If either is still assigned to a live key, you are trusting that key's owner not to use it."
     },
     {
       "id": "i13-holder-distribution",
       "type": "read",
       "title": "Holder Concentration & The Top 10 Rule",
-      "body": "On-chain transparency allows you to inspect the token distribution across all holders:\n\n• **Healthy Distribution:** The largest holder is usually the verified AMM liquidity pool (30%–60%), with the top 10 individual wallets each holding under 2% to 4% of total supply.\n• **Dangerous Concentration:** If the top 10 non-pool wallets control 40%+ of supply, a small cartel of insiders can coordinate to dump the price into retail liquidity.\n• **Beware Sybil Wallets:** Sophisticated deployers often distribute supply across 50 fresh wallets before launch to disguise concentration. Always check transaction history to see if multiple top holders were funded by the same deployer wallet."
+      "body": "Holder data is public, so you can inspect distribution directly.\n\n- **Healthy.** The largest holder is usually a verified AMM pool holding 30% to 60%, with top-10 individual wallets each under roughly 2% to 4% of supply.\n- **Dangerous.** If the top 10 non-pool wallets control 40% or more, a small group can coordinate a dump into retail liquidity.\n- **Sybil wallets.** Sophisticated deployers split supply across dozens of fresh wallets before launch to disguise concentration. Check whether the top holders were funded by the same source wallet — that is usually visible in a couple of clicks.\n\nA holder count on its own is nearly meaningless. Ten thousand wallets holding dust each is not distribution."
     },
     {
       "id": "i13-lp-burns",
       "type": "read",
       "title": "Verifying LP Token Burns & Locks",
-      "body": "When a creator adds initial liquidity to Raydium, they receive LP tokens representing ownership of that pool. If the creator retains those LP tokens, they can pull the liquidity at any moment, leaving buyers with worthless tokens (a 'rug pull').\n\nTo prove permanence, legitimate deployers send their LP tokens to the Solana incinerator address (`11111111111111111111111111111111`) or a verifiable timelock contract like Streamflow. You can verify this transaction on Solscan by confirming a `Burn` or `Transfer` instruction to the null address."
+      "body": "When a creator adds initial liquidity to Raydium, they receive LP tokens representing ownership of that pool. Keep those tokens and you can pull the liquidity whenever you like, leaving buyers holding something worthless. That is a rug pull, and it does not require a smart contract bug.\n\nTo prove the liquidity is permanent, legitimate deployers send their LP tokens to the Solana incinerator address (`1nc1nerator11111111111111111111111111111111`) or lock them in a verifiable escrow such as Streamflow.\n\nHow to check it yourself: find the liquidity pool's LP mint on Solscan, look at its largest holders, and confirm a `Burn` or a transfer to the incinerator or a locker program. If the top LP holder is an ordinary wallet, the creator can still exit."
     },
     {
       "id": "i13-deepdive",
       "type": "deepdive",
       "title": "Under the Hood: Reading Mint Data via JSON-RPC",
-      "body": "You don't need a browser to verify a token. You can query the Solana RPC directly using `getAccountInfo` or `getTokenSupply`. In TypeScript with `@solana/web3.js`:\n\n```typescript\nimport { getMint } from '@solana/spl-token';\n\nconst mintInfo = await getMint(connection, mintPublicKey);\nconst isMintRevoked = mintInfo.mintAuthority === null;\nconst isFreezeRevoked = mintInfo.freezeAuthority === null;\nconsole.log({ isMintRevoked, isFreezeRevoked });\n```\nIf both values are `null`, the supply is hard-capped and no holder accounts can be frozen."
+      "body": "You do not need a browser to verify a token. A direct RPC call answers the same question the explorer does.\n\n```typescript\nimport { getMint } from '@solana/spl-token';\n\nconst mintInfo = await getMint(connection, mintPublicKey);\nconst isMintRevoked = mintInfo.mintAuthority === null;\nconst isFreezeRevoked = mintInfo.freezeAuthority === null;\nconsole.log({ isMintRevoked, isFreezeRevoked });\n```\n\nIf both values are `null`, nobody can mint more supply and nobody can freeze your <Term id=\"token_account\">token account</Term>. That does not make the token safe — teams find other ways to hurt holders — but it removes the two cheapest attacks.\n\nThe same session can pull supply and largest accounts with `getTokenSupply` and `getTokenLargestAccounts`, which is all you need to run the concentration check from the previous step without a third-party dashboard."
     },
     {
       "id": "i13-quiz",
@@ -60,8 +60,9 @@
             "The buyer's wallet will lose its SOL balance"
           ],
           "correct": 1,
-          "explainRight": "Correct! An active freeze authority allows the authority holder to freeze token accounts, creating a honeypot trap.",
-          "explainWrong": "Incorrect. Active freeze authority grants the deployer power to freeze user accounts, stopping them from selling."
+          "explainRight": "An active freeze authority can freeze any token account of that mint, including yours. You could buy in and find your balance unsellable — a honeypot by another name.",
+          "explainWrong": "Network fees are unaffected, nothing converts to Bitcoin, and your SOL is untouched. The freeze authority only controls token accounts of that mint, and that control is exactly the trap.",
+          "difficulty": "basic"
         },
         {
           "id": "q2",
@@ -73,8 +74,9 @@
             "By renaming the token symbol"
           ],
           "correct": 1,
-          "explainRight": "Spot on! Burning LP tokens or locking them in a transparent on-chain escrow proves the liquidity is permanent.",
-          "explainWrong": "Incorrect. Irreversible LP token burns or verified timelocks provide cryptographic proof of locked liquidity."
+          "explainRight": "Burning sends the LP tokens somewhere they can never be redeemed from, and a transparent locker locks them under verifiable on-chain rules. Either way the proof lives on the ledger, not in a tweet.",
+          "explainWrong": "Slippage tolerance and a symbol change do nothing for liquidity ownership, and a social media promise is not enforcement. Only an irreversible burn or a verifiable lock changes who can pull the pool.",
+          "difficulty": "intermediate"
         },
         {
           "id": "q3",
@@ -86,8 +88,9 @@
             "Solana block time makes holding tokens impossible"
           ],
           "correct": 1,
-          "explainRight": "Exactly! High holder count can be faked with dust transfers, while a few puppet wallets hold the vast majority of actual supply.",
-          "explainWrong": "Incorrect. Deployers frequently create dozens of puppet wallets to mask supply concentration; always audit top holder percentages."
+          "explainRight": "A deployer can fund dozens of fresh wallets from one source, distribute the supply before launch, and manufacture a holder count. Always check whether the top wallets were funded by the same address.",
+          "explainWrong": "Solana has no holder limit and staking is unrelated. High holder counts can be manufactured with dust transfers while a handful of puppet wallets hold the real supply — which is why top-holder concentration is the number that matters.",
+          "difficulty": "intermediate"
         }
       ],
       "passScore": 2

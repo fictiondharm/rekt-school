@@ -5,10 +5,9 @@
   "title": "Estimating a Launch (Judge the Launch Game)",
   "estMinutes": 12,
   "objectives": [
-    "Evaluate new token launches using initial float percentage, investor cliff duration, and insider allocations",
-    "Compare Fully Diluted Valuation (FDV) against established sector peers to identify unrealistic valuations",
-    "Recognize the predatory 'Low Float, High FDV' launch blueprint that creates artificial early pumps followed by multi-year bleed",
-    "Apply the 4-part Due Diligence Checklist to judge whether a launch is Fair, Overvalued, or an Insider Trap"
+    "Judge a launch on float, cliff length, and insider share instead of unit price",
+    "Compare an FDV against real sector peers and ask whether the multiple makes sense",
+    "Run a four-point checklist that separates a fair launch from an insider exit"
   ],
   "requires": ["I10"],
   "freePreview": false,
@@ -19,31 +18,31 @@
       "id": "i11-intro",
       "type": "read",
       "title": "Day 1 Euphoria vs. Fundamental Reality",
-      "body": "When a hyped project launches a token on Solana, DEX aggregators like Jupiter see millions of dollars in instant volume. Social feeds are inundated with price targets and ticker memes.\n\nHowever, institutional traders evaluate a launch through a completely different lens: supply structure and valuation relative to comps. While retail buyers look at the unit price ($0.50 vs $5.00), smart money looks at the float ratio, total FDV, and the countdown to early backer unlocking."
+      "body": "When a hyped project launches a token on Solana, the volume is real. Millions of dollars move through Jupiter in the first hours, and social feeds fill with price targets.\n\nTraders who have been through a few launches look at something else entirely. Not the unit price — $0.50 versus $5.00 tells you nothing on its own — but the float ratio, the <Term id=\"fdv\">FDV</Term>, and the countdown until early backers can sell.\n\nRetail watches the ticker. The rest of us read the supply schedule and the <Term id=\"vesting\">vesting</Term> contracts."
     },
     {
       "id": "i11-low-float-trap",
       "type": "read",
       "title": "The 'Low Float, High FDV' Playbook",
-      "body": "One of the most dangerous dynamics in modern crypto is the Low Float / High FDV trap:\n\n1. **Artificial Scarcity:** A protocol issues 1,000,000,000 tokens, but unlocks only 2% to 5% (e.g. 30M tokens) on Day 1.\n2. **Inflated Price:** Because very few tokens are available to trade, modest buying easily pumps the price to $2.00, resulting in a modest initial Market Cap of $60M.\n3. **Hidden Giant:** At $2.00, the Fully Diluted Valuation (FDV) is an astounding **$2,000,000,000 ($2 Billion)**, higher than established blue-chip protocols with hundreds of millions in proven fees!\n4. **The Inevitable Bleed:** As the 95% locked supply progressively unlocks over the subsequent 24 months, secondary market liquidity is overwhelmed, causing the token to relentlessly bleed 80% to 95% against SOL."
+      "body": "You have met this pattern before in I9. It is worth walking through with real numbers, because it is still the most common way launch buyers lose.\n\n1. **Artificial scarcity.** A protocol issues 1,000,000,000 tokens and unlocks only 2% to 5% on day one — say 30M tokens.\n2. **Inflated price.** With very few tokens available, modest buying pushes the price to $2.00 and an initial <Term id=\"market_cap\">market cap</Term> of $60M. That looks reasonable.\n3. **Hidden giant.** At $2.00 the <Term id=\"fdv\">FDV</Term> is $2 billion — higher than established blue-chip protocols doing hundreds of millions in real fee volume.\n4. **The inevitable bleed.** The remaining 95% unlocks over the next two years. Secondary market liquidity gets overwhelmed, and the token bleeds 80% to 95% against SOL.\n\nYou do not need to predict which projects will do this. You need to notice that the <Term id=\"float\">float</Term> is tiny before you buy."
     },
     {
       "id": "i11-peer-comps",
       "type": "read",
       "title": "Benchmarking with Sector Peers ('Comps')",
-      "body": "In traditional finance, analysts value companies using comparable company analysis (Comps). The exact same discipline applies to DeFi tokens:\n\n• If leading Solana DEXes (like Raydium or Orca) trade at an FDV of $400M–$600M while processing billions in monthly volume, does it make sense for a brand new unproven swap router to launch at a $1.5B FDV?\n• If a perpetual DEX generates $100k/year in protocol fees, is an FDV multiple of 1,000x justifiable?\n\nWhenever a newly launched token's FDV exceeds that of established sector leaders with 10x the organic users and revenue, it is mathematically mispriced."
+      "body": "Traditional analysts value companies against comparable companies. The same discipline applies to DeFi tokens, and it is the fastest check you can run.\n\n- If established Solana DEXs trade at an FDV of $400M to $600M while processing billions in monthly volume, does a brand new swap router deserve a $1.5B FDV on day one?\n- If a perpetuals DEX generates $100k a year in protocol fees, is a 1,000x fee multiple justifiable?\n\nWhen a newly launched token's FDV exceeds that of a sector leader with ten times the users and revenue, it is not 'early'. It is mispriced relative to everything already working."
     },
     {
       "id": "i11-framework",
       "type": "read",
       "title": "The 4-Pillar Due Diligence Checklist",
-      "body": "Before buying any newly launched token, verify these four criteria:\n\n1. **Circulating Float (≥ 15%):** Ensures sufficient supply exists so early market makers cannot monopolize and artificially squeeze the price.\n2. **Relative Peer Multiple (≤ 2.5x):** The token's FDV should not exceed 2.5x the median of battle-tested peers in the same niche.\n3. **Lockup Cliff (≥ 12 Months):** Protects retail buyers from venture capital unlocks during the project's critical initial product build.\n4. **Insider Share (≤ 35%):** Ensures the community, liquidity providers, and DAO control the true majority of governance and long-term supply."
+      "body": "Before buying any newly launched token, check four things:\n\n1. **Circulating float: 15% or more.** Enough supply that early market makers cannot monopolise and squeeze the price.\n2. **Relative peer multiple: 2.5x or less.** The <Term id=\"fdv\">FDV</Term> should not exceed roughly 2.5 times the median of battle-tested peers in the same niche.\n3. **Lockup <Term id=\"cliff\">cliff</Term>: 12 months or more.** Retail buyers get protected through the critical build phase instead of funding early investors' exit.\n4. **Insider share: 35% or less.** The community, liquidity providers, and DAO control the true majority of long-term supply.\n\nMiss one and you are taking a bigger swing than the pitch suggests. Miss two and you are probably the exit liquidity."
     },
     {
       "id": "i11-deepdive",
       "type": "deepdive",
       "title": "Under the Hood: Market Maker Call Options & Loans",
-      "body": "Behind almost every major token launch is a market-making deal. A protocol loans tens of millions of tokens to a high-frequency trading firm alongside European-style call options. The market maker uses these loaned tokens to provide liquidity depth on DEX pools while hedging on centralized exchanges. Understanding these agreements explains why initial launch prices often hover in tight corridors before drifting lower as option expiries approach."
+      "body": "Behind almost every major token launch sits a market-making deal that is rarely written in the whitepaper.\n\nThe structure: the protocol loans tens of millions of tokens to a high-frequency trading firm alongside European-style call options. The market maker uses those loaned tokens to provide depth on DEX pools while hedging on centralized exchanges, and the options give it the right — not the obligation — to buy at a fixed price later.\n\nThis explains behaviour you will otherwise find confusing:\n\n- Launch prices often hover in tight corridors for weeks. That is the market maker defending a band, not organic price discovery.\n- Liquidity can look deep and then thin out quickly once the loan term ends.\n- As option expiries approach, the incentive to hedge and dump increases, which is one reason early launch highs fade.\n\nNone of this is illegal, and none of it is automatically a red flag. But a deal that gives a professional firm cheap tokens and a free option means the early chart is not a clean read on demand. Read the loan terms when they are disclosed, and assume they exist when they are not."
     },
     {
       "id": "i11-quiz",
@@ -60,8 +59,9 @@
             "The smart contract cannot be audited"
           ],
           "correct": 1,
-          "explainRight": "Correct! Low float creates temporary artificial scarcity, but future unlock sell pressure almost always overwhelms buy demand.",
-          "explainWrong": "Incorrect. The danger of low float / high FDV is that the 97% locked supply will eventually enter the market, causing severe dilution."
+          "explainRight": "A 3% float means 97% of the supply is still locked and has to arrive eventually. Unlock waves of that size almost always overwhelm buy pressure, so early holders get diluted relentlessly. The small market cap is an illusion created by hiding most of the pizza in the kitchen.",
+          "explainWrong": "The danger is not technical and there is no tax. It is supply: the 97% locked today is future sell pressure that will hit secondary markets as lockups expire, which is exactly what the low-float trap does to late buyers.",
+          "difficulty": "basic"
         },
         {
           "id": "q2",
@@ -73,8 +73,9 @@
             "The validators have pre-approved the $800M valuation"
           ],
           "correct": 1,
-          "explainRight": "Exactly! If an unproven newcomer is valued at 8x seasoned category leaders, it represents extreme valuation risk.",
-          "explainWrong": "Incorrect. When a newcomer is valued far above seasoned sector leaders without proven traction, it is severely overvalued."
+          "explainRight": "Comps matter. If seasoned lending protocols with years of uptime and real revenue sit at a $100M FDV, an unproven fork at $800M is asking eight times the valuation with none of the track record. Repricing risk is severe, and you are paying for narrative rather than fees.",
+          "explainWrong": "A bigger number is not a better deal, validators do not pre-approve valuations, and more code does not create more value. When a newcomer is priced far above sector leaders without proven traction, the market is simply early to the correction.",
+          "difficulty": "intermediate"
         },
         {
           "id": "q3",
@@ -86,8 +87,9 @@
             "50% float with 100% unlocked for the team on Day 1"
           ],
           "correct": 1,
-          "explainRight": "Spot on! Healthy Day-1 float, a full 1-year cliff, and low insider concentration protect market integrity.",
-          "explainWrong": "Incorrect. A healthy launch combines decent circulating float (≥15-20%), long cliff locks (≥12 months), and modest insider control (≤35%)."
+          "explainRight": "A quarter of supply circulating on day one, a full year cliff followed by linear vesting, and only a quarter held by insiders. Retail has real liquidity to trade, insiders are locked through the build phase, and the community controls most of the supply.",
+          "explainWrong": "The other structures concentrate risk in different ways: 2% float with a 3-month cliff and 70% insiders is an exit plan; 0.5% with no cliff is worse; full day-one team unlock invites an instant dump. A healthy launch combines float above roughly 15% to 20%, cliffs of at least 12 months, and insider control under about 35%.",
+          "difficulty": "intermediate"
         }
       ],
       "passScore": 2

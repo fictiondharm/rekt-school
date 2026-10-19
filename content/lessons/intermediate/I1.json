@@ -5,10 +5,10 @@
   "title": "How a Liquidity Pool Really Works",
   "estMinutes": 8,
   "objectives": [
-    "Understand the constant-product formula x · y = k",
-    "Discover why pool depth directly determines price impact",
-    "Test low vs high liquidity with identical trade sizes",
-    "Avoid the beginner trap of trading into thin pools"
+    "How x · y = k prices a swap, and why that rule means a pool can never run empty",
+    "Why the same $50 trade is a rounding error in one pool and a real cost in another",
+    "Work a constant-product trade by hand until the numbers stop being abstract",
+    "The one habit that stops you overpaying on thin pools"
   ],
   "requires": [],
   "freePreview": true,
@@ -19,7 +19,7 @@
       "id": "i1-the-piggy-bank",
       "type": "read",
       "title": "The Shared Piggy Bank",
-      "body": "In traditional stock markets, buyers wait for sellers in an order book: if nobody wants to sell exactly when you want to buy, you simply cannot trade. DeFi threw that model in the bin. Instead, you trade against a shared <Term id=\"liquidity_pool\">liquidity pool</Term> run by an <Term id=\"amm\">AMM</Term> (Automated Market Maker) - a robot shopkeeper with no order book and no waiting around.\n\n**The shared piggy bank analogy.**\n\nPicture a public piggy bank holding two tokens: **SOL** and **fUSDC**. Anyone can walk up, drop in SOL, and take out fUSDC. No human sets the price - one formula does it:\n\n`x · y = k`\n\n- `x` = the amount of SOL sitting in the vault.\n- `y` = the amount of fUSDC sitting in the vault.\n- `k` = their product, a number the pool is forbidden from changing. Every trade must leave `x · y` exactly the same.\n\nBecause `k` can never change, the pool can never run out of a token and can always quote a price for any trade size. The price is simply the ratio of the two reserves: if the vault holds 10 SOL and 2,000 fUSDC, one SOL is worth 200 fUSDC.\n\n**Why you should care about depth.**\n\nThe *size* of the vault (its <Term id=\"tvl\">TVL</Term>) decides how much your own trade moves the price. Drop $50 into a $4,000 pool and you feel it immediately. Drop $50 into a $400,000 pool and it is a rounding error. That effect is called <Term id=\"price_impact\">price impact</Term>, and it is the number-one hidden tax on careless traders.\n\nIn this lesson you will trade the exact same size against a tiny pool and an ocean-deep pool, and watch price impact collapse from scary to invisible. Buckle up."
+      "body": "On a stock exchange you wait for a seller. On Solana's AMMs there is no order book and nobody to wait for. You trade against a shared pot of tokens that anyone can fill and anyone can draw from.\n\nSimply put, a liquidity pool is a wallet the market owns. It holds two tokens — here SOL and fUSDC — and it prices every trade off the ratio sitting between them.\n\nThe pot obeys one rule:\n\n`x · y = k`\n\nx is the SOL inside, y is the fUSDC inside, and k is the product of the two. A swap is not allowed to change k. You cannot empty the pot, because pushing SOL out forces y upward, which makes every remaining SOL more expensive.\n\nDepth is what decides how much that costs you. The pool you will trade in the simulator holds about $4,000. The deep pool holds about $400,000. Same $50 order in both. One is a visible fraction of the shallow pot; the other is dust. That self-inflicted price move is <Term id=\"price_impact\">price impact</Term>, and it is the most common way a swap quietly returns less than you expected."
     },
     {
       "id": "i1-simulator",
@@ -33,28 +33,28 @@
         }
       },
       "goal": {
-        "description": "Switch between Shallow and Deep pools with a 50 fUSDC trade to see price impact drop from over 2.4% to under 0.05%!",
+        "description": "Switch between the shallow and deep pools on a 50 fUSDC trade and watch price impact fall from over 2.4% to under 0.05%.",
         "targetProperty": "priceImpact",
         "condition": "lte",
         "targetValue": 0.01
       },
       "hints": [
-        "Select the 'Deep Pool' toggle on the right.",
-        "Observe how the price impact readout immediately shrinks toward zero.",
-        "Use the trade slider to experiment with trade sizes up to 500 fUSDC."
+        "Switch the pool selector to the Deep pool.",
+        "Watch the price impact readout collapse toward zero.",
+        "Then drag the trade slider up to 500 fUSDC and see how much worse the shallow pool gets."
       ]
     },
     {
       "id": "i1-what-happened",
       "type": "reveal",
       "title": "What Just Happened? Price Impact",
-      "body": "The exact same 50 fUSDC trade produced two completely different outcomes. Here is the breakdown:\n\n- **Shallow Pool ($4,000 TVL):** your 50 fUSDC was a big fraction of the vault, so it dragged the price several percent against you. That self-inflicted price move is <Term id=\"price_impact\">price impact</Term>.\n- **Deep Ocean Pool ($400,000 TVL):** the same 50 fUSDC was a drop in the ocean, so the price barely twitched and you received far more SOL.\n\nWhy should you care? Price impact is the silent loss you never see on a trade confirmation. It is what turns a 'great entry' into a mediocre one, and it combines with <Term id=\"slippage\">slippage</Term> to decide whether your trade actually fills at the price you saw.\n\n**Rule of thumb: deeper pools give safer, fairer trades.** When in doubt, check the pool's depth before you size up - and always split monster orders across pools or use an aggregator."
+      "body": "Same 50 fUSDC, two very different fills.\n\nIn the shallow pool the trade was a meaningful slice of the vault, so the curve pushed the price several percent against you before the swap finished. That cost never shows up as a line item on the confirmation screen.\n\nIn the deep pool the same order was a rounding error. Impact dropped below 0.05% and you received measurably more SOL for the exact same input.\n\nPrice impact stacks with <Term id=\"slippage\">slippage</Term> to decide what actually lands in your wallet. A <Term id=\"quote\">quote</Term> you accept and a fill you receive stop being the same thing the moment a pool has to move.\n\nThe habit worth building: look at the pool's reserves before you size a trade. If your order is more than a fraction of a percent of the pool, split it, route through an aggregator, or find a deeper pool."
     },
     {
       "id": "i1-under-the-hood",
       "type": "deepdive",
       "title": "Under the Hood: Deriving x · y = k",
-      "body": "Why does x · y = k behave this way? \n\nLet a pool hold 100 SOL (x) and 10,000 USDC (y). The product k is 100 × 10,000 = 1,000,000. \nWhen a trader puts in 10 SOL, the new SOL reserve becomes 110. To keep k = 1,000,000, the new USDC reserve must become 1,000,000 / 110 = 9,090.91 USDC. \n\nThe trader receives 10,000 - 9,090.91 = 909.09 USDC (giving an effective price of $90.91/SOL instead of the initial spot price of $100/SOL).\nThat 9.09% drop is price impact! Because x is in the denominator, larger trades relative to pool depth experience exponentially worse pricing."
+      "body": "Let's derive the curve by hand so the number stops being abstract.\n\nA pool holds 100 SOL and 10,000 USDC, so `k = 100 × 10,000 = 1,000,000`.\n\nYou swap 10 SOL in. The SOL reserve becomes 110. To hold k constant the USDC reserve must become `1,000,000 / 110 ≈ 9,090.91`.\n\nYou receive `10,000 − 9,090.91 ≈ 909.09 USDC`.\n\nThe spot price before your trade was $100 per SOL. Your effective price was $90.91. That 9.09% gap is price impact, and it is calculated before any <Term id=\"liquidity_pool\">pool</Term> fee — most AMMs charge another 0.25% to 0.3% on top.\n\nTwo things to notice. Impact is not linear: a trade twice the size does not simply cost twice as much, because x sits in the denominator. And impact is always a property of your order relative to the pool's size. A 10 SOL trade into a pool holding 10,000 SOL is a completely different event."
     },
     {
       "id": "i1-quiz",
@@ -71,8 +71,8 @@
             "The total number of users who have joined the pool"
           ],
           "correct": 1,
-          "explainRight": "Correct! 'k' is the constant product (x × y) that the pool's formula forces to stay the same on every swap. That single constraint is what makes the pool able to price any trade without ever running out of tokens.",
-          "explainWrong": "Not quite. 'k' is the invariant product of the two reserves (reserveA × reserveB). Because a swap must keep x · y equal to k, the pool can always find a new price that keeps the product constant.",
+          "explainRight": "'k' is the invariant: reserve A multiplied by reserve B. Every swap has to leave that product unchanged, which is why the pool always has a price for any trade size and can never be emptied.",
+          "explainWrong": "Not gas fees and not user counts. k is simply the product of the two reserves, held constant by the contract. That one constraint is what lets an <Term id=\"amm\">AMM</Term> work without an order book.",
           "difficulty": "basic"
         },
         {
@@ -85,8 +85,8 @@
             "Because the pool automatically re-mints SOL the moment reserves get low"
           ],
           "correct": 0,
-          "explainRight": "Exactly! The constant product k puts the reserve in the denominator: as SOL leaves the pool, the price of each remaining SOL climbs steeply. The market prices your demand into the curve, and the last fraction of a pool is essentially priceless.",
-          "explainWrong": "Not that. The protection is built into the math: the x · y = k formula means a shrinking SOL reserve drives the price of SOL up exponentially, pricing out further purchases long before the pool is empty.",
+          "explainRight": "The last coins are the expensive ones. As SOL leaves, x shrinks and the invariant forces each remaining SOL up in price, so the trade stops being affordable long before the pot empties.",
+          "explainWrong": "There is no daily trade limit and no validator rule involved. The protection is arithmetic: a shrinking reserve makes each remaining unit cost dramatically more.",
           "difficulty": "basic"
         },
         {
@@ -99,8 +99,8 @@
             "A pool with only 1 holder"
           ],
           "correct": 2,
-          "explainRight": "Correct! TVL is the size of the vault, and a deep pool absorbs your order as a tiny fraction of reserves. That keeps price impact close to zero instead of pricing your own trade against you.",
-          "explainWrong": "No. The fund that matters is reserve size (TVL). A big order in a tall pool is a small wave; the same order in a puddle pool is a tsunami that drags the price against you.",
+          "explainRight": "Depth is the size of the vault. A big order in a big pool is a small fraction of the reserves, so the price barely moves.",
+          "explainWrong": "Fee tier and pool age have nothing to do with it. What matters is reserves measured against your order size — a shallow pot turns an ordinary trade into a wave.",
           "difficulty": "basic"
         },
         {
@@ -113,8 +113,8 @@
             "$667"
           ],
           "correct": 0,
-          "explainRight": "Correct! New SOL reserve = 110, and to keep k = 1,000,000, the USDC reserve must become 1,000,000 / 110 ≈ 9,091, so the trader receives 10,000 − 9,091 ≈ $909. The effective price works out to ~$90.91/SOL versus the $100 spot price - that gap is price impact.",
-          "explainWrong": "Close, but do the math: with 10 SOL added, reserves become 110 SOL and x · y must stay 1,000,000, so the USDC side drops to ~9,091. The trader takes out the difference: about $909, not a straight 10 × 100.",
+          "explainRight": "You add 10 SOL, so x becomes 110. To hold k at 1,000,000 the USDC side has to fall to about 9,091, which leaves you roughly $909. Against the $100 spot price that is about a $9 haircut — your price impact.",
+          "explainWrong": "Do the division, not the multiplication. With x at 110 the USDC reserve must drop to around 9,091 to keep the product constant, so the payout is about $909.",
           "difficulty": "intermediate"
         },
         {
@@ -127,8 +127,8 @@
             "Validators impose a memory tax on frequent traders"
           ],
           "correct": 1,
-          "explainRight": "Exactly. With x · y = k, reducing x (SOL) forces y to rise to keep the product constant, which means the price of SOL in USDC goes up. Every buy makes the next one pricier - that's the AMM's built-in supply and demand.",
-          "explainWrong": "No. There's no surcharge or tax - it's pure scarcity math. Each purchase reduces the SOL reserve, and the constant-product formula converts that shortage directly into a higher SOL price for the next buyer.",
+          "explainRight": "Every buy shrinks x, and the invariant turns that scarcity into a higher price for the next buyer. It is supply and demand written as one equation.",
+          "explainWrong": "There is no repeat-buyer surcharge. Each swap reduces the SOL reserve, and x · y = k converts that reduction straight into a higher quote.",
           "difficulty": "intermediate"
         },
         {
@@ -141,8 +141,8 @@
             "Price impact shrinks as pool reserves grow, but grows non-linearly as your trade size approaches the full reserve"
           ],
           "correct": 3,
-          "explainRight": "Correct. Price impact is a ratio: your trade over the pool reserves. Bigger reserves = smaller ratio = less impact, and because x sits in the denominator, impact explodes worse-than-linearly as trades approach the reserve size. That non-linearity is the hidden tax on careless traders.",
-          "explainWrong": "Not quite. Price impact is relative: it depends on your trade size compared to pool reserves. Because of the x in the denominator, it snowballs non-linearly as your trade approaches the reserve, and always gets smaller as the pool gets deeper.",
+          "explainRight": "Price impact scales with order size relative to reserves. Deeper reserves shrink it; a trade that approaches the reserve size blows it up faster than linearly.",
+          "explainWrong": "It is never uniform across pools, and it is not limited to tiny trades. Impact is a ratio, so it grows worse-than-linearly as your order approaches the pool's reserves.",
           "difficulty": "thinking"
         },
         {
@@ -155,8 +155,8 @@
             "Deep pools reject trades under $100"
           ],
           "correct": 0,
-          "explainRight": "Correct. In Pool A your $50 is ~1.25% of the vault, dragging the price several percent against you; in Pool B it's a rounding error. Same input, different output - the shallow pool quietly eats your money as price impact.",
-          "explainWrong": "No. Trade size is identical, but price impact is not - it depends on trade size relative to reserves. In the shallow pool your trade is a meaningful chunk of the vault, so you receive meaningfully less SOL for the same 50 USDC.",
+          "explainRight": "In the $4,000 pool your $50 is a visible share of the vault, so the curve pushes the price hard against you. In the $400,000 pool it is noise. Same input, meaningfully different output.",
+          "explainWrong": "Identical order size does not mean identical fill. The shallow pool treats your $50 as a large order and hands back less SOL for it.",
           "difficulty": "thinking"
         }
       ],

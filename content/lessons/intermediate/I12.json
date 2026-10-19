@@ -5,10 +5,10 @@
   "title": "Case Studies: Historical Exploits & Lessons",
   "estMinutes": 14,
   "objectives": [
-    "Deconstruct the Mango Markets $114M oracle manipulation attack on Solana",
-    "Understand the Wormhole Bridge $325M signature verification bypass vulnerability",
-    "Learn why illiquid collateral and spot oracles are catastrophic architectural flaws",
-    "Analyze institutional security patterns: TWAP oracles, Pyth confidence intervals, and borrow limits"
+    "Reconstruct the Mango Markets $114M oracle manipulation on Solana",
+    "Reconstruct the Wormhole $325M signature verification bypass",
+    "Tell an economic design flaw apart from a code bug",
+    "See which defences modern protocols actually use"
   ],
   "requires": ["I11"],
   "freePreview": false,
@@ -19,31 +19,31 @@
       "id": "i12-intro",
       "type": "read",
       "title": "Why We Study Exploits",
-      "body": "In traditional aviation, every commercial flight accident leads to a rigorous NTSB black-box investigation and mandatory industry-wide engineering retrofits. Commercial flight is remarkably safe today precisely because the industry studied every past disaster.\n\nIn DeFi, smart contracts and economic mechanisms evolve through the exact same ruthless pressure. Hundreds of millions of dollars in historic exploits have produced modern architectural safeguards, such as decentralized Pyth confidence intervals, cross-margin borrow caps, and rigorous Anchor program validation."
+      "body": "Aviation is safe because every crash is investigated in public and the industry is forced to retrofit. DeFi learns the same way, only faster and with larger sums attached.\n\nHundreds of millions of dollars in historic exploits produced the safeguards you see today: confidence intervals on <Term id=\"oracle\">oracles</Term>, isolated borrow markets, time-weighted prices, and stricter account checks in Solana programs. You cannot use those defences well unless you understand what they defend against."
     },
     {
       "id": "i12-mango-exploit",
       "type": "read",
       "title": "Case 1: The Mango Markets $114M Oracle Drain",
-      "body": "In October 2022, an attacker targeted Mango Markets on Solana:\n\n1. **The Setup:** The attacker funded Account A and Account B with $5M USDC each.\n2. **The Artificial Pump:** On Mango's perpetual order book, Account A took a massive short position in MNGO-PERP while Account B took an equal long position. Because MNGO was an illiquid token, aggressive buying on spot DEXes surged the spot price from $0.038 to $0.91 within minutes.\n3. **Unrealized PnL Collateral:** Mango's risk engine evaluated Account B's paper unrealized profit at over $400M, treating it as valid collateral.\n4. **The Drain:** The attacker borrowed $114M in real assets (SOL, USDC, BTC, mSOL) against this inflated mark-to-market collateral, draining the protocol's liquidity pool and leaving Mango with worthless bad debt."
+      "body": "October 2022, on Solana. The attacker funded two accounts with roughly $5M each and went to work on Mango Markets' perpetuals.\n\n1. **The pump.** Account A took a massive short in MNGO-PERP while Account B took an equal long. MNGO was thinly traded, so aggressive buying on spot DEXs pushed the spot price from around $0.038 to about $0.91 within minutes.\n2. **Paper profit as collateral.** Mango's risk engine marked Account B's unrealised position at over $400M and accepted that as valid <Term id=\"collateral\">collateral</Term>.\n3. **The drain.** The attacker borrowed $114M in real assets — SOL, USDC, BTC, mSOL — against that inflated mark, emptied the protocol's liquidity, and left behind bad debt.\n\nNo admin key was stolen and no contract was broken. The code did exactly what it was written to do: trust a manipulable spot price on an illiquid token. That is an economic design flaw, which is why an audit report alone would never have caught it."
     },
     {
       "id": "i12-wormhole-exploit",
       "type": "read",
       "title": "Case 2: The Wormhole $325M Signature Bypass",
-      "body": "In February 2022, Solana's premier cross-chain bridge, Wormhole, suffered a $325M exploit:\n\n1. **Cross-Chain Bridge Architecture:** When you bridge ETH to Solana, 19 institutional Guardian validators sign a VAA (Verified Action Approval) attesting that real ETH was deposited on Ethereum.\n2. **The Flaw:** Wormhole's Solana smart contract relied on `verify_signatures` to validate cryptographic proofs. However, the contract invoked an outdated Solana system instruction parser without verifying that the account address executing the verification was the genuine Solana `sysvar::instructions` account.\n3. **The Spoof:** The attacker passed a spoofed account pre-loaded with simulated success states, tricking Wormhole into believing 120,000 ETH had been deposited.\n4. **The Mint:** The contract minted 120,000 wrapped ETH (whETH) on Solana out of thin air."
+      "body": "February 2022. Wormhole was Solana's largest cross-chain <Term id=\"bridge\">bridge</Term>, and it lost about 120,000 wrapped ETH — roughly $325M at the time.\n\nHow bridges work, briefly: when you move ETH from Ethereum to Solana, a set of Guardian validators signs a message attesting that real ETH was deposited on the Ethereum side. Solana-side contracts verify those signatures before minting the wrapped token.\n\nThe flaw: Wormhole's Solana program relied on a system instruction to verify signatures, but it did not check that the account it read that instruction data from was the genuine sysvar account. The attacker supplied a spoofed account pre-loaded to look like a successful verification.\n\nResult: the contract believed 120,000 ETH had been deposited and minted 120,000 wrapped ETH on Solana out of nothing.\n\nJump Crypto later topped up the bridge and the funds were largely recovered, but the lesson stayed: a bridge is only as strong as the smallest account-check in its verification path."
     },
     {
       "id": "i12-institutional-defenses",
       "type": "read",
       "title": "Institutional Defenses: How Protocols Guard Today",
-      "body": "Modern Solana protocols have implemented crucial defenses against these attack vectors:\n\n• **Pyth Confidence Intervals (Oracle Defense):** Pyth publishes not just a price, but an uncertainty bound (`±σ`). If a price spikes with huge confidence dispersion or low market volume, lending engines reject the quote.\n• **TWAP (Time-Weighted Average Price):** Replaces volatile spot prices with multi-block moving averages, making instantaneous price pump attacks prohibitively expensive.\n• **Hard Asset Borrow Caps:** Illiquid tokens (like low-cap governance tokens) cannot be used to borrow blue-chips like SOL or USDC, or have strict global caps limiting total exposure to $1M.\n• **Anchor Constraint Checks:** Solana smart contract frameworks like Anchor provide idiomatic `#[account(address = sysvar::instructions::ID)]` constraints to prevent program account substitution."
+      "body": "Modern Solana protocols have built real defences against both attacks.\n\n- **Pyth confidence intervals.** Pyth publishes not just a price but an uncertainty band around it. If a print spikes while the band is wide or market volume is thin, lending engines can reject the quote instead of pricing collateral with it.\n- **Time-weighted average prices (TWAP).** Replaces volatile spot reads with multi-block averages, which makes a one-minute pump much more expensive to sustain.\n- **Hard borrow caps.** Illiquid governance tokens either sit in isolated markets or carry strict global caps, so they cannot be used to borrow unlimited blue-chips.\n- **Account constraint checks.** Anchor-style `#[account(address = sysvar::instructions::ID)]` constraints stop a program from accepting a spoofed sysvar — the exact class of bug that cost Wormhole $325M.\n\nNone of these are optional extras. They are the price of admission for a protocol that intends to hold other people's money."
     },
     {
       "id": "i12-deepdive",
       "type": "deepdive",
       "title": "Under the Hood: Economic Exploit vs. Code Vulnerability",
-      "body": "Notice the crucial difference between the two attacks:\n\n• **Wormhole was a Smart Contract Logic Bug:** The code allowed an unauthorized spoof of Solana sysvars. The mathematics were never the problem; the cryptographic validation pipeline was bypassed.\n• **Mango Markets was an Economic Mechanism Flaw:** The code functioned exactly as written. The flaw was allowing an illiquid asset to serve as cross-margin collateral based on a manipulable spot oracle price.\n\nAs a DeFi participant, auditing economic mechanism design is just as critical as checking smart contract audit reports."
+      "body": "The two attacks differ in kind, and the difference is worth holding onto.\n\n- **Wormhole was a code bug.** The verification pipeline accepted an account it should have rejected. The economics were irrelevant; the bug was in the plumbing.\n- **Mango was an economic mechanism flaw.** Every line of code worked as written. The flaw was allowing an illiquid asset to serve as cross-margin collateral valued by a manipulable spot oracle.\n\nThe practical consequence: audit reports catch the first kind and routinely miss the second. When you look at a protocol, ask both questions — is the code written correctly, and is the design immune to someone playing it against itself? A protocol can be perfectly coded and still drainable."
     },
     {
       "id": "i12-quiz",
@@ -60,8 +60,9 @@
             "The Mango program had a syntax compilation error"
           ],
           "correct": 1,
-          "explainRight": "Correct! Thin pool price manipulation combined with treating illiquid mark-to-market profits as collateral created bad debt.",
-          "explainWrong": "Incorrect. The exploit manipulated thin spot oracle prices, tricking the protocol into treating artificial paper gains as collateral."
+          "explainRight": "The attacker pumped a thin spot market, let the risk engine mark his perp position at that pumped price, then borrowed against the paper profit. Real assets left the protocol and worthless bad debt stayed behind. No key theft involved.",
+          "explainWrong": "There was no admin key, no 51% attack, and no compiler bug. The code did what it was written to do — trust a manipulable spot price on an illiquid asset when valuing collateral.",
+          "difficulty": "basic"
         },
         {
           "id": "q2",
@@ -73,8 +74,9 @@
             "It automatically buys back dumped tokens with insurance reserves"
           ],
           "correct": 1,
-          "explainRight": "Spot on! Wide confidence intervals tell lending engines that market consensus is fractured, automatically halting risky liquidations or borrows.",
-          "explainWrong": "Incorrect. Confidence intervals measure price uncertainty across data providers; wide intervals alert protocols to halt transactions."
+          "explainRight": "Pyth reports a price together with an uncertainty band. When a print spikes with a wide band or thin volume, the lending engine treats the quote as unreliable and halts the borrow or liquidation that would have depended on it.",
+          "explainWrong": "No KYC and no automatic buybacks. The confidence interval measures how sure the oracle is, and wide uncertainty is a red flag a protocol can act on before it prices anything with it.",
+          "difficulty": "intermediate"
         },
         {
           "id": "q3",
@@ -86,8 +88,9 @@
             "Banning all perpetual contracts across DeFi"
           ],
           "correct": 1,
-          "explainRight": "Exactly! Isolated risk pools and hard borrow caps ensure that an exploit in an illiquid token cannot drain core protocol reserves.",
-          "explainWrong": "Incorrect. Modern protocols use isolated risk tiers and hard borrow caps to firewall core assets from volatile tokens."
+          "explainRight": "Isolate the risk. If an illiquid governance token can only borrow a capped amount in its own market, a 20x price pump cannot drain $114M of SOL and USDC from the main pool. Bad debt stays contained where it was created.",
+          "explainWrong": "Not rate limits on users, not banning USDC, not banning perps. Modern lending firewalls core assets by isolating volatile collateral and capping total borrowable exposure against it.",
+          "difficulty": "intermediate"
         }
       ],
       "passScore": 2

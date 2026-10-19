@@ -5,10 +5,10 @@
   "title": "Governance, DAOs, and Airdrop Dynamics",
   "estMinutes": 14,
   "objectives": [
-    "Understand on-chain DAO governance models, token voting, and multisig councils",
-    "Identify governance vulnerabilities, including flash-loan voting attacks and low-quorum hijacks",
-    "Analyze the necessity of execution timelocks and veto councils",
-    "Model post-airdrop market behavior, mercenary capital dump rates, and long-term token retention"
+    "See how on-chain governance actually executes a treasury move",
+    "Understand the flash-loan governance hijack well enough to recognise the pattern",
+    "Know why timelocks and vote-escrow exist",
+    "Read an airdrop as a liquidity event rather than a gift"
   ],
   "requires": ["I13"],
   "freePreview": false,
@@ -19,31 +19,31 @@
       "id": "i14-intro",
       "type": "read",
       "title": "Decentralization vs. Coordination",
-      "body": "DeFi protocols strive to eliminate single points of failure. Instead of a centralized board of directors, protocols deploy on-chain governance programs (like SPL Governance or Realms on Solana) that allow token holders to propose, vote on, and execute protocol parameter upgrades and treasury disbursements.\n\nHowever, naive token-weighted governance creates severe economic attack surfaces that can compromise entire protocol treasuries."
+      "body": "DeFi protocols want to avoid a single point of failure, so instead of a board of directors they deploy on-chain governance — on Solana, typically through SPL Governance or Realms. Token holders propose changes, vote on them, and execute parameter updates and treasury payments through the program.\n\nIt sounds clean. In practice, naive token-weighted voting creates economic attack surfaces that can empty an entire treasury if the rules are loose enough. This lesson is about those surfaces and the defences that close them."
     },
     {
       "id": "i14-flash-loan-hijacks",
       "type": "read",
       "title": "The Flash Loan Governance Hijack",
-      "body": "Consider a DAO with a $20M treasury and 10,000,000 total governance tokens. Typically, voter participation is low (only 5% to 8% of tokens cast votes in ordinary proposals).\n\nIf the governance system allows instantaneous execution:\n1. An attacker notices that only 500,000 tokens voted on a quiet weekend proposal.\n2. In a single transaction, the attacker borrows 1,000,000 governance tokens from a lending market or AMM.\n3. The attacker votes 'YES' on a malicious proposal: *'Transfer $10M treasury funds to attacker wallet'*.\n4. The proposal passes quorum, executes immediately, and the attacker repays the borrowed tokens in the same block.\n\nThis exact attack occurred on protocols like Beanstalk ($182M loss) and Build Finance."
+      "body": "Take a DAO with a $20M treasury and 10,000,000 governance tokens. Ordinary participation is low — often only 5% to 8% of supply votes on a routine proposal.\n\nNow suppose the system executes a passed vote immediately:\n\n1. An attacker notices that a quiet weekend proposal drew only 500,000 votes.\n2. In a single transaction, they borrow 1,000,000 governance tokens from a lending market or AMM.\n3. They vote yes on a proposal that transfers $10M of treasury to their own wallet.\n4. It passes quorum, executes, and the borrowed tokens go back in the same block.\n\nThis is a <Term id=\"flash_loan\">flash loan</Term> <Term id=\"governance\">governance</Term> hijack, and it is not theoretical. Beanstalk lost about $182M this way on Ethereum in April 2022, and Build Finance was taken the same month. The <Term id=\"dao\">DAO</Term> never had a chance to react, because the entire attack fit inside one transaction."
     },
     {
       "id": "i14-timelocks-squads",
       "type": "read",
       "title": "Institutional Defenses: Timelocks & Multisig Councils",
-      "body": "To prevent sudden governance hostile takeovers, battle-tested protocols enforce critical safety layers:\n\n• **Execution Timelocks (24–72 hours):** Once a vote passes, funds cannot move until a mandatory waiting period elapses. This gives honest liquidity providers and users time to withdraw their capital if a malicious vote ever passes.\n• **Security Councils & Veto Multisigs (e.g. Squads):** High-integrity community guardians hold multisig veto keys capable of canceling unauthorized proposals that violate constitutional rules.\n• **Vote-Escrowed Token Locking (veTokens):** Only tokens locked for 1 to 4 years gain voting power, preventing flash-borrowed tokens from casting votes."
+      "body": "Battle-tested protocols stack several layers so a hijack cannot become a withdrawal.\n\n- **Execution timelocks, 24 to 72 hours.** Once a vote passes, nothing moves until the delay expires. If a malicious proposal passes, users and LPs can read it and withdraw their capital before execution.\n- **Security councils and veto multisigs.** Community guardians hold multisig keys able to cancel proposals that break the protocol's rules. Squads on Solana is the common implementation.\n- **Vote-escrowed locking.** Only tokens locked for one to four years carry voting power. Flash-borrowed tokens cannot be locked, so they cannot vote. The attack dies at step two.\n\nThe pattern across all three: make vote-buying expensive or slow enough that honest participants have time to exit."
     },
     {
       "id": "i14-airdrop-mechanics",
       "type": "read",
       "title": "The Airdrop Flywheel & The Mercenary Dump",
-      "body": "Airdrops are the primary user acquisition mechanism in crypto, rewarding early community testers with governance tokens. However, the secondary market math is unforgiving:\n\n• **The Mercenary Sell-Off:** Statistically, 60% to 85% of airdrop recipients immediately sell 100% of their allocation on Day 1 for SOL or stablecoins.\n• **Sybil Industrialization:** Professional airdrop farmers use automated scripts across thousands of wallets to maximize claims. Protocols use on-chain clustering heuristics to prune sybil rings.\n• **Retention Design:** Modern protocols incentivize long-term retention through staking multiplier boosts, fee-sharing dividends, or phased vesting airdrops."
+      "body": "<Term id=\"airdrop\">Airdrops</Term> are crypto's primary user-acquisition tool: reward early community members with governance tokens and you get attention, holders, and a story. The secondary market math is less romantic.\n\n- **The mercenary sell-off.** A large share of recipients sell their entire allocation on day one for SOL or stablecoins. They farmed the airdrop; they are not here for the product.\n- **Sybil industrialisation.** Professional farmers run scripts across thousands of wallets to multiply claims. Protocols respond with on-chain clustering heuristics that prune sybil rings before the snapshot.\n- **Retention design.** Modern protocols fight the dump with staking multiplier boosts, fee sharing, or phased <Term id=\"vesting\">vesting</Term> on the claim itself — anything that makes selling on day one costly.\n\nRead an airdrop as a liquidity event, not a gift. The size of the claim, the cliff on it, and the depth of the receiving pool tell you more than the announcement does."
     },
     {
       "id": "i14-deepdive",
       "type": "deepdive",
       "title": "Under the Hood: Multisig Governance on Solana with Squads",
-      "body": "On Solana, institutional governance predominantly uses **Squads Protocol**, a formally verified smart contract multisig. A Squads vault requires an `M-of-N` cryptographic threshold (e.g., 4 out of 7 team members) to sign any transaction. Squads supports automated timelocks, programmatic spending limits, and program upgrade authority delegation, providing military-grade key security."
+      "body": "On Solana, institutional governance mostly runs through Squads, a multisig program used by protocols and foundations to hold upgrade authorities and treasuries.\n\nThe core is a simple threshold: an M-of-N rule, such as 4 of 7 signers, must approve any transaction the vault executes. Around that sit the operational controls teams actually rely on:\n\n- Automated timelocks so a fully signed transaction still waits before it can run.\n- Spending limits per account, so a compromised key cannot empty a vault on its own.\n- Program upgrade authority held by the vault rather than an individual, so shipping a change also requires the threshold.\n\nThe security property worth remembering: a multisig does not make a bad proposal impossible, it makes a unilateral one impossible. Combine it with a timelock and you get both the threshold and the exit window — which is what actually stops the flash-loan hijack from mattering."
     },
     {
       "id": "i14-quiz",
@@ -60,8 +60,9 @@
             "It eliminates gas fees for all voters"
           ],
           "correct": 1,
-          "explainRight": "Correct! Timelocks prevent instantaneous treasury drainage, giving users an exit window in the event of a hostile vote.",
-          "explainWrong": "Incorrect. A timelock enforces a delay between proposal passage and execution, giving honest participants time to react."
+          "explainRight": "A timelock does not stop a bad vote; it slows it down. Between passage and execution, LPs and users can read the proposal, see the treasury transfer, and leave. That exit window is the defence.",
+          "explainWrong": "Validators cannot pause the chain, it does not speed anything up, and it has nothing to do with fees. The delay exists so honest capital can withdraw before a malicious proposal can move funds.",
+          "difficulty": "basic"
         },
         {
           "id": "q2",
@@ -73,8 +74,9 @@
             "It reduces the voting quorum to 0%"
           ],
           "correct": 1,
-          "explainRight": "Spot on! Because flash loans only last for a single transaction block, borrowed tokens cannot satisfy time-lock vesting requirements.",
-          "explainWrong": "Incorrect. Time-locked vote escrow requires long-term commitment, rendering single-block borrowed tokens powerless."
+          "explainRight": "Flash loans last for a single transaction. Tokens locked for months or years cannot be borrowed for one block, so the borrowed balance carries no voting weight and the attack fails before it can reach the treasury.",
+          "explainWrong": "No KYC and no banned swaps. Time-locked vote escrow measures commitment in months and years, which single-block borrowed tokens cannot fake.",
+          "difficulty": "intermediate"
         },
         {
           "id": "q3",
@@ -86,8 +88,9 @@
             "All liquidity pools are permanently deleted"
           ],
           "correct": 1,
-          "explainRight": "Exactly! Unvested airdrops generate massive immediate sell pressure from short-term farmers, heavily testing AMM pool depth.",
-          "explainWrong": "Incorrect. Airdrops experience substantial immediate sell-off from mercenary recipients, creating intense downward pressure."
+          "explainRight": "An unvested airdrop is free money to most recipients, and mercenary farmers sell it. The first hours are a stress test for the AMM: if the pool is thin, the claim itself becomes the dump.",
+          "explainWrong": "Recipients do not hold forever, nothing converts to gas, and pools are not deleted. Unvested airdrops generate substantial immediate sell pressure from short-term farmers.",
+          "difficulty": "intermediate"
         }
       ],
       "passScore": 2

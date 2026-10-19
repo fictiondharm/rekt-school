@@ -5,10 +5,10 @@
   "title": "Token Cliffs and Unlock Pressure",
   "estMinutes": 14,
   "objectives": [
-    "Model how sudden cliff unlock events dump supply into automated market makers",
-    "Understand why secondary market depth determines price resilience",
-    "Analyze how insider unlock schedules create structural downward pressure",
-    "Differentiate models of pressure from speculative price predictions"
+    "Model what a cliff unlock actually sends into the market",
+    "Judge whether the pool is deep enough to absorb it",
+    "Tell a stream and a cliff apart when the total unlocked is identical",
+    "Watch an unlock happen yourself on a block explorer"
   ],
   "requires": ["I9"],
   "freePreview": false,
@@ -19,25 +19,25 @@
       "id": "i10-intro",
       "type": "read",
       "title": "The Anatomy of an Unlock Event",
-      "body": "Think of a token's locked supply as water held behind a dam. For months the reservoir just sits there, quiet. Then the first <Term id=\"cliff\">cliff</Term> opens its gates, and a wall of supply rushes at the market all at once. That is an unlock event.\n\n**What actually happens at the milestone.**\n\n- The project reaches its first major cliff (often Month 12), and thousands of early investors and team members suddenly hold transferable tokens.\n- Even founders who believe in the project may keep holding - but many venture funds are legally bound to return capital to their limited partners.\n- As a result, a large share - commonly **20% to 60%** - of the newly <Term id=\"unlock\">unlocked</Term> tokens is routed straight to DEXs to be sold for USDC or SOL.\n- The <Term id=\"liquidity_pool\">liquidity pool</Term> on the other side of that trade absorbs every sell order, and its shape decides the damage.\n\n**The key framing to carry forward.**\n\n- An unlock does not guarantee a crash; it creates *structural* sell pressure that demand must outweigh.\n- Your job is not to predict the price, but to measure the pressure against the pool's ability to absorb it."
+      "body": "Locked supply is water held behind a dam. For months the reservoir just sits there. Then the first <Term id=\"cliff\">cliff</Term> opens its gates and a wall of supply rushes the market all at once. That is an unlock event.\n\nWhat actually happens at the milestone:\n\n- The project reaches its first major cliff — often month 12 — and thousands of early investors and team members suddenly hold transferable tokens.\n- Founders who believe in the project may keep holding. Venture funds usually cannot: they are legally bound to return capital to their limited partners.\n- As a result a large share — commonly 20% to 60% — of the newly <Term id=\"unlock\">unlocked</Term> tokens goes straight to DEXs to be sold for USDC or SOL.\n- The <Term id=\"liquidity_pool\">liquidity pool</Term> on the other side of that trade absorbs every sell order, and its shape decides the damage.\n\nTwo framings to carry forward:\n\n- An unlock does not guarantee a crash. It creates structural sell pressure that demand has to outweigh.\n- Your job is not to predict the price. It is to measure the pressure against the pool's ability to absorb it."
     },
     {
       "id": "i10-pool-depth",
       "type": "read",
       "title": "Why AMM Pool Depth Dictates Survival",
-      "body": "Picture a bathtub and a swimming pool. Dropping a boulder into the bathtub sends water over the sides; the same boulder barely ripples the swimming pool. Sell pressure works the same way against <Term id=\"amm\">AMM</Term> liquidity - the size of the pool, not the size of the headline, decides the splash.\n\n**Recall the constant product formula `x · y = k`.**\n\n- When a large dump of `dx` tokens enters a <Term id=\"liquidity_pool\">pool</Term>, the spot price moves according to `Price Impact ≈ dx / (x + dx)`.\n- The bigger the sell relative to the reserves already inside the pool, the more violent the <Term id=\"price_impact\">price impact</Term> and <Term id=\"slippage\">slippage</Term>.\n\n**Compare two pools absorbing the exact same unlock.**\n\n- **Shallow pool:** only $1M of reserves. Dumping $2M of unlocked tokens causes catastrophic slippage, crashing the token by 60%+.\n- **Deep pool:** $20M+ spread across Orca and Raydium. The same sell flow is swallowed with only minor price degradation.\n\nThis is why sharp DeFi analysts always compare the *upcoming monthly unlock size* directly against *daily DEX liquidity* before forming any view."
+      "body": "Drop a boulder into a bathtub and the water goes over the sides. Drop the same boulder into a swimming pool and it barely ripples. Sell pressure works the same way against <Term id=\"amm\">AMM</Term> liquidity: the size of the pool, not the size of the headline, decides the splash.\n\nRecall the constant product formula `x · y = k`.\n\n- When a large dump of tokens enters a <Term id=\"liquidity_pool\">pool</Term>, the spot price moves with the order relative to reserves.\n- The bigger the sell against the reserves already inside, the more violent the <Term id=\"price_impact\">price impact</Term> and <Term id=\"slippage\">slippage</Term>.\n\nCompare two pools absorbing the same unlock:\n\n- **Shallow pool:** $1M of reserves. Dumping $2M of unlocked tokens causes catastrophic slippage, crashing the token by 60% or more.\n- **Deep pool:** $20M+ spread across Orca and Raydium. The same sell flow is swallowed with only minor price degradation.\n\nThis is why careful analysts always compare the upcoming monthly unlock size directly against daily DEX liquidity before forming any view."
     },
     {
       "id": "i10-cliff-vs-linear",
       "type": "read",
       "title": "Cliff Shock vs. Smooth Linear Streaming",
-      "body": "Two projects can release the exact same number of tokens and produce completely different price behavior. The difference is not *how much* unlocks - it is *when*, and how evenly the release is spread.\n\n**The two dominant designs.**\n\n- **Lump-Sum Monthly Cliffs:** a giant bucket drops on the 1st of each month. This creates predictable \"dump dates\" that short sellers can front-run, amplifying downward <Term id=\"slippage\">slippage</Term>.\n- **Streaming Linear <Term id=\"vesting\">Vesting</Term> (e.g. Streamflow / Sablier): tokens unlock smoothly every second, so supply is diffused continuously instead of bursting.\n\n**Why smooth streaming usually holds up better.**\n\n- Continuous flow lets regular protocol revenue and retail demand absorb the float organically.\n- There is no single dramatic date for bots to cluster around, so the front-runnable \"event\" largely disappears.\n- A <Term id=\"cliff\">cliff</Term> concentrates pressure into one moment, which makes unlock shock as much a *timing* problem as a *volume* problem."
+      "body": "Two projects can release the exact same number of tokens and produce completely different price behaviour. The difference is not *how much* unlocks — it is *when*, and how evenly it spreads.\n\nThe two dominant designs:\n\n- **Lump-sum monthly cliffs.** A giant bucket drops on the first of each month. This creates predictable dump dates that short sellers can front-run, amplifying downward <Term id=\"slippage\">slippage</Term>.\n- **Streaming linear <Term id=\"vesting\">vesting</Term>.** Services like Streamflow unlock tokens smoothly every second, so supply is diffused continuously instead of bursting.\n\nWhy streaming usually holds up better:\n\n- Continuous flow lets regular protocol revenue and retail demand absorb the float organically.\n- There is no single dramatic date for bots to cluster around, so the front-runnable event largely disappears.\n- A <Term id=\"cliff\">cliff</Term> concentrates pressure into one moment, which makes unlock shock as much a timing problem as a volume problem."
     },
     {
       "id": "i10-under-the-hood",
       "type": "deepdive",
       "title": "Under the Hood: How MEV Bots Front-Run Unlocks",
-      "body": "On Solana, transactions are public before they finalize - which means an unlock is never a surprise to the bots watching for it. Think of searchers as hawks circling a feeding schedule they already know by heart.\n\n**The front-running playbook.**\n\n- Searcher bots monitor the vesting escrow contract addresses directly.\n- The instant the <Term id=\"unlock\">unlock</Term> transaction confirms on-chain, they anticipate the incoming DEX sell flow.\n- They may short the token on perps, or pull <Term id=\"liquidity_pool\">pool</Term> liquidity to widen the bid-ask spread and profit from the resulting <Term id=\"slippage\">slippage</Term>.\n- Because that value is extracted from ordinary traders, it is a form of MEV that leans on <Term id=\"amm\">AMM</Term> mechanics.\n\n**How a careful analyst tracks it.**\n\n- Follow the vesting contract balance on Solscan to see exactly when tokens are claimed.\n- Watch for those tokens being moved into exchange deposit accounts - that is the tell that supply is about to hit the market.\n- Reading the chain before the crowd is how you turn a chaotic unlock into a measured, evidence-based view."
+      "body": "On Solana transactions are public before they finalise, so an unlock is never a surprise to the bots watching for it. Searchers behave like hawks circling a feeding schedule they already know by heart.\n\nThe front-running playbook:\n\n- Searcher bots monitor the vesting escrow contract addresses directly.\n- The instant the <Term id=\"unlock\">unlock</Term> transaction confirms on-chain, they anticipate the incoming DEX sell flow.\n- They may short the token on perps, or pull <Term id=\"liquidity_pool\">pool</Term> liquidity to widen the bid-ask spread and profit from the resulting <Term id=\"slippage\">slippage</Term>.\n- Because that value is extracted from ordinary traders, it is a form of MEV built on <Term id=\"amm\">AMM</Term> mechanics.\n\nHow a careful analyst tracks it:\n\n- Follow the vesting contract balance on Solscan to see exactly when tokens are claimed.\n- Watch for those tokens moving into exchange deposit accounts — that is the tell that supply is about to hit the market.\n- Reading the chain before the crowd is how you turn a chaotic unlock into a measured, evidence-based view."
     },
     {
       "id": "i10-quiz",
@@ -55,8 +55,8 @@
           ],
           "correct": 2,
           "difficulty": "basic",
-          "explainRight": "Correct. In a constant-product AMM, price moves continuously as reserves shift, so a sell far larger than the pool drives the price down hard. There is no order book to absorb it - the pool itself is the only buyer.",
-          "explainWrong": "AMMs never reject trades or mint free liquidity - they simply reprice along the x · y = k curve. A $10M sell against a $2M pool overwhelms the reserves, producing extreme price impact and slippage."
+          "explainRight": "In a constant-product AMM the price moves continuously as reserves shift, so a sell far larger than the pool drives the price down hard. There is no order book to absorb it — the pool itself is the only buyer.",
+          "explainWrong": "AMMs never reject trades or mint free liquidity; they simply reprice along the x · y = k curve. A $10M sell against a $2M pool overwhelms the reserves."
         },
         {
           "id": "q2",
@@ -69,8 +69,8 @@
           ],
           "correct": 3,
           "difficulty": "basic",
-          "explainRight": "Correct. Streaming diffuses supply in tiny amounts around the clock, so demand absorbs it gradually instead of in one frightening hit. That also removes the obvious date on which short sellers and bots pile in.",
-          "explainWrong": "Streaming does not change fees or lockups - it changes the shape of the release. By spreading supply evenly it eliminates the big, front-runnable dump dates that create the worst downward volatility."
+          "explainRight": "Streaming diffuses supply in tiny amounts around the clock, so demand absorbs it gradually instead of in one frightening hit. It also removes the obvious date on which short sellers and bots pile in.",
+          "explainWrong": "Streaming does not change fees or lockups — it changes the shape of the release. By spreading supply evenly it eliminates the big, front-runnable dump dates that create the worst volatility."
         },
         {
           "id": "q3",
@@ -83,8 +83,8 @@
           ],
           "correct": 1,
           "difficulty": "intermediate",
-          "explainRight": "Correct. Price impact is how much the order itself moves the pool, while slippage is the difference between the quoted and the executed price. Large orders into shallow pools produce both, and they hit hardest during unlock dumps.",
-          "explainWrong": "Market cap, FDV, cliffs, and vesting describe token economics, not trade execution. The correct pairing is price impact - the movement your own order causes in the pool - and slippage, the gap between the quote you saw and the fill you actually got."
+          "explainRight": "Price impact is how much the order itself moves the pool; slippage is the gap between the quoted price and the fill. Large orders into shallow pools produce both, and they hit hardest during unlock dumps.",
+          "explainWrong": "Market cap, FDV, cliffs, and vesting describe token economics, not trade execution. The correct pairing is the order's own market impact plus the quote-to-fill gap."
         },
         {
           "id": "q4",
@@ -97,8 +97,8 @@
           ],
           "correct": 0,
           "difficulty": "intermediate",
-          "explainRight": "Correct. Blockchain data is transparent, so searcher bots watch vesting escrow addresses continuously and can trade the moment claimed tokens flow toward exchanges. Their edge comes from automation and public information, not insider tips.",
-          "explainWrong": "Nobody is feeding bots secret unlock dates - the whole point is that on-chain data is public. Bots win because they monitor escrow contracts around the clock and automate reactions instantly, far faster than a human reading a dashboard."
+          "explainRight": "On-chain data is transparent, so searcher bots watch vesting escrow addresses continuously and can trade the moment claimed tokens head toward exchanges. Their edge is automation plus public information, not insider tips.",
+          "explainWrong": "Nobody is feeding bots secret unlock dates. Bots win because they monitor escrow contracts around the clock and react instantly, far faster than a human reading a dashboard."
         },
         {
           "id": "q5",
@@ -111,8 +111,8 @@
           ],
           "correct": 3,
           "difficulty": "intermediate",
-          "explainRight": "Correct. Unlock models quantify mechanical supply pressure, but real prices also depend on demand, sentiment, and off-market (OTC) deals. Treat the output as one input into your reasoning, never as a prophecy.",
-          "explainWrong": "A supply model is not a price oracle. It measures how much new supply must be absorbed, but demand, sentiment, and OTC trading can change the outcome entirely, so it cannot predict an exact price move."
+          "explainRight": "Unlock models quantify mechanical supply pressure, but real prices also depend on demand, sentiment, and off-market deals. Treat the output as one input into your reasoning, never as a prophecy.",
+          "explainWrong": "A supply model is not a price oracle. It measures how much new supply must be absorbed, but demand, sentiment, and OTC trading can change the outcome entirely."
         },
         {
           "id": "q6",
@@ -125,8 +125,8 @@
           ],
           "correct": 2,
           "difficulty": "thinking",
-          "explainRight": "Correct. Same total supply, very different timing. Streaming lets the market digest supply continuously, while a one-day cliff creates a single moment of maximum pressure that traders can anticipate and front-run.",
-          "explainWrong": "Equal totals do not mean equal impact, because timing determines how much the pool must absorb at once. A single-day release concentrates all the pressure into one front-runnable moment, whereas streaming spreads it out."
+          "explainRight": "Same total supply, very different timing. Streaming lets the market digest supply continuously, while a one-day cliff creates a single moment of maximum pressure that traders can anticipate and front-run.",
+          "explainWrong": "Equal totals do not mean equal impact, because timing determines how much the pool must absorb at once. A single-day release concentrates all the pressure into one front-runnable moment."
         },
         {
           "id": "q7",
@@ -139,8 +139,8 @@
           ],
           "correct": 0,
           "difficulty": "thinking",
-          "explainRight": "Correct. Once the first dump shrinks the pool and the price, the second unlock is even larger relative to the now-smaller reserves, so each round can hurt more than the last. Unlock pressure compounds when demand does not refill the pool.",
-          "explainWrong": "Price impact is not linear - it grows as reserves shrink. After the first large dump drains the pool, the second unlock faces thinner liquidity, so the damage compounds instead of averaging out to the same total."
+          "explainRight": "Once the first dump shrinks the pool and the price, the second unlock is even larger relative to the now-smaller reserves, so each round can hurt more than the last. Unlock pressure compounds when demand does not refill the pool.",
+          "explainWrong": "Price impact is not linear — it grows as reserves shrink. After the first large dump drains the pool, the second unlock faces thinner liquidity, so the damage compounds instead of averaging out."
         }
       ],
       "passScore": 5

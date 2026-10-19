@@ -5,10 +5,10 @@
   "title": "Be the Liquidity Provider",
   "estMinutes": 14,
   "objectives": [
-    "Learn how liquidity providers (LPs) deposit pairs into pools",
-    "Understand LP receipt tokens and pool share tracking",
-    "Discover how trading fees accrue automatically to liquidity providers",
-    "Read AMM mechanics well enough to avoid guessing quiz answers"
+    "Deposit a matched pair into a pool and understand exactly what you get back",
+    "Follow trading fees from the swap into the vault and into your LP token",
+    "Read the minting math that protects early depositors",
+    "Know what an exit actually returns — it is never your original deposit"
   ],
   "requires": ["I1"],
   "freePreview": false,
@@ -19,19 +19,19 @@
       "id": "i2-intro",
       "type": "read",
       "title": "How Liquidity Providers Earn Fees",
-      "body": "AMMs only work because ordinary users deposit tokens into the shared pool. These users are called **Liquidity Providers (LPs)**. Think of an <Term id=\"amm\">AMM</Term> as a robot shopkeeper: it never negotiates, never runs out of stock, and it always trades using one simple math formula against the tokens sitting in a <Term id=\"liquidity_pool\">liquidity pool</Term>.\n\n**Your job as an LP is to fill the pool's shelves.**\n\n- You deposit **equal values** of both tokens. Example: $100 of SOL and $100 of fUSDC.\n- The smart contract weighs your deposit against everything already in the pool.\n- It mints you <Term id=\"lp_token\">LP tokens</Term> - a digital receipt proving the exact percentage of the pool you now own.\n\nWhy equal values? Because a pool is a balanced scale. If the scale tilts, arbitrage bots rush in and trade until it levels out again. By depositing 50/50, you hand the formula the two ingredients in the proportions it expects, so you can never deposit a lopsided pile and instantly steal a larger share of the pool.\n\n**Follow your $200 through the machine:**\n\n1. You send $100 SOL + $100 fUSDC into the pool contract.\n2. The contract calculates: \"You now own X% of me.\"\n3. It mints you LP tokens to prove that claim.\n4. The pool keeps working. Traders swap against it 24/7 while your share sits in the vault.\n\nYou have not \"bought\" anything and you have not lent money to anyone. You bought a **piece of the ongoing marketplace** - and that piece earns rent on every single trade that happens inside it."
+      "body": "AMMs only work because ordinary people put tokens into the shared pot. Those people are liquidity providers, and what they do is simpler than it sounds.\n\nYou deposit equal values of both tokens — $100 of SOL and $100 of fUSDC. The contract measures your deposit against everything already in the pool, then mints you <Term id=\"lp_token\">LP tokens</Term>. Those tokens are the receipt: they encode exactly what percentage of the pool you now own.\n\nEqual values matter because a pool is a balanced scale. Deposit lopsided and the scale tips, which is free money for the next arbitrage bot. By depositing 50/50 you hand the <Term id=\"amm\">formula</Term> the two ingredients in the proportion it already expects.\n\nFollow your $200 through the machine:\n\n1. You send $100 SOL and $100 fUSDC to the pool contract.\n2. The contract works out what fraction of the <Term id=\"liquidity_pool\">liquidity pool</Term> that is.\n3. It mints LP tokens proving your claim.\n4. Traders swap against the pot 24/7 while your share sits there.\n\nYou have not bought anything and you have not lent to anybody. You bought a slice of a live marketplace, and that slice earns a cut of every trade that happens inside it."
     },
     {
       "id": "i2-fees",
       "type": "read",
       "title": "Trading Fees: The LP Yield Engine",
-      "body": "Every time a trader swaps through the pool, they pay a fee (typically **0.3%**). This fee is not sent to a bank, a company, or a founder's wallet. It is deposited **directly into the pool's vaults**. This small cut is the entire reason anyone wants to become an LP.\n\n**Walk through one real swap:**\n\n- A trader swaps $1,000 from fUSDC into SOL.\n- The pool keeps $3 of it as a fee and adds the fee straight to its reserves.\n- Your LP tokens, at that exact moment, become redeemable for a tiny bit more of the underlying tokens than before.\n\nFees pile up in the vault, so the total quantity of tokens inside the pool grows over time. Your LP token never pays a \"salary\" in a new currency. Instead, **each unit quietly becomes redeemable for more tokens as the pool gets fatter** - that is the LP yield engine in one sentence.\n\nThe golden rule:\n\n- More swap volume = more fees hitting the vault = your share grows faster.\n- Fewer swappers = slower growth. That is why LPs obsess over *where* they park their liquidity.\n\nWhen you want out, you **burn your LP tokens** back to the contract. The contract gives you back your proportional slice of the pool's current reserves: your original deposit plus your cut of every fee collected while you were inside.\n\nOne honest warning before you get excited: fees are LP's friend, but violent price swings are not. Read up on <Term id=\"impermanent_loss\">impermanent loss</Term> before you ever go all-in on a pool."
+      "body": "Every <Term id=\"swap\">swap</Term> through the pool pays a fee, typically 0.3%. That fee does not go to a bank, a company, or a founder wallet. It goes straight back into the pool's reserves.\n\nWalk one trade through:\n\n- A trader swaps $1,000 of fUSDC into SOL.\n- The pool keeps $3 and adds it to the reserves.\n- At that instant your LP tokens can be redeemed for a slightly larger slice of tokens than a moment before.\n\nFees never appear as a separate payment. They quietly grow what each LP unit redeems for. That is the whole engine.\n\nThe trade-off is obvious once you say it out loud: more volume means more fees landing in the vault, so where you park liquidity matters as much as how much you deposit.\n\nWhen you want out, you burn the LP tokens. The contract returns your proportional slice of the current reserves — your capital plus every fee collected while you were inside.\n\nOne warning before that sounds too easy. Fees are on your side; violent price swings are not. Read <Term id=\"impermanent_loss\">impermanent loss</Term> before you go all-in on a pool."
     },
     {
       "id": "i2-under-the-hood",
       "type": "deepdive",
       "title": "Under the Hood: LP Token Minting Math",
-      "body": "For the first deposit, the minted LP amount equals `sqrt(amountA × amountB)` minus a small permanently locked minimum (1,000 units locked to prevent empty pool attacks). For subsequent deposits, LP tokens are minted proportionally to `min(amountA / reserveA, amountB / reserveB) × totalLPSupply`.\n\n**Reading the formulas like an LP:**\n\n- `sqrt(A × B)` anchors the very first LP unit to the pool's geometry, not to any single currency, so the initial price can never be gamed.\n- `min(...)` protects early LPs: you cannot deposit a lopsided pair and instantly claim a bigger share of the pool by dumping one side only.\n- On withdrawal, the contract reverses the path exactly: it **burns** your LP tokens and releases your proportion of the live reserves - nothing more, nothing less. Every fee earned along the way is already baked into those reserves.\n\nThis is why LP mechanics feel odd at first but are beautifully fair in practice: every action is stored as math, and math never lies."
+      "body": "On the very first deposit the contract mints `sqrt(amountA × amountB)` LP tokens, minus a tiny amount — around 1,000 units — that is locked forever.\n\nEvery deposit after that mints proportionally:\n\n`LP tokens = min(amountA / reserveA, amountB / reserveB) × totalLPSupply`\n\nReading that like an LP:\n\n- The square root anchors the first LP unit to the pool's geometry rather than to any currency, so the opening price cannot be gamed.\n- The `min(...)` protects the people already inside. Deposit lopsided and you only get credit for the side that matches the pool's ratio.\n- The locked 1,000 units are a floor. Without them someone could drain the pool to near-zero and attack the accounting. With them the last withdrawal is never worth taking.\n\nOn the way out the contract simply burns your tokens and hands back your share of the live reserves. Fees collected along the way are already baked into those reserves, so there is no separate payout to claim."
     },
     {
       "id": "i2-quiz",
@@ -49,8 +49,8 @@
           ],
           "correct": 2,
           "difficulty": "basic",
-          "explainRight": "Correct! LP tokens are the contract's receipt. They are not a loan, a discount, or a dashboard fantasy - they are a redeemable claim that stores exactly what fraction of the pool you own. When you burn them later, the contract honors that fraction with whatever the pool contains at that moment.",
-          "explainWrong": "Not quite. LP tokens are a digital receipt minted by the contract that represents your proportional ownership of the pool. They are not a loan (you owe nothing back), and they are not a discount voucher. If you ever see an app promising 'percentage points' that are never represented by tokens, that is a red flag - a real pool always mints a real receipt."
+          "explainRight": "LP tokens are a redeemable claim on a fraction of the pool, minted by the contract. When you burn them later, the contract honours that fraction using whatever the pool holds at that moment.",
+          "explainWrong": "It is not a loan — you owe nothing back — and it is not a discount coupon. A real pool always mints a real receipt. If an app shows you 'percentage points' with no token behind them, treat that as a red flag."
         },
         {
           "id": "q2",
@@ -63,8 +63,8 @@
           ],
           "correct": 1,
           "difficulty": "basic",
-          "explainRight": "Exactly. The $3 never leaves the pool - it is added straight to the reserves that back every LP token. Fees are not paid out as a new currency; they quietly increase what each LP token can be redeemed for. More volume in the pool means the vault gets fatter, and every LP, proportionally, earns more.",
-          "explainWrong": "Close, but the fee does not shrink the pool or leave it. In a standard AMM the fee is deposited back into the vault, which grows the underlying reserves. Since your LP tokens redeem a proportional slice of those reserves, each token effectively becomes worth a little more after every trade. That compounding growth in the vault is the entire LP business model."
+          "explainRight": "The $3 never leaves the pool. It is added to the reserves backing every LP token, so each token redeems for a little more than it did a moment before. More volume means the vault grows faster.",
+          "explainWrong": "Fees do not shrink the pool and do not leave it. In a standard AMM the cut goes back into the reserves, which is exactly why LP tokens gain redemption value over time."
         },
         {
           "id": "q3",
@@ -77,8 +77,8 @@
           ],
           "correct": 0,
           "difficulty": "intermediate",
-          "explainRight": "Correct. Fees only accumulate inside the vault that the pool actually sees traffic through. Higher swap volume means more 0.3% cuts were deposited into LP A's reserves, so every LP token there redeems for more. Volume is the fuel; reserves are the reading on the fuel gauge.",
-          "explainWrong": "Fees are not a dividend that is paid regardless of usage - they are minted from actual trading activity. The pool with more swaps keeps a bigger share of fees in its reserves, which raises the redemption value of its LP tokens. No extra LP tokens are printed to 'reward' traffic, and a single-day price move does not determine fee collection."
+          "explainRight": "Fees land in the vault of the pool that actually saw the trades. Ten times the volume means ten times the fee cuts in LP A's reserves, so each LP token there redeems for more.",
+          "explainWrong": "There is no fixed dividend paid regardless of usage. Fee income comes from real trading, and the busier pool accumulates more of it. No extra LP tokens are printed as a thank-you for traffic."
         },
         {
           "id": "q4",
@@ -91,8 +91,8 @@
           ],
           "correct": 3,
           "difficulty": "intermediate",
-          "explainRight": "Correct. If a pool could be drained to near-zero, an attacker could deposit a tiny amount, withdraw the last sliver of tokens, and leave the protocol with empty vaults. Locking a floor of ~1,000 LP units makes the final withdrawal so unprofitable that emptying the pool is not worth it. It is a cheap insurance policy written into the math itself.",
-          "explainWrong": "It is not for gas, audits, or deflation - it is a security mechanism. The locked LP tokens are a structural firewall: they guarantee there is always a minimum claim against the pool, so nobody can economically extract the reserves down to zero. Empty-pool attacks are one of the oldest AMM exploits, and minimum liquidity is the standard defence."
+          "explainRight": "A pool that could be drained to near-zero is attackable: deposit a little, scoop out the last sliver, leave the accounting broken. Locking a floor of ~1,000 units makes that last withdrawal worthless to attempt.",
+          "explainWrong": "It is not for gas, audits, or deflation. The locked units are a security floor written into the maths, so nobody can economically extract the reserves down to zero."
         },
         {
           "id": "q5",
@@ -105,8 +105,8 @@
           ],
           "correct": 0,
           "difficulty": "intermediate",
-          "explainRight": "Correct - you own 1% of the pool (150 / 15,000 = 0.01), so you are entitled to 1% of the fees: $4,500 x 1% = $45. That is the proportional guarantee at the heart of LP shares: your slice is always exactly your token fraction divided by the total. The math never sneaks in a rounding fee against you.",
-          "explainWrong": "Work the fraction first: 150 out of 15,000 LP tokens is exactly 1%, not 10% and not 0.1%. One percent of $4,500 is $45. This is why even small LP positions earn - and why understanding 'your tokens / total supply' matters more than memorizing dollar amounts when you read a DEX dashboard."
+          "explainRight": "150 out of 15,000 is exactly 1%, so 1% of $4,500 is $45. Your slice is always your tokens divided by the total supply — nothing more complicated than that.",
+          "explainWrong": "Work the fraction first: 150 / 15,000 = 1%. One percent of $4,500 is $45. This is why understanding 'your tokens over total supply' matters more than memorising numbers off a dashboard."
         },
         {
           "id": "q6",
@@ -119,8 +119,8 @@
           ],
           "correct": 2,
           "difficulty": "thinking",
-          "explainRight": "Exactly right. Burning LP tokens returns your proportional share of the *live reserves* - not a time capsule of your original deposit. As the pool rebalances through trades, the mix of underlying tokens you exit with can differ from what you entered with. Your gains arrive as extra quantity in the reserves (fees), and your losses, if any, arrive as a less favourable ratio (impermanent loss). The receipt always pays out the current contents, never the nostalgic version.",
-          "explainWrong": "An LP exit is not a refund of what you put in. The contract returns your proportional slice of the reserves sitting in the pool *now*. That includes the fees accrued on top of your capital, but it also reflects the ratio the pool rebalanced to while you were inside. The receipt is a claim on current contents - the math does not owe you the identical coins, and it does not owe you a USD promise either."
+          "explainRight": "Burning returns your share of the reserves as they are now, not as they were when you entered. Fees raised the total; the rebalancing changed the mix. You leave with a different composition than you arrived with.",
+          "explainWrong": "An LP exit is not a refund of the original deposit. The contract pays out the current contents of the pool, in whatever ratio the trades have moved it to. There is no USD promise and no time capsule."
         },
         {
           "id": "q7",
@@ -133,8 +133,8 @@
           ],
           "correct": 0,
           "difficulty": "thinking",
-          "explainRight": "Correct. Every swap changes the pool twice: it adds the input token (with the fee) and removes the output token, which tilts the reserve ratio. When you burn your LP tokens you exit a pool that holds different proportions than the day you entered - and thanks to the 0.3% cuts, more total value than if nobody had traded at all. Declining to model the fee as part of the reserves is exactly how beginners underestimate what their LP position is worth.",
-          "explainWrong": "Swaps are far from zero-sum. Each one injects the input token plus its fee into the reserves and drains the output token, so the total quantity grows and the ratio shifts. Nothing is escrowed for 30 days, and your LP share itself never 'shrinks by 0.3%' per trade - what changes is the *content* of the pool you redeem from. Trace the reserves, not the hype, and the right picture is always a fatter, rebalanced vault."
+          "explainRight": "A swap changes the pool twice: it adds the input token with its fee, and it drains the output token. You exit a vault holding more total value and a different ratio than the day you walked in.",
+          "explainWrong": "Swaps are not zero-sum for the pool. Each one injects the input plus the fee and removes output, so reserves grow and tilt. Your LP share does not shrink by 0.3% per trade — what changes is the contents you redeem from."
         }
       ],
       "passScore": 5
