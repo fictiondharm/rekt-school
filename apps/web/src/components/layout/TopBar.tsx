@@ -49,6 +49,11 @@ const NAV_LINKS: NavLink[] = [
     href: '/glossary',
     isActive: (p) => p.startsWith('/glossary'),
   },
+  {
+    label: 'Games',
+    href: '/games',
+    isActive: (p) => p.startsWith('/games'),
+  },
 ];
 
 export function TopBar({ lessonTitle, aura = 0, showTourButton = false }: TopBarProps) {
