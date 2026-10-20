@@ -12,7 +12,7 @@ import type { Mood } from '@/lib/rugTycoon';
  *   - 'walk' -> suspicious (squint + flat mouth + raised brow)
  */
 
-export type CharId = 'rugsy' | 'carl' | 'fiona' | 'harry' | 'wanda' | 'nina';
+export type CharId = 'rugsy' | 'carl' | 'fiona' | 'harry' | 'wanda' | 'nina' | 'liquidator';
 
 interface Visual {
   skin: string;
@@ -73,7 +73,15 @@ const VISUALS: Record<CharId, Visual> = {
     hairStyle: 'long',
     accessory: 'crown',
   },
-  nina: {
+  liquidator: {
+    skin: '#e6c09b',
+    hair: '#1a1a1a',
+    cloth: '#2a2a2a',
+    pants: '#1a1a1a',
+    accent: '#666666',
+    hairStyle: 'flat',
+    accessory: 'shades',
+  },  nina: {
     skin: '#f2d3b0',
     hair: '#6d28d9',
     cloth: '#5b21b6',
@@ -233,4 +241,4 @@ export function Character({ id, mood, size = 64, dim = false, className, title }
   );
 }
 
-export const CHARACTER_IDS: CharId[] = ['rugsy', 'carl', 'fiona', 'harry', 'wanda', 'nina'];
+export const CHARACTER_IDS: CharId[] = ['rugsy', 'carl', 'fiona', 'harry', 'wanda', 'nina', 'liquidator'];

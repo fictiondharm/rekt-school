@@ -53,6 +53,25 @@ export default function GamesPage() {
           </div>
         </Link>
 
+        <Link href="/games/liquidation-line" className="g-card">
+          <div className="g-card-art">
+            <Character id="liquidator" mood="walk" size={96} title="Liquidator Bot" />
+          </div>
+          <h2 className="g-card-title">Liquidation Line</h2>
+          <p className="g-card-pitch">
+            Perpetual futures with leverage over 5 wicked rounds. Candle wicks hunt liquidations.
+            Isolated margin, funding, and one line between survival and wipeout.
+          </p>
+          <div className="g-card-meta">
+            <span className="g-card-best">
+              <BestScore storageKey="defi_maxi_liquidation_line_best" label="Liquidation Line" />
+            </span>
+            <span>
+              Play <ArrowRight size={13} style={{ display: 'inline', verticalAlign: '-2px' }} />
+            </span>
+          </div>
+        </Link>
+
         <Link href="/games/pool-party" className="g-card">
           <div className="g-card-art">
             <Character id="nina" mood="walk" size={96} title="Newbie Nina" />
@@ -89,3 +108,4 @@ export default function GamesPage() {
     </main>
   );
 }
+
