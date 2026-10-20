@@ -6,10 +6,6 @@ import { ArrowRight, Wrench } from 'lucide-react';
 
 const COMING_SOON = [
   {
-    title: 'Pool Party',
-    pitch: 'Provide liquidity the hard way, and watch what impermanent loss really does to you.',
-  },
-  {
     title: 'Governance Heist',
     pitch: 'Flash-loan your way to a majority vote. Real Beanstalk numbers, real consequences.',
   },
@@ -22,7 +18,7 @@ const COMING_SOON = [
 export const metadata = {
   title: 'Games - Rekt School',
   description:
-    'Play Rug Tycoon, a free browser game that teaches you to spot token launches that are set up to fail.',
+    'Play Rug Tycoon and Pool Party, free browser games that teach you to spot token launches and liquidity pools that are set up to fail you.',
 };
 
 export default function GamesPage() {
@@ -50,6 +46,25 @@ export default function GamesPage() {
           <div className="g-card-meta">
             <span className="g-card-best">
               <BestScore />
+            </span>
+            <span>
+              Play <ArrowRight size={13} style={{ display: 'inline', verticalAlign: '-2px' }} />
+            </span>
+          </div>
+        </Link>
+
+        <Link href="/games/pool-party" className="g-card">
+          <div className="g-card-art">
+            <Character id="nina" mood="walk" size={96} title="Newbie Nina" />
+          </div>
+          <h2 className="g-card-title">Pool Party</h2>
+          <p className="g-card-pitch">
+            Provide liquidity for six days and watch what impermanent loss really does to your
+            fees. Stay, add, or bail - the pool does not care either way.
+          </p>
+          <div className="g-card-meta">
+            <span className="g-card-best">
+              <BestScore storageKey="defi_maxi_pool_party_best" label="Pool Party" />
             </span>
             <span>
               Play <ArrowRight size={13} style={{ display: 'inline', verticalAlign: '-2px' }} />
