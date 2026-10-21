@@ -13,7 +13,7 @@ import {
 } from '@solana/spl-token';
 import { createPublicClient, http, parseEther, type Address } from 'viem';
 import { base } from 'viem/chains';
-import { BASE_USDC, BASE_USDT, BASE_USDT_DECIMALS, BASE_TREASURY } from '@/lib/base';
+import { BASE_USDC, BASE_TREASURY, USDC_DECIMALS } from '@/lib/base';
 import { UNLOCK_PRICE_USD, UNLOCK_USDC_AMOUNT } from '@/lib/pricing';
 import { setCourseUnlocked } from '@/lib/unlock';
 import { WalletConnectButton } from './WalletPicker';
@@ -26,12 +26,6 @@ const CHAIN_ASSETS: Record<Chain, Asset[]> = {
   'solana-devnet': ['USDC', 'SOL'],
   base: ['USDC', 'ETH'],
 };
-
-/** Assets offered for a chain (USDT on Base is opt-in via an env address). */
-function assetsForChain(chain: Chain): Asset[] {
-  if (chain === 'base' && BASE_USDT) return ['USDC', 'USDT', 'ETH'];
-  return CHAIN_ASSETS[chain];
-}
 
 /** Token mints, keyed by chain and asset. Native SOL / ETH are not listed. */
 const TOKEN_MINTS: Record<string, string> = {
@@ -174,7 +168,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
 
   const handleChainChange = (c: Chain) => {
     setChain(c);
-    setAsset(assetsForChain(c)[0]);
+    setAsset(CHAIN_ASSETS[c][0]);
     setStatus('idle');
     setError(null);
   };
@@ -292,23 +286,16 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
 
       let txHash: `0x${string}`;
 
-      if (isTokenAsset(asset)) {
-        const tokenAddress = asset === 'USDC' ? BASE_USDC : BASE_USDT;
-        const decimals = asset === 'USDC' ? 6 : BASE_USDT_DECIMALS;
-        if (!tokenAddress) {
-          setStatus('error');
-          setError(`${asset} is not available on Base yet.`);
-          return;
-        }
+      if (asset === 'USDC') {
         txHash = await provider.request({
           method: 'eth_sendTransaction',
           params: [
             {
               from: evmAddress,
-              to: tokenAddress,
+              to: BASE_USDC,
               data: encodeTokenTransfer(
                 BASE_TREASURY,
-                BigInt(Math.round(amountValue * 10 ** decimals))
+                BigInt(Math.round(amountValue * 10 ** USDC_DECIMALS))
               ),
             },
           ],
@@ -443,10 +430,10 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
 
               <div
                 className={`grid gap-2 p-1 bg-bg rounded-lg ${
-                  assetsForChain(chain).length > 2 ? 'grid-cols-3' : 'grid-cols-2'
+                  CHAIN_ASSETS[chain].length > 2 ? 'grid-cols-3' : 'grid-cols-2'
                 }`}
               >
-                {assetsForChain(chain).map((a) => (
+                {CHAIN_ASSETS[chain].map((a) => (
                   <button
                     key={a}
                     type="button"

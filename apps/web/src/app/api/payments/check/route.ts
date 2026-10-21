@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { getAssociatedTokenAddress } from '@solana/spl-token';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { verifyBasePayment, BASE_TREASURY, BASE_USDC, BASE_USDT, BASE_USDT_DECIMALS } from '@/lib/base';
+import { verifyBasePayment, BASE_TREASURY } from '@/lib/base';
 import { baseClient } from '@/lib/base';
 import { UNLOCK_PRICE_USD } from '@/lib/pricing';
 
@@ -179,21 +179,14 @@ export async function POST(req: NextRequest) {
     const toWallet = chain === 'base' ? BASE_TREASURY : TREASURY_SOLANA;
 
     if (chain === 'base') {
-      if (isTokenAsset(asset)) {
-        const token = asset === 'USDC' ? BASE_USDC : BASE_USDT;
-        const decimals = asset === 'USDC' ? 6 : BASE_USDT_DECIMALS;
-        if (!token) {
-          return NextResponse.json(
-            { success: false, message: `${asset} is not supported on Base.` }
-          );
-        }
-        const result = await verifyBasePayment(txHash as `0x${string}`, token, decimals);
+      if (asset === 'USDC') {
+        const result = await verifyBasePayment(txHash as `0x${string}`);
         valid = result.valid;
         if (result.from) from = result.from;
         if (valid) {
-          tokenAmount = Number(result.amount ?? 0) / 10 ** decimals;
+          tokenAmount = Number(result.amount ?? 0) / 1_000_000;
           usdValue = tokenAmount;
-          currency = asset;
+          currency = 'USDC';
         }
       } else {
         try {
