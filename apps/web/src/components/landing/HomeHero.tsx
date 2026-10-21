@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLiquidityLab } from '@/hooks/useLiquidityLab';
 import { CandyButton } from '@/components/landing/CandyButton';
 import { GhostButton } from '@/components/landing/GhostButton';
@@ -8,8 +9,38 @@ import { LiquidityLabCard } from '@/components/landing/LiquidityLabCard';
 import { SpeechBubble } from '@/components/landing/SpeechBubble';
 import { TOTAL_LESSON_COUNT, UNLOCK_PRICE_INR } from '@/lib/pricing';
 
+const LAB_SEEN_KEY = 'rekt_school_home_lab_seen';
+
+function hasSeenLab(): boolean {
+  try {
+    return window.sessionStorage.getItem(LAB_SEEN_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function markLabSeen(): void {
+  try {
+    window.sessionStorage.setItem(LAB_SEEN_KEY, '1');
+  } catch {
+    /* private mode: the demo simply plays again next visit */
+  }
+}
+
 export function HomeHero() {
-  const lab = useLiquidityLab({ autoPlay: true, strategy: 'sweep' });
+  // The demo only plays the first time the home page is opened in a session.
+  // Coming back to the home page later shows the lab in a still state.
+  const [autoPlay, setAutoPlay] = useState(false);
+
+  useEffect(() => {
+    if (!hasSeenLab()) setAutoPlay(true);
+  }, []);
+
+  const handleAutoStart = useCallback(() => {
+    markLabSeen();
+  }, []);
+
+  const lab = useLiquidityLab({ autoPlay, strategy: 'sweep', onAutoStart: handleAutoStart });
 
   return (
     <section

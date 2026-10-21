@@ -20,6 +20,26 @@ const QUESTIONS: { question: string; answer: string }[] = [
     answer:
       'That’s exactly who Level 1 is for. It starts at “what is a wallet,” and every jargon word is tappable.',
   },
+  {
+    question: 'Who is this for?',
+    answer:
+      'People who read the hack headlines and want the mechanics, not the hype. No coding background needed. If you can use a browser and follow a few steps, you can finish this.',
+  },
+  {
+    question: 'DeFi is the same everywhere. Why Solana?',
+    answer:
+      'The mechanics are identical everywhere: pools, oracles, liquidations. We picked Solana because failures are cheaper to replay, transactions are fast, and a Devnet faucet hands you real tokens worth nothing. Same lessons, smaller blast radius.',
+  },
+  {
+    question: 'How long does the whole thing take?',
+    answer:
+      'Basic is roughly 84 minutes of reading and clicking. Intermediate and Pro go deeper, a few hours each. Every lesson is split into steps, so you can stop after one and pick it up later.',
+  },
+  {
+    question: 'Can I try it before paying anything?',
+    answer:
+      'Yes. One lesson from every level plus all three arcade games are free and run in your browser. No wallet, no sign-up, no real money.',
+  },
 ];
 
 export function FaqChat() {

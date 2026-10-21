@@ -16,7 +16,7 @@ const COMING_SOON = [
 ];
 
 export const metadata = {
-  title: 'Games - Rekt School',
+  title: 'Arcade - Rekt School',
   description:
     'Play Rug Tycoon and Pool Party, free browser games that teach you to spot token launches and liquidity pools that are set up to fail you.',
 };
@@ -28,8 +28,8 @@ export default function GamesPage() {
         <Link href="/" className="g-backlink">
           <ArrowLeft size={14} /> Back to home
         </Link>
-        <span className="g-hub-kicker">Rekt School Arcade</span>
-        <h1 className="g-hub-title">Games</h1>
+        <span className="g-hub-kicker">Free to play · no wallet</span>
+        <h1 className="g-hub-title">Arcade</h1>
         <p className="g-hub-sub">
           Nothing to install, nothing to connect, nothing to pay for. Each game teaches one thing
           you will wish you had known earlier - by making you the person doing it.

@@ -13,7 +13,7 @@ export default function GamesLayout({ children }: { children: React.ReactNode })
       />
       <div className="g-root">
         <PixelBackdrop />
-        <TopBar lessonTitle="Games" />
+        <TopBar lessonTitle="Arcade" />
         {children}
       </div>
     </>

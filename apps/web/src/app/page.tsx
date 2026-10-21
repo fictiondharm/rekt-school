@@ -15,27 +15,10 @@ import {
   WarStories,
 } from '@/components/landing';
 
-const HOME_NAV_LINKS = [
-  { label: 'Course', href: '#course', isActive: () => false },
-  { label: 'Arcade', href: '/games', isActive: (path: string) => path.startsWith('/games') },
-  {
-    label: 'War Stories',
-    href: '/war-stories',
-    isActive: (path: string) => path.startsWith('/war-stories'),
-  },
-  { label: 'Glossary', href: '/glossary', isActive: (path: string) => path === '/glossary' },
-  { label: 'Pricing', href: '#pricing', isActive: () => false },
-];
-
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-bg text-ink">
-      <TopBar
-        navLinks={HOME_NAV_LINKS}
-        showAura={false}
-        showWallet={false}
-        cta={{ label: 'Start free', href: '#free' }}
-      />
+      <TopBar showAura={false} showWallet={false} cta={{ label: 'Start free', href: '#free' }} />
 
       <main className="flex flex-col">
         <HomeHero />

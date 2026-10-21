@@ -437,7 +437,7 @@ export function LiquidationLine() {
     <main className='g-shell-content'>
       <div className='g-topline'>
         <Link href='/games' className='g-backlink'>
-          <ArrowLeft size={14} /> Back to Games
+          <ArrowLeft size={14} /> Back to Arcade
         </Link>
         <span className='g-round-chip'>
           Balance: {fmt(balance)} {phase === 'trading' ? ' | Round ' + (roundIndex + 1) + '/5' : ''}
@@ -663,7 +663,7 @@ export function LiquidationLine() {
               <RotateCcw size={16} /> Play again
             </button>
             <Link href='/games' className='g-btn'>
-              <ArrowLeft size={16} /> Back to Games
+              <ArrowLeft size={16} /> Back to Arcade
             </Link>
           </div>
           <div style={{ fontSize: '10px', color: '#666', textAlign: 'center' }}>Simulation. Not trading advice.</div>

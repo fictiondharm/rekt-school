@@ -25,6 +25,8 @@ export interface UseLiquidityLabOptions {
   initialTradeAmount?: number;
   /** Fired when the visitor picks the deep pool themselves. */
   onGoalAchieved?: () => void;
+  /** Fired the moment the auto-play takes over the slider. */
+  onAutoStart?: () => void;
 }
 
 export interface UseLiquidityLabResult {
@@ -60,6 +62,7 @@ export function useLiquidityLab({
   initialPool = 'shallow',
   initialTradeAmount = TRADE_SIZE.default,
   onGoalAchieved,
+  onAutoStart,
 }: UseLiquidityLabOptions = {}): UseLiquidityLabResult {
   const [poolType, setPoolTypeState] = useState<PoolType>(initialPool);
   const [tradeAmount, setTradeAmountState] = useState<number>(initialTradeAmount);
@@ -90,6 +93,7 @@ export function useLiquidityLab({
     if (!autoPlay || !inView || userTookOver.current) return;
 
     setHasInteracted(true);
+    onAutoStart?.();
     let step = 0;
 
     const id = setInterval(
@@ -126,7 +130,7 @@ export function useLiquidityLab({
     );
 
     return () => clearInterval(id);
-  }, [autoPlay, inView, strategy]);
+  }, [autoPlay, inView, strategy, onAutoStart]);
 
   const takeOver = useCallback(() => {
     userTookOver.current = true;

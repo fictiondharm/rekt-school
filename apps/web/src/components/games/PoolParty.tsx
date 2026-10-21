@@ -245,7 +245,7 @@ export function PoolParty() {
     <main className="g-shell-content">
       <div className="g-topline">
         <Link href="/games" className="g-backlink">
-          <ArrowLeft size={14} /> Back to Games
+          <ArrowLeft size={14} /> Back to Arcade
         </Link>
         <span className="g-round-chip">{chip}</span>
       </div>
@@ -440,7 +440,7 @@ export function PoolParty() {
               <RotateCcw size={16} /> Play again
             </button>
             <Link href="/games" className="g-btn">
-              <ArrowLeft size={16} /> Back to Games
+              <ArrowLeft size={16} /> Back to Arcade
             </Link>
           </div>
         </section>

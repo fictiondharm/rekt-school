@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { WalletChip } from '@/components/onchain/WalletChip';
+import { SITE_NAV, type SiteNavLink } from '@/lib/siteNav';
 import { Sparkles, Menu, X } from 'lucide-react';
 import type { Tier } from '@defi-mommy/content-schema';
 
@@ -15,8 +16,8 @@ interface TopBarProps {
   showTourButton?: boolean;
   tier?: Tier;
   lessonId?: string;
-  /** Replaces the default course navigation (used by the landing page). */
-  navLinks?: NavLink[];
+  /** Replaces the shared navigation (rarely needed). */
+  navLinks?: SiteNavLink[];
   /** Hides the Aura chip. */
   showAura?: boolean;
   /** Hides the connect-wallet chip. */
@@ -25,53 +26,14 @@ interface TopBarProps {
   cta?: { label: string; href: string };
 }
 
-interface NavLink {
-  label: string;
-  href: string;
-  isActive: (path: string) => boolean;
-}
-
-const NAV_LINKS: NavLink[] = [
-  {
-    label: 'Basic',
-    href: '/basic',
-    isActive: (p) => p === '/basic' || p.startsWith('/basic/') || /^\/learn\/b/i.test(p),
-  },
-  {
-    label: 'Intermediate',
-    href: '/intermediate',
-    isActive: (p) => p.startsWith('/intermediate') || /^\/learn\/i/i.test(p),
-  },
-  {
-    label: 'Pro',
-    href: '/pro',
-    isActive: (p) => p === '/pro' || p.startsWith('/pro/') || /^\/learn\/p/i.test(p),
-  },
-  {
-    label: 'War Stories',
-    href: '/war-stories',
-    isActive: (p) => p.startsWith('/war-stories'),
-  },
-  {
-    label: 'Glossary',
-    href: '/glossary',
-    isActive: (p) => p.startsWith('/glossary'),
-  },
-  {
-    label: 'Games',
-    href: '/games',
-    isActive: (p) => p.startsWith('/games'),
-  },
-];
-
 export function TopBar({
   lessonTitle,
   aura = 0,
   showTourButton = false,
-  navLinks = NAV_LINKS,
+  navLinks = SITE_NAV,
   showAura = true,
   showWallet = true,
-  cta,
+  cta = { label: 'Start free', href: '/#free' },
 }: TopBarProps) {
   const pathname = usePathname() || '/';
   const [menuOpen, setMenuOpen] = useState(false);
@@ -79,6 +41,17 @@ export function TopBar({
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
+
+  // Section links scroll on the home page and navigate home from everywhere else.
+  const resolveHref = (link: SiteNavLink) => {
+    if (!link.sectionId) return link.href;
+    return pathname === '/' ? `#${link.sectionId}` : `/#${link.sectionId}`;
+  };
+
+  const isActive = (link: SiteNavLink) =>
+    link.activePrefixes.some(
+      (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+    );
 
   return (
     <header className="sticky top-0 z-30 bg-bg border-b-2 border-ink">
@@ -108,11 +81,11 @@ export function TopBar({
 
           <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => {
-              const active = link.isActive(pathname);
+              const active = isActive(link);
               return (
                 <Link
-                  key={link.href}
-                  href={link.href}
+                  key={link.label}
+                  href={resolveHref(link)}
                   aria-current={active ? 'page' : undefined}
                   className={`px-3 py-1.5 rounded-full text-sm font-bold transition-colors ${
                     active
@@ -168,11 +141,11 @@ export function TopBar({
         <div className="md:hidden border-t-2 border-ink bg-bg animate-in fade-in">
           <nav className="mx-auto max-w-6xl px-4 sm:px-6 py-3 flex flex-col gap-1">
             {navLinks.map((link) => {
-              const active = link.isActive(pathname);
+              const active = isActive(link);
               return (
                 <Link
-                  key={link.href}
-                  href={link.href}
+                  key={link.label}
+                  href={resolveHref(link)}
                   aria-current={active ? 'page' : undefined}
                   onClick={() => setMenuOpen(false)}
                   className={`px-3 py-2.5 rounded-lg text-sm font-bold transition-colors ${
