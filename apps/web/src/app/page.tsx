@@ -18,7 +18,7 @@ import {
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-bg text-ink">
-      <TopBar showAura={false} showWallet={false} cta={{ label: 'Start free', href: '#free' }} />
+      <TopBar showAura={false} cta={{ label: 'Start free', href: '#free' }} />
 
       <main className="flex flex-col">
         <HomeHero />
