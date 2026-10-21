@@ -13,25 +13,36 @@ import {
 } from '@solana/spl-token';
 import { createPublicClient, http, parseEther, type Address } from 'viem';
 import { base } from 'viem/chains';
-import { BASE_USDC, BASE_TREASURY } from '@/lib/base';
+import { BASE_USDC, BASE_USDT, BASE_USDT_DECIMALS, BASE_TREASURY } from '@/lib/base';
 import { UNLOCK_PRICE_USD, UNLOCK_USDC_AMOUNT } from '@/lib/pricing';
 import { setCourseUnlocked } from '@/lib/unlock';
 import { WalletConnectButton } from './WalletPicker';
 
 type Chain = 'solana-mainnet' | 'solana-devnet' | 'base';
-type Asset = 'USDC' | 'SOL' | 'ETH';
+type Asset = 'USDC' | 'USDT' | 'SOL' | 'ETH';
 
 const CHAIN_ASSETS: Record<Chain, Asset[]> = {
-  'solana-mainnet': ['USDC', 'SOL'],
-  'solana-devnet': ['SOL'],
+  'solana-mainnet': ['USDC', 'USDT', 'SOL'],
+  'solana-devnet': ['USDC', 'SOL'],
   base: ['USDC', 'ETH'],
 };
 
-/** Solana mainnet USDC mint. */
-const SOLANA_USDC_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
-// Devnet has its own tokens: the course fUSDC (from the in-app faucet) and
-// Circle's devnet USDC.
-const SOLANA_DEVNET_USDC_MINT = 'G5U9iSQwKogEbdQx9DuJ6qFcRyYpkqbtFiafCtLFoHNd';
+/** Assets offered for a chain (USDT on Base is opt-in via an env address). */
+function assetsForChain(chain: Chain): Asset[] {
+  if (chain === 'base' && BASE_USDT) return ['USDC', 'USDT', 'ETH'];
+  return CHAIN_ASSETS[chain];
+}
+
+/** Token mints, keyed by chain and asset. Native SOL / ETH are not listed. */
+const TOKEN_MINTS: Record<string, string> = {
+  'solana-mainnet:USDC': 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+  'solana-mainnet:USDT': 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
+  // Devnet: the course fUSDC (from the in-app faucet) and Circle's devnet USDC.
+  'solana-devnet:USDC': 'G5U9iSQwKogEbdQx9DuJ6qFcRyYpkqbtFiafCtLFoHNd',
+};
+
+/** True when the asset is a token (not the chain's native coin). */
+const isTokenAsset = (asset: Asset) => asset === 'USDC' || asset === 'USDT';
 
 /** Treasury wallet that receives the unlock payment. */
 const TREASURY_SOLANA = 'HtKPeixUAG5a28rxn4weDqyNfwb8BwSmEp7y7xfZHTf5';
@@ -39,6 +50,7 @@ const TREASURY_SOLANA = 'HtKPeixUAG5a28rxn4weDqyNfwb8BwSmEp7y7xfZHTf5';
 /** Used when the live price feed is unreachable. */
 const FALLBACK_PRICES: Record<Asset, number> = {
   USDC: 1,
+  USDT: 1,
   SOL: 150,
   ETH: 3000,
 };
@@ -111,7 +123,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
 
   /** Live USD price of the selected asset, with a static fallback. */
   const fetchAssetPrice = useCallback(async (selected: Asset): Promise<number> => {
-    if (selected === 'USDC') return 1;
+    if (selected === 'USDC' || selected === 'USDT') return 1;
     const id = selected === 'SOL' ? 'solana' : 'ethereum';
     try {
       const res = await fetch(
@@ -126,8 +138,8 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
     return FALLBACK_PRICES[selected];
   }, []);
 
-  // Auto-fill the amount whenever the asset changes: USDC is always 1.49,
-  // SOL/ETH are converted from the live price with a small buffer.
+  // Auto-fill the amount whenever the asset changes: stablecoins are always
+  // 1.49, SOL/ETH are converted from the live price with a small buffer.
   useEffect(() => {
     if (!isOpen) return;
     let cancelled = false;
@@ -136,7 +148,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
       if (cancelled) return;
       setPriceUsd(price);
       setAmount(
-        asset === 'USDC'
+        isTokenAsset(asset)
           ? UNLOCK_USDC_AMOUNT
           : ((UNLOCK_PRICE_USD / price) * PRICE_BUFFER).toFixed(asset === 'ETH' ? 6 : 4)
       );
@@ -154,7 +166,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
   const amountValue = parseFloat(amount);
   const amountValid = Number.isFinite(amountValue) && amountValue > 0;
   const usdValue = amountValid
-    ? asset === 'USDC'
+    ? isTokenAsset(asset)
       ? amountValue
       : amountValue * priceUsd
     : 0;
@@ -162,7 +174,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
 
   const handleChainChange = (c: Chain) => {
     setChain(c);
-    setAsset(CHAIN_ASSETS[c][0]);
+    setAsset(assetsForChain(c)[0]);
     setStatus('idle');
     setError(null);
   };
@@ -198,24 +210,28 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
       const treasury = new PublicKey(TREASURY_SOLANA);
       const tx = new Transaction();
 
-      if (asset === 'USDC') {
-        const usdcMint = new PublicKey(
-          chain === 'solana-devnet' ? SOLANA_DEVNET_USDC_MINT : SOLANA_USDC_MINT
-        );
-        const fromATA = await getAssociatedTokenAddress(usdcMint, publicKey);
-        const toATA = await getAssociatedTokenAddress(usdcMint, treasury);
+      if (isTokenAsset(asset)) {
+        const mintAddress = TOKEN_MINTS[`${chain}:${asset}`];
+        if (!mintAddress) {
+          setStatus('error');
+          setError(`${asset} is not available on ${chain}.`);
+          return;
+        }
+        const tokenMint = new PublicKey(mintAddress);
+        const fromATA = await getAssociatedTokenAddress(tokenMint, publicKey);
+        const toATA = await getAssociatedTokenAddress(tokenMint, treasury);
         // Read the mint decimals on-chain so devnet fUSDC is not scaled wrong.
-        const mintInfo = await getMint(conn, usdcMint);
+        const mintInfo = await getMint(conn, tokenMint);
         const baseUnits = Math.round(amountValue * 10 ** mintInfo.decimals);
 
-        // Idempotent ATA creation so a first-time payer without a USDC token
+        // Idempotent ATA creation so a first-time payer without a token
         // account can still pay.
         tx.add(
           createAssociatedTokenAccountIdempotentInstruction(
             publicKey,
             fromATA,
             publicKey,
-            usdcMint
+            tokenMint
           )
         );
         tx.add(
@@ -223,7 +239,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
             publicKey,
             toATA,
             treasury,
-            usdcMint
+            tokenMint
           )
         );
         tx.add(createTransferInstruction(fromATA, toATA, publicKey, BigInt(baseUnits)));
@@ -276,16 +292,23 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
 
       let txHash: `0x${string}`;
 
-      if (asset === 'USDC') {
+      if (isTokenAsset(asset)) {
+        const tokenAddress = asset === 'USDC' ? BASE_USDC : BASE_USDT;
+        const decimals = asset === 'USDC' ? 6 : BASE_USDT_DECIMALS;
+        if (!tokenAddress) {
+          setStatus('error');
+          setError(`${asset} is not available on Base yet.`);
+          return;
+        }
         txHash = await provider.request({
           method: 'eth_sendTransaction',
           params: [
             {
               from: evmAddress,
-              to: BASE_USDC,
-              data: encodeUsdcTransfer(
+              to: tokenAddress,
+              data: encodeTokenTransfer(
                 BASE_TREASURY,
-                BigInt(Math.round(amountValue * 1_000_000))
+                BigInt(Math.round(amountValue * 10 ** decimals))
               ),
             },
           ],
@@ -418,8 +441,12 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
                 ))}
               </div>
 
-              <div className="grid grid-cols-2 gap-2 p-1 bg-bg rounded-lg">
-                {CHAIN_ASSETS[chain].map((a) => (
+              <div
+                className={`grid gap-2 p-1 bg-bg rounded-lg ${
+                  assetsForChain(chain).length > 2 ? 'grid-cols-3' : 'grid-cols-2'
+                }`}
+              >
+                {assetsForChain(chain).map((a) => (
                   <button
                     key={a}
                     type="button"
@@ -444,11 +471,11 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
                   <span className="text-ink-soft">Network:</span>
                   <span className="font-mono text-ink">{networkLabel}</span>
                 </div>
-                {asset === 'USDC' && (
+                {isTokenAsset(asset) && (
                   <div className="flex justify-between">
                     <span className="text-ink-soft">Amount:</span>
                     <span className="font-mono font-bold text-accent text-sm">
-                      {UNLOCK_USDC_AMOUNT} USDC
+                      {UNLOCK_USDC_AMOUNT} {asset}
                     </span>
                   </div>
                 )}
@@ -475,7 +502,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
                     <span>Minimum ${UNLOCK_PRICE_USD.toFixed(2)}</span>
                     <span className="font-mono">
                       ≈ ${usdValue ? usdValue.toFixed(2) : '0.00'}
-                      {asset !== 'USDC' && priceUsd ? ` @ $${priceUsd.toFixed(2)}` : ''}
+                      {!isTokenAsset(asset) && priceUsd ? ` @ $${priceUsd.toFixed(2)}` : ''}
                     </span>
                   </p>
                 </div>
@@ -544,7 +571,8 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
   );
 }
 
-function encodeUsdcTransfer(to: Address, amount: bigint): `0x${string}` {
+/** ERC-20 `transfer(address,uint256)` call data. */
+function encodeTokenTransfer(to: Address, amount: bigint): `0x${string}` {
   const selector = '0xa9059cbb';
   const paddedTo = to.slice(2).padStart(64, '0');
   const paddedAmount = amount.toString(16).padStart(64, '0');

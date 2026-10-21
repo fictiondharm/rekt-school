@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { getAssociatedTokenAddress } from '@solana/spl-token';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { verifyBasePayment, BASE_TREASURY } from '@/lib/base';
+import { verifyBasePayment, BASE_TREASURY, BASE_USDC, BASE_USDT, BASE_USDT_DECIMALS } from '@/lib/base';
 import { baseClient } from '@/lib/base';
 import { UNLOCK_PRICE_USD } from '@/lib/pricing';
 
@@ -11,12 +11,19 @@ const SOLANA_MAINNET_RPC =
 const SOLANA_DEVNET_RPC = process.env.SOLANA_DEVNET_RPC_URL || 'https://api.devnet.solana.com';
 
 const TREASURY_SOLANA = 'HtKPeixUAG5a28rxn4weDqyNfwb8BwSmEp7y7xfZHTf5';
-const SOLANA_USDC_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
-// Devnet tokens: the course fUSDC (in-app faucet) and Circle's devnet USDC.
-const SOLANA_DEVNET_USDC_MINTS = [
-  'G5U9iSQwKogEbdQx9DuJ6qFcRyYpkqbtFiafCtLFoHNd',
-  '4zMMC9srt5x11eyo7cBJhz9A1JgG3rSBCJ1DoiYaAK',
-];
+// Token mints the server accepts per chain and asset.
+const TOKEN_MINTS: Record<string, string[]> = {
+  'solana-mainnet:USDC': ['EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'],
+  'solana-mainnet:USDT': ['Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB'],
+  'solana-devnet:USDC': [
+    // Course fUSDC (in-app faucet) and Circle's devnet USDC.
+    'G5U9iSQwKogEbdQx9DuJ6qFcRyYpkqbtFiafCtLFoHNd',
+    '4zMMC9srt5x11eyo7cBJhz9A1JgG3rSBCJ1DoiYaAK',
+  ],
+};
+
+/** True when the asset is a token rather than the chain's native coin. */
+const isTokenAsset = (asset: string) => asset === 'USDC' || asset === 'USDT';
 
 async function getUsdPrice(id: string): Promise<number> {
   try {
@@ -172,14 +179,21 @@ export async function POST(req: NextRequest) {
     const toWallet = chain === 'base' ? BASE_TREASURY : TREASURY_SOLANA;
 
     if (chain === 'base') {
-      if (asset === 'USDC') {
-        const result = await verifyBasePayment(txHash as `0x${string}`);
+      if (isTokenAsset(asset)) {
+        const token = asset === 'USDC' ? BASE_USDC : BASE_USDT;
+        const decimals = asset === 'USDC' ? 6 : BASE_USDT_DECIMALS;
+        if (!token) {
+          return NextResponse.json(
+            { success: false, message: `${asset} is not supported on Base.` }
+          );
+        }
+        const result = await verifyBasePayment(txHash as `0x${string}`, token, decimals);
         valid = result.valid;
         if (result.from) from = result.from;
         if (valid) {
-          tokenAmount = Number(result.amount ?? 0) / 1_000_000;
+          tokenAmount = Number(result.amount ?? 0) / 10 ** decimals;
           usdValue = tokenAmount;
-          currency = 'USDC';
+          currency = asset;
         }
       } else {
         try {
@@ -217,12 +231,11 @@ export async function POST(req: NextRequest) {
           // The fee payer is the first account and is the wallet that paid.
           from = accountKeys[0].pubkey.toBase58();
 
-          if (asset === 'USDC') {
-            // A USDC payment moves tokens, not lamports, so the treasury's SOL
-            // balance does not change. Read the treasury token account balance
-            // delta instead.
-            const candidateMints =
-              chain === 'solana-devnet' ? SOLANA_DEVNET_USDC_MINTS : [SOLANA_USDC_MINT];
+          if (isTokenAsset(asset)) {
+            // A token payment moves tokens, not lamports, so the treasury's
+            // SOL balance does not change. Read the treasury token account
+            // balance delta instead.
+            const candidateMints = TOKEN_MINTS[`${chain}:${asset}`] ?? [];
 
             for (const mintAddress of candidateMints) {
               try {
@@ -245,7 +258,7 @@ export async function POST(req: NextRequest) {
                 if (delta > 0n) {
                   tokenAmount = Number(delta) / 10 ** decimals;
                   usdValue = tokenAmount;
-                  currency = 'USDC';
+                  currency = asset;
                   if (usdValue >= UNLOCK_PRICE_USD) valid = true;
                   break;
                 }
