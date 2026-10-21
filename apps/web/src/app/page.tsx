@@ -98,56 +98,52 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
 
           <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-7 space-y-6">
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-white border-2 border-ink rounded-full text-[11px] font-bold uppercase tracking-widest shadow-pop-sm">
-                <span className="w-2 h-2 rounded-full bg-quaternary" />
-                Rekt School
-              </span>
+                <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-white border-2 border-ink rounded-full text-[11px] font-bold uppercase tracking-widest shadow-pop-sm">
+                  <span className="w-2 h-2 rounded-full bg-quaternary" />
+                  Rekt School
+                </span>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold tracking-tight text-ink leading-[1.05]">
-                Don&apos;t get rekt. Learn DeFi by{' '}
-                <span className="relative inline-block">
-                  <span className="relative z-10">breaking it</span>
-                  <span className="absolute -bottom-1 left-0 right-0 h-3 bg-tertiary -rotate-1 z-0" aria-hidden="true" />
-                </span>{' '}
-                in a sandbox first.
-              </h1>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold tracking-tight text-ink leading-[1.05]">
+                  Get rekt for{' '}
+                  <span className="relative inline-block">
+                    <span className="relative z-10">₹149</span>
+                    <span className="absolute -bottom-1 left-0 right-0 h-3 bg-tertiary -rotate-1 z-0" aria-hidden="true" />
+                  </span>
+                  {' '}before you get rekt for real.
+                </h1>
 
-              <p className="text-base sm:text-lg text-ink-soft leading-relaxed max-w-2xl">
-                Three tiers, zero real risk. <strong className="text-ink">Tier 1 (Basic)</strong> puts
-                you on live Solana Devnet with a real wallet and free faucet money.{' '}
-                <strong className="text-ink">Tier 2 (Intermediate)</strong> drops you into pure
-                simulation labs. <strong className="text-ink">Tier 3 (Pro)</strong> hands you the scary
-                stuff - flash loans, oracle attacks, MEV. Break AMMs, trigger liquidations, mint tokens,
-                spot scams: no real cash ever touches it.
-              </p>
+                <p className="text-base sm:text-lg text-ink-soft leading-relaxed max-w-2xl">
+                  Break AMMs, trigger liquidations, farm scams, and pull flash loans - all in a sandbox.{' '}
+                  <strong className="text-ink">Learn the tricks that drain wallets</strong> before they drain yours.
+                </p>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
-                <Link href="/learn/b1" className="sm:w-auto">
-                  <Button size="lg" variant="primary" className="w-full sm:w-auto gap-2">
-                    <Play className="w-4 h-4" /> Start the free lesson
-                  </Button>
-                </Link>
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  onClick={() => setPaymentModalOpen(true)}
-                  className="w-full sm:w-auto gap-2"
-                >
-                  <Coins className="w-4 h-4" /> Unlock everything for $1
-                </Button>
-                <a
-                  href="#curriculum"
-                  className="sm:ml-2 text-sm font-medium text-ink-soft hover:text-ink inline-flex items-center gap-1.5 self-center"
-                >
-                  View curriculum <ArrowRight className="w-4 h-4" />
-                </a>
-              </div>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
+                  <Button
+                    size="lg"
+                    variant="primary"
+                onClick={() => setPaymentModalOpen(true)}
+                className="w-full sm:w-auto gap-2"
+              >
+                <Coins className="w-4 h-4" /> Get full access — ₹149
+              </Button>
+                  <Link href="/learn/b1" className="sm:w-auto">
+                    <Button size="lg" variant="secondary" className="w-full sm:w-auto gap-2">
+                      <Play className="w-4 h-4" /> Try a free lesson first
+                    </Button>
+                  </Link>
+                  <a
+                    href="#pricing"
+                    className="sm:ml-2 text-sm font-medium text-ink-soft hover:text-ink inline-flex items-center gap-1.5 self-center"
+                  >
+                    See what you unlock <ArrowRight className="w-4 h-4" />
+                  </a>
+                </div>
 
               <div className="flex flex-wrap items-center gap-3 pt-3">
                 {[
-                  { icon: ShieldCheck, text: 'Real Solana · Free test money', color: 'text-quaternary' },
-                  { icon: Coins, text: '10,000 fUSDC faucet included', color: 'text-tertiary' },
-                  { icon: KeyRound, text: 'Aura progress tracking', color: 'text-secondary' },
+                  { icon: ShieldCheck, text: 'Solana Devnet + Sandbox', color: 'text-quaternary' },
+                  { icon: Coins, text: 'All tiers unlocked', color: 'text-tertiary' },
+                  { icon: KeyRound, text: 'Games, sims & war stories', color: 'text-secondary' },
                 ].map(({ icon: Icon, text, color }) => (
                   <span key={text} className="flex items-center gap-2 px-3 py-1.5 bg-white border-2 border-ink rounded-full text-[13px] font-medium shadow-pop-sm">
                     <Icon className={`w-4 h-4 ${color}`} /> {text}
@@ -533,71 +529,76 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
           </p>
         </section>
 
-        {/* INVITE CODE */}
-        <section className="py-16 border-t-2 border-ink">
-          <Card className="p-8 shadow-pop">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-              <div className="space-y-3 max-w-xl">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-tertiary border-2 border-ink flex items-center justify-center">
-                    <KeyRound className="w-5 h-5 text-ink" />
+        {/* PRICING */}
+        <section id="pricing" className="py-16 border-t-2 border-ink scroll-mt-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="lg:col-span-7 space-y-6">
+              <span className="inline-flex px-4 py-1.5 bg-quaternary text-ink text-[11px] font-bold uppercase tracking-widest border-2 border-ink rounded-full shadow-pop-sm">
+                Early access
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-heading font-extrabold text-ink">
+                Everything. One price. Learn to spot the rekt before it finds you.
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                  'All lessons (Basic, Intermediate, Pro)',
+                  'All DeFi sims and games',
+                  'War Stories: real exploits decoded',
+                  'Glossary + glossary tooltips',
+                  'Solana Devnet labs + full sandbox',
+                  'Aura tracking & progress',
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-quaternary" />
+                    <span className="text-sm text-ink">{item}</span>
                   </div>
-                  <h3 className="font-heading font-bold text-xl text-ink">
-                    Have an invite code?
-                  </h3>
-                </div>
-                <p className="text-sm text-ink-soft leading-relaxed">
-                  Have a code from us? Enter it to unlock the full course for free - no payment
-                  needed. Otherwise, get instant access for $1 USDC on Solana or Base.
-                </p>
-                <p className="text-xs text-ink-faint">
-                  No code yet? Ask the owner to send you one so you can unlock without paying.
-                </p>
+                ))}
               </div>
-
-              <form
-                onSubmit={handleRedeem}
-                className="w-full md:w-auto flex flex-col sm:flex-row gap-3 shrink-0"
-              >
-                <input
-                  type="text"
-                  placeholder="Enter invite code"
-                  aria-label="Invite code"
-                  value={inviteCode}
-                  onChange={(e) => setInviteCode(e.target.value)}
-                  className="px-4 py-3 text-sm font-mono bg-white rounded-lg border-2 border-border focus:ring-4 focus:ring-accent/30 focus:border-accent focus:outline-none w-full sm:w-56 transition-all"
-                />
-                <Button type="submit" variant="primary" isLoading={isRedeeming} className="shrink-0">
-                  Redeem
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setPaymentModalOpen(true)}
-                  className="shrink-0"
-                >
-                  Unlock for $1
-                </Button>
-              </form>
             </div>
-
-            {redeemStatus && (
-              <div
-                className={`mt-5 p-4 rounded-xl text-sm flex items-center gap-3 border-2 ${
-                  redeemStatus.success
-                    ? 'bg-quaternary/20 text-ink border-quaternary'
-                    : 'bg-red-50 text-red-700 border-red-300'
-                }`}
-              >
-                {redeemStatus.success ? (
-                  <CheckCircle2 className="w-5 h-5 shrink-0" />
-                ) : (
-                  <Lock className="w-5 h-5 shrink-0" />
-                )}
-                <span>{redeemStatus.message}</span>
-              </div>
-            )}
-          </Card>
+            <div className="lg:col-span-5">
+              <Card className="p-8 shadow-pop-lg relative overflow-hidden">
+                <div className="absolute -top-6 -right-6 w-20 h-20 bg-tertiary rounded-full border-2 border-ink flex items-center justify-center rotate-12">
+                  <span className="text-xs font-bold">EARLY</span>
+                </div>
+                <div className="space-y-4">
+                  <h3 className="font-heading font-extrabold text-2xl text-ink">Full access</h3>
+                  <div className="flex items-end gap-3">
+                    <span className="text-5xl font-heading font-extrabold text-ink">₹149</span>
+                    <span className="text-lg text-ink-faint line-through mb-1">$5</span>
+                  </div>
+                  <p className="text-sm text-ink-soft">Early users lock in ₹149. Price goes up after launch.</p>
+                  <Button size="lg" variant="primary" onClick={() => setPaymentModalOpen(true)} className="w-full gap-2">
+                    <Coins className="w-4 h-4" /> Get full access for ₹149
+                  </Button>
+                  <div className="pt-4 border-t border-border space-y-3">
+                    <p className="text-xs font-bold text-ink uppercase tracking-wider">FAQ</p>
+                    <div className="space-y-2">
+                      <p className="text-xs text-ink"><span className="font-bold">Do I need real crypto?</span> No. Use free Devnet funds or play in the sandbox.</p>
+                      <p className="text-xs text-ink"><span className="font-bold">When does price go up?</span> After early access ends. Lock in now.</p>
+                    </div>
+                    <details className="text-xs text-ink">
+                      <summary className="cursor-pointer font-semibold">Have a code?</summary>
+                      <form onSubmit={handleRedeem} className="mt-3 flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Enter code"
+                          value={inviteCode}
+                          onChange={(e) => setInviteCode(e.target.value)}
+                          className="flex-1 px-3 py-2 text-xs font-mono bg-white rounded-lg border border-border focus:outline-none"
+                        />
+                        <Button type="submit" variant="secondary" size="sm" isLoading={isRedeeming}>Redeem</Button>
+                      </form>
+                      {redeemStatus && (
+                        <p className={`mt-2 text-xs ${redeemStatus.success ? 'text-quaternary' : 'text-red-600'}`}>
+                          {redeemStatus.message}
+                        </p>
+                      )}
+                    </details>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </div>
         </section>
 
         <PaymentModal
@@ -617,7 +618,6 @@ localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
             <span className="font-bold text-ink">Rekt School</span>
             <span>Solana Devnet &amp; Sandbox educational academy</span>
             <span>Non-custodial, zero financial advice</span>
-            <span>Built for Solana Hackathon 2026</span>
           </div>
         </footer>
       </main>
