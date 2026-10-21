@@ -17,3 +17,7 @@ apps/web/faucet-mint.json
 # generated invite codes (secret — do not commit)
 scripts/seed-invites.csv
 scripts/seed-invites.sql
+
+# local planning notes (not for the repo)
+NEXT-SPRINT.md
+.gstack/

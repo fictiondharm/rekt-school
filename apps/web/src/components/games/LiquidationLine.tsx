@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Character } from '@/components/games/Character';
 import { addLocalAura } from '@/lib/progress';
@@ -68,8 +68,6 @@ const RANK_TITLES = [
   { minBalance: 2000, title: 'Perp Veteran', blurb: 'Disciplined risk management.' },
 ];
 
-const LEARN_LESSON_IDS = ['i2', 'i3', 'b9', 'b6'];
-
 function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return function () {
@@ -103,6 +101,45 @@ function getRoundScenarios(roundIndex: number): ScenarioConfig[] {
   }
 }
 
+function fmt(n: any): string {
+  if (typeof n === 'number' && !isNaN(n)) {
+    return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  console.error('LL_FMT_UNDEF', n);
+  return '--';
+}
+
+function buildLesson(roundState: RoundState, position: Position | null, pnl: number): { lesson: string; lessonId: string } {
+  if (roundState.liquidated) {
+    return {
+      lesson: 'A candle wick hit your liquidation price and wiped your entire margin. At high leverage a brief spike is enough — liquidation triggers on wicks (highs/lows), not just closes.',
+      lessonId: 'i2',
+    };
+  }
+  if (roundState.fundingPaidTotal > 0) {
+    return {
+      lesson: 'You survived, but funding fees slowly drained your position. When one side is crowded, it pays the other side every funding interval.',
+      lessonId: 'b9',
+    };
+  }
+  if (position && pnl > 0) {
+    return {
+      lesson: 'You closed in profit. Size and leverage that let you survive the wicks are what keep you in the game long enough for a good trade to pay off.',
+      lessonId: 'i3',
+    };
+  }
+  if (position && pnl <= 0) {
+    return {
+      lesson: 'Price moved against your position but you were not liquidated. Cutting a loss early is far better than holding until a wick takes everything.',
+      lessonId: 'b6',
+    };
+  }
+  return {
+    lesson: 'You sat out this round. No trade is also a position — avoiding forced liquidation is a skill in itself.',
+    lessonId: 'i3',
+  };
+}
+
 function readNumber(key: string, fallback = 0): number {
   if (typeof window === 'undefined') return fallback;
   try {
@@ -130,7 +167,6 @@ export function LiquidationLine() {
   const [roundResults, setRoundResults] = useState<any[]>([]);
   const [lastRoundResult, setLastRoundResult] = useState<any>(null);
   const [reactCharacter, setReactCharacter] = useState<'wanda' | 'liquidator' | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const awardedRef = useRef(false);
 
   useEffect(() => {
@@ -143,6 +179,13 @@ export function LiquidationLine() {
   }, []);
 
   const positionSize = useMemo(() => calculatePositionSize(margin, leverage), [margin, leverage]);
+
+  const liquidationPricePreview = useMemo(() => {
+    const basePrice = scenario?.startPrice ?? 100;
+    return side === 'long'
+      ? calculateLiquidationPriceLong(basePrice, leverage)
+      : calculateLiquidationPriceShort(basePrice, leverage);
+  }, [side, leverage, scenario]);
 
   const handleStart = () => {
     awardedRef.current = false;
@@ -319,6 +362,7 @@ export function LiquidationLine() {
           pnl: position ? pnl : 0,
           fundingPaid: roundState.fundingPaidTotal,
           balanceChange: (position && !roundState.liquidated) ? position.margin + pnl : (roundState.liquidated ? -(position?.margin || 0) : 0),
+          ...buildLesson(roundState, position, pnl),
         };
         
         setLastRoundResult(result);
@@ -396,7 +440,7 @@ export function LiquidationLine() {
           <ArrowLeft size={14} /> Back to Games
         </Link>
         <span className='g-round-chip'>
-          Balance:  {phase === 'trading' && '| Round ' + (roundIndex + 1) + '/5'}
+          Balance: {fmt(balance)} {phase === 'trading' ? ' | Round ' + (roundIndex + 1) + '/5' : ''}
         </span>
       </div>
 
@@ -438,14 +482,14 @@ export function LiquidationLine() {
           </label>
 
           <label className='g-field'>
-            <span className='g-field-label'>Margin <b></b></span>
+            <span className='g-field-label'>Margin <b>${fmt(margin)}</b></span>
             <input type='range' className='g-range' min={LIQUIDATION_CONFIG.marginStep} max={Math.min(1000, balance)} step={LIQUIDATION_CONFIG.marginStep} value={margin} onChange={(e) => setMargin(Number(e.target.value))} />
           </label>
 
           <div style={{ background: '#1a1a1a', padding: '12px', border: '1px solid #333', fontSize: '12px' }}>
-            <div>Position Size: <strong></strong></div>
+            <div>Position Size: <strong>${fmt(positionSize)}</strong></div>
             <div>Fictional PERP-WICK / FICT-BTC</div>
-            <div>Liquidation Price: <strong></strong></div>
+            <div>Liquidation Price: <strong>${fmt(liquidationPricePreview)}</strong></div>
           </div>
 
           <button type='button' className='g-btn g-btn-primary g-btn-wide' onClick={startRound}>
@@ -459,13 +503,13 @@ export function LiquidationLine() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <div style={{ fontSize: '12px', color: '#888' }}>PERP-WICK / FICT-BTC</div>
-              <div style={{ fontSize: '24px', fontFamily: 'monospace' }}></div>
+              <div style={{ fontSize: '24px', fontFamily: 'monospace' }}>${fmt(currentPrice)}</div>
             </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontSize: '11px' }}>Candle {roundState.currentIndex + 1}/{roundState.candles.length}</div>
               {position && (
                 <div style={{ fontSize: '11px', color: position.side === 'long' ? '#4ade80' : '#f87171' }}>
-                  {position.side.toUpperCase()} {position.leverage}x | Liq: 
+                  {position.side.toUpperCase()} {position.leverage}x | Liq: ${fmt(position.liquidationPrice)}
                 </div>
               )}
             </div>
@@ -480,21 +524,59 @@ export function LiquidationLine() {
             </div>
           )}
 
-          <div style={{ background: '#0a0a0a', padding: '12px', border: '1px solid #333', height: '120px', display: 'flex', alignItems: 'end', gap: '2px', overflow: 'hidden' }}>
-            {roundState.candles.slice(0, roundState.currentIndex + 1).map((candle, idx) => {
-              const height = Math.abs(candle.high - candle.low) * 20;
-              const isUp = candle.close >= candle.open;
-              const isLiqCandle = roundState.liquidated && roundState.liquidationCandleIndex === idx;
+          <div style={{ position: 'relative', background: '#0a0a0a', padding: '12px', border: '1px solid #333', height: '160px', display: 'flex', alignItems: 'end', gap: '2px', overflow: 'hidden' }}>
+            {position && scenario && (() => {
+              const visible = roundState.candles.slice(0, roundState.currentIndex + 1);
+              const highs = visible.map((c) => c.high).concat([position.entryPrice, position.liquidationPrice]);
+              const lows = visible.map((c) => c.low).concat([position.entryPrice, position.liquidationPrice]);
+              const priceHigh = Math.max(...highs);
+              const priceLow = Math.min(...lows);
+              const priceRange = Math.max(0.0001, priceHigh - priceLow);
+              const chartHeight = 120;
+              const yOf = (price: number) => ((priceHigh - price) / priceRange) * chartHeight;
               return (
-                <div
-                  key={idx}
-                  style={{
-                    width: '8px',
-                    background: isLiqCandle ? '#ff0000' : isUp ? '#4ade80' : '#f87171',
-                    height: Math.max(4, height) + 'px',
-                    position: 'relative',
-                  }}
-                />
+                <>
+                  <div style={{ position: 'absolute', left: 0, right: 0, top: yOf(position.entryPrice) + 'px', borderTop: '1px dashed #888' }}>
+                    <span style={{ position: 'absolute', right: '4px', top: '-11px', fontSize: '9px', color: '#888' }}>Entry ${fmt(position.entryPrice)}</span>
+                  </div>
+                  <div style={{ position: 'absolute', left: 0, right: 0, top: yOf(position.liquidationPrice) + 'px', borderTop: '1px solid #ff0000' }}>
+                    <span style={{ position: 'absolute', right: '4px', top: '-11px', fontSize: '9px', color: '#ff0000' }}>Liq ${fmt(position.liquidationPrice)}</span>
+                  </div>
+                </>
+              );
+            })()}
+            {roundState.candles.slice(0, roundState.currentIndex + 1).map((candle, idx) => {
+              const isUp = candle.close >= candle.open;
+              const color = isUp ? '#4ade80' : '#f87171';
+              const isLiqCandle = roundState.liquidated && roundState.liquidationCandleIndex === idx;
+              const range = Math.max(0.0001, candle.high - candle.low);
+              const bodyTop = Math.max(candle.open, candle.close);
+              const bodyBottom = Math.min(candle.open, candle.close);
+              const chartHeight = 120;
+              return (
+                <div key={idx} style={{ position: 'relative', width: '8px', height: chartHeight + 'px', flex: '0 0 auto' }}>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: '1px',
+                      background: isLiqCandle ? '#ff0000' : color,
+                      top: ((candle.high - bodyTop) / range) * chartHeight + 'px',
+                      height: (Math.max(0.0001, bodyTop - bodyBottom) / range) * chartHeight + 'px',
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: '0',
+                      width: '8px',
+                      background: isLiqCandle ? '#ff0000' : color,
+                      top: ((candle.high - bodyTop) / range) * chartHeight + 'px',
+                      height: Math.max(2, (Math.abs(candle.close - candle.open) / range) * chartHeight) + 'px',
+                    }}
+                  />
+                </div>
               );
             })}
           </div>
@@ -502,13 +584,13 @@ export function LiquidationLine() {
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
             {!position ? (
               <button type='button' className='g-btn g-btn-primary' onClick={openPosition}>
-                Open {side.toUpperCase()} {leverage}x ( margin)
+                Open {side.toUpperCase()} {leverage}x (${fmt(margin)} margin)
               </button>
             ) : (
               <>
                 <button type='button' className='g-btn' onClick={() => closePosition(false)}>Close all</button>
                 <button type='button' className='g-btn' onClick={() => closePosition(true)}>Close half</button>
-                <button type='button' className='g-btn' onClick={addMargin}><Plus size={14} /> Add  margin</button>
+                <button type='button' className='g-btn' onClick={addMargin}><Plus size={14} /> Add $100 margin</button>
               </>
             )}
             <button type='button' className='g-btn' onClick={() => setPaused(!paused)}>
@@ -533,13 +615,16 @@ export function LiquidationLine() {
               </div>
             </div>
           ) : (
-            <div>PnL: <strong style={{ color: lastRoundResult.pnl >= 0 ? '#4ade80' : '#f87171' }}>{lastRoundResult.pnl >= 0 ? '+' : ''}</strong></div>
+            <div>PnL: <strong style={{ color: lastRoundResult.pnl >= 0 ? '#4ade80' : '#f87171' }}>{lastRoundResult.pnl >= 0 ? '+' : ''}${fmt(Math.abs(lastRoundResult.pnl))}</strong></div>
           )}
-          <div>Funding paid: </div>
+          {lastRoundResult.liquidated && (
+            <div>PnL: <strong style={{ color: '#f87171' }}>-${fmt(lastRoundResult.balanceChange < 0 ? Math.abs(lastRoundResult.balanceChange) : (lastRoundResult.pnl >= 0 ? 0 : Math.abs(lastRoundResult.pnl)))}</strong></div>
+          )}
+          <div>Funding paid: <strong>${fmt(lastRoundResult.fundingPaid)}</strong></div>
           <div style={{ background: '#1a1a1a', padding: '10px', border: '1px solid #333', fontSize: '12px' }}>
-            <strong>Lesson:</strong> Liquidations happen from wick prices, not just closes. Use lower leverage and manage risk.
+            <strong>Lesson:</strong> {lastRoundResult.lesson}
             <div style={{ marginTop: '4px' }}>
-              <Link href={'/learn/' + LEARN_LESSON_IDS[roundIndex % LEARN_LESSON_IDS.length]} className='g-learn'>
+              <Link href={'/learn/' + lastRoundResult.lessonId} className='g-learn'>
                 Learn why →
               </Link>
             </div>
@@ -555,9 +640,10 @@ export function LiquidationLine() {
           <div className='g-grade-badge'>FINAL RESULT</div>
           <h2 className='g-rank'>{(RANK_TITLES.filter(r => balance >= r.minBalance).pop() || RANK_TITLES[0]).title}</h2>
           <p className='g-sub'>{(RANK_TITLES.filter(r => balance >= r.minBalance).pop() || RANK_TITLES[0]).blurb}</p>
+          {totalAura > 0 && <p className='g-sub' style={{ fontSize: '12px' }}>· Total aura: <strong>{totalAura}</strong></p>}
           <div className='g-stats'>
             <div className='g-stat'>
-              <span className='g-stat-num'></span>
+              <span className='g-stat-num'>${fmt(balance)}</span>
               <span className='g-stat-label'>final balance</span>
             </div>
             <div className='g-stat'>
@@ -589,7 +675,7 @@ export function LiquidationLine() {
           <div className='g-tut'>
             <h3 className='g-title'>How Liquidation Line works</h3>
             <ul className='g-tut-list'>
-              <li>Start with ,000 fake balance. Trade a fictional perp over 5 rounds.</li>
+              <li>Start with $1,000 fake balance. Trade a fictional perp over 5 rounds.</li>
               <li>Choose Long/Short, leverage (1x-50x), and margin. Higher leverage = closer liquidation.</li>
               <li>Liquidation is triggered by candle wicks (high/low), not just close price.</li>
               <li>Funding is paid every few candles. Liquidated positions lose all margin.</li>
