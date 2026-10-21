@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { Button, Badge } from '@/components/ui';
 import { DollarSign, CheckCircle2, ShieldCheck, Wallet } from 'lucide-react';
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -551,6 +552,21 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
               <ShieldCheck className="w-3.5 h-3.5 text-accent shrink-0" />
               <span>One-time unlock for lifetime course access.</span>
             </div>
+            <p className="text-[10px] text-ink-faint text-center leading-snug">
+              By paying you agree to our{' '}
+              <Link href="/terms" className="underline hover:text-accent">
+                Terms
+              </Link>{' '}
+              ,{' '}
+              <Link href="/refunds" className="underline hover:text-accent">
+                Refund Policy
+              </Link>{' '}
+              and{' '}
+              <Link href="/privacy" className="underline hover:text-accent">
+                Privacy Policy
+              </Link>
+              .
+            </p>
           </div>
         )}
       </div>
