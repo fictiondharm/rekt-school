@@ -55,6 +55,12 @@ interface PageProps {
   params: Promise<{ lessonId: string }>;
 }
 
+const TIER_LABELS: Record<string, string> = {
+  basic: 'Basic',
+  intermediate: 'Intermediate',
+  pro: 'Pro',
+};
+
 export default function DynamicLessonPage({ params }: PageProps) {
   const resolvedParams = use(params);
   const lessonId = resolvedParams.lessonId.toUpperCase();
@@ -259,7 +265,20 @@ export default function DynamicLessonPage({ params }: PageProps) {
         </div>
 
         {/* If locked, render Lock Wall */}
-        {!access.allowed ? (
+        <div className="flex-1 flex flex-col min-h-0 min-w-0">
+          <div className="flex items-center gap-3 border-b border-border bg-bg px-4 sm:px-6 py-2">
+            <Link
+              href="/"
+              className="text-xs font-semibold text-accent hover:underline inline-flex items-center gap-1"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" /> Back to home
+            </Link>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-ink-faint">
+              {TIER_LABELS[lesson.tier]} tier
+            </span>
+          </div>
+
+          {!access.allowed ? (
           <div className="flex-1 flex items-center justify-center p-6 bg-surface/30">
             <Card className="max-w-md w-full p-8 space-y-6 border-2 border-ink shadow-pop-lg">
               <div className="w-16 h-16 rounded-full bg-tertiary/30 border-2 border-ink flex items-center justify-center text-amber-700">
@@ -360,10 +379,10 @@ export default function DynamicLessonPage({ params }: PageProps) {
 
               <div className="pt-2 border-t border-border flex items-center justify-between text-xs">
                 <Link
-                  href="/learn/b1"
+                  href="/"
                   className="text-accent hover:underline flex items-center gap-1 font-semibold"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5" /> Back to Free B1
+                  <ArrowLeft className="w-3.5 h-3.5" /> Back to home
                 </Link>
                 <Link
                   href="/learn/i1"
@@ -381,6 +400,7 @@ export default function DynamicLessonPage({ params }: PageProps) {
             onAuraChange={(delta) => setAura((prev) => prev + delta)}
           />
         )}
+        </div>
       </div>
 
       {/* Mobile curriculum trigger */}

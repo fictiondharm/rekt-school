@@ -17,8 +17,12 @@ import {
 
 const HOME_NAV_LINKS = [
   { label: 'Course', href: '#course', isActive: () => false },
-  { label: 'Arcade', href: '#arcade', isActive: () => false },
-  { label: 'War Stories', href: '#cases', isActive: () => false },
+  { label: 'Arcade', href: '/games', isActive: (path: string) => path.startsWith('/games') },
+  {
+    label: 'War Stories',
+    href: '/war-stories',
+    isActive: (path: string) => path.startsWith('/war-stories'),
+  },
   { label: 'Glossary', href: '/glossary', isActive: (path: string) => path === '/glossary' },
   { label: 'Pricing', href: '#pricing', isActive: () => false },
 ];

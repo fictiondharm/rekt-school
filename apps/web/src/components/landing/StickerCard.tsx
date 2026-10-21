@@ -1,6 +1,8 @@
 import React from 'react';
+import Link from 'next/link';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { ArrowRight } from 'lucide-react';
 
 export type StickerAccent = 'accent' | 'secondary' | 'tertiary';
 
@@ -12,6 +14,8 @@ export interface StickerCardProps {
   footer?: string;
   accent?: StickerAccent;
   className?: string;
+  /** When set the whole card becomes a link to that route. */
+  href?: string;
 }
 
 const HEADER_CLASSES: Record<StickerAccent, string> = {
@@ -31,16 +35,10 @@ export function StickerCard({
   footer,
   accent = 'accent',
   className,
+  href,
 }: StickerCardProps) {
-  return (
-    <article
-      className={twMerge(
-        clsx(
-          'wig flex flex-col overflow-hidden rounded-3xl border-2 border-ink bg-surface shadow-pop-lg',
-          className
-        )
-      )}
-    >
+  const body = (
+    <>
       <div
         className={twMerge(
           clsx(
@@ -62,7 +60,30 @@ export function StickerCard({
         {footer && (
           <div className="mt-auto pt-2 text-sm font-bold text-ink">{footer}</div>
         )}
+        {href && (
+          <div className="flex items-center gap-1 pt-1 text-sm font-bold text-accent">
+            Open {title} <ArrowRight className="h-3.5 w-3.5" />
+          </div>
+        )}
       </div>
-    </article>
+    </>
   );
+
+  const cardClass = twMerge(
+    clsx(
+      'wig flex flex-col overflow-hidden rounded-3xl border-2 border-ink bg-surface shadow-pop-lg',
+      href && 'transition-transform hover:-translate-y-1 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-accent',
+      className
+    )
+  );
+
+  if (href) {
+    return (
+      <Link href={href} className={cardClass} aria-label={`${title} - open the ${title} lessons`}>
+        {body}
+      </Link>
+    );
+  }
+
+  return <article className={cardClass}>{body}</article>;
 }

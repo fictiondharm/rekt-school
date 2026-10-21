@@ -1,4 +1,6 @@
 import React from 'react';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 import { CaseFile } from '@/components/landing/CaseFile';
 import { SectionHeading } from '@/components/landing/SectionHeading';
 
@@ -36,11 +38,19 @@ export function WarStories() {
       className="mx-auto w-full max-w-6xl scroll-mt-24 px-6 py-20 lg:py-24"
     >
       <div className="flex flex-col gap-11">
-        <SectionHeading
-          eyebrow="War Stories · Case files"
-          title="Learn from other people’s money."
-          tone="pink"
-        />
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <SectionHeading
+            eyebrow="War Stories · Case files"
+            title="Learn from other people’s money."
+            tone="pink"
+          />
+          <Link
+            href="/war-stories"
+            className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink bg-surface px-4 py-2 text-sm font-bold text-ink shadow-pop-sm transition-transform hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-accent"
+          >
+            All case files <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
         <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-7">
           {CASES.map((warCase) => (
             <CaseFile key={warCase.href} {...warCase} />

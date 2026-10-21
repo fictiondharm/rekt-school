@@ -47,10 +47,10 @@ export default function GlossaryPage() {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <Link
-                href="/learn/b1"
+                href="/"
                 className="text-xs font-semibold text-accent hover:underline flex items-center gap-1"
               >
-                <ArrowLeft className="w-3.5 h-3.5" /> Back to Lessons
+                <ArrowLeft className="w-3.5 h-3.5" /> Back to home
               </Link>
             </div>
             <h1 className="text-3xl font-heading font-bold text-ink flex items-center gap-2.5">

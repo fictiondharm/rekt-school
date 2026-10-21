@@ -37,6 +37,7 @@ export function LevelMap() {
               description="Real wallet, free faucet money. Mint a token, make your first swap, check it on an explorer."
               footer={`${LESSON_COUNTS.basic} lessons · ~84 min`}
               accent="accent"
+              href="/basic"
             />
             <StickerCard
               index="02"
@@ -45,6 +46,7 @@ export function LevelMap() {
               description="Push every curve until it breaks. AMMs, impermanent loss, lending, liquidations, tokenomics."
               footer={`${LESSON_COUNTS.intermediate} lessons`}
               accent="secondary"
+              href="/intermediate"
             />
             <StickerCard
               index="03"
@@ -53,6 +55,7 @@ export function LevelMap() {
               description="What actually drains wallets: flash loans, oracle attacks, MEV, perps. Ends with a capstone audit."
               footer={`${LESSON_COUNTS.pro} lessons`}
               accent="tertiary"
+              href="/pro"
             />
           </div>
         </div>

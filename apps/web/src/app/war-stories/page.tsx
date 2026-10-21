@@ -20,10 +20,10 @@ export default function WarStoriesPage() {
       <main className="flex-1 w-full max-w-5xl mx-auto p-6 sm:p-8 space-y-10">
         <div>
           <Link
-            href="/learn/b1"
+            href="/"
             className="text-xs font-semibold text-accent hover:underline inline-flex items-center gap-1"
           >
-            <ArrowLeft className="w-3.5 h-3.5" /> Back to Lessons
+            <ArrowLeft className="w-3.5 h-3.5" /> Back to home
           </Link>
         </div>
 

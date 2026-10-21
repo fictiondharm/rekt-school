@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Character } from '@/components/games/Character';
 import { BestScore } from '@/components/games/BestScore';
-import { ArrowRight, Wrench } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Wrench } from 'lucide-react';
 
 const COMING_SOON = [
   {
@@ -25,6 +25,9 @@ export default function GamesPage() {
   return (
     <main className="g-hub">
       <header className="g-hub-head">
+        <Link href="/" className="g-backlink">
+          <ArrowLeft size={14} /> Back to home
+        </Link>
         <span className="g-hub-kicker">Rekt School Arcade</span>
         <h1 className="g-hub-title">Games</h1>
         <p className="g-hub-sub">
