@@ -1,5 +1,6 @@
-import { createPublicClient, http, parseUnits, type Address, type Hash } from 'viem';
+import { createPublicClient, http, type Address, type Hash } from 'viem';
 import { base } from 'viem/chains';
+import { UNLOCK_USDC_BASE_UNITS } from '@/lib/pricing';
 
 export const BASE_USDC = '0x833589fCD1eD18E646dC60844d597A8678760cD0' as Address;
 export const BASE_TREASURY = '0x469a7cDbD8228fb1Eb29dA6A3D62949a880deaa2' as Address;
@@ -10,7 +11,8 @@ export const baseClient = createPublicClient({
 });
 
 export const USDC_DECIMALS = 6;
-export const ONE_USDC = parseUnits('1', USDC_DECIMALS);
+/** Minimum USDC transfer that counts as an unlock payment. */
+export const MIN_UNLOCK_USDC = BigInt(UNLOCK_USDC_BASE_UNITS);
 
 export async function verifyBasePayment(txHash: Hash): Promise<{
   valid: boolean;
@@ -46,7 +48,7 @@ export async function verifyBasePayment(txHash: Hash): Promise<{
       if (
         to?.toLowerCase() === BASE_TREASURY.toLowerCase() &&
         value !== undefined &&
-        value >= ONE_USDC
+        value >= MIN_UNLOCK_USDC
       ) {
         return { valid: true, from, amount: value };
       }

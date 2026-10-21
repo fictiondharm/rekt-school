@@ -1,18 +1,15 @@
 'use client';
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, Button, Slider, Badge } from '@/components/ui';
-import { simulateSwap, getSpotPrice } from '@defi-mommy/sim-core';
+import { useLiquidityLab } from '@/hooks/useLiquidityLab';
+import { LIQUIDITY_POOLS } from '@/lib/liquidityLab';
 import {
   RotateCcw,
   Sparkles,
-  ArrowRight,
-  TrendingDown,
   Layers,
   HelpCircle,
   CheckCircle2,
-  AlertTriangle,
-  Info,
 } from 'lucide-react';
 import { TourWrapper } from '@/components/tour/TourWrapper';
 
@@ -24,108 +21,42 @@ export interface LiquidityLabProps {
 }
 
 export function LiquidityLab({ onGoalAchieved, className, autoPlay = false }: LiquidityLabProps) {
-  // Pool mode: 'shallow' (low liquidity) or 'deep' (high liquidity)
-  const [poolType, setPoolType] = useState<'shallow' | 'deep'>('shallow');
-  const [tradeAmount, setTradeAmount] = useState<number>(50); // fUSDC
   const [showComparison, setShowComparison] = useState<boolean>(true);
-  const [hasInteracted, setHasInteracted] = useState<boolean>(false);
   const [isTourActive, setIsTourActive] = useState<boolean>(false);
 
-  // Auto-play (homepage demo): runs while in view, stops the moment the user touches a control.
-  const rootRef = useRef<HTMLDivElement>(null);
-  const userTookOver = useRef(false);
-  const [autoPlaying, setAutoPlaying] = useState(false);
+  // Shared model: same pools, math and autoplay behaviour as the homepage teaser.
+  const lab = useLiquidityLab({
+    autoPlay,
+    strategy: 'demo',
+    onGoalAchieved,
+  });
 
-  useEffect(() => {
-    if (!autoPlay || typeof IntersectionObserver === 'undefined') return;
-    const el = rootRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) setAutoPlaying(entry.isIntersecting);
-      },
-      { threshold: 0.4 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [autoPlay]);
+  const { poolType, tradeAmount } = lab;
 
-  useEffect(() => {
-    if (!autoPlay || !autoPlaying || userTookOver.current) return;
-    setHasInteracted(true);
-    let step = 0;
-    const id = setInterval(() => {
-      if (userTookOver.current) {
-        clearInterval(id);
-        return;
-      }
-      step += 1;
-      const wave = (Math.sin(step / 8) + 1) / 2; // 0..1
-      setTradeAmount(Math.max(10, Math.round((10 + wave * 490) / 10) * 10));
-      if (step % 28 === 0) {
-        setPoolType((p) => (p === 'shallow' ? 'deep' : 'shallow'));
-      }
-    }, 110);
-    return () => clearInterval(id);
-  }, [autoPlay, autoPlaying]);
-
-  // Pool configurations:
+  // Pool configurations (single source of truth in @/lib/liquidityLab):
   // Shallow Pool: 10 SOL, 2,000 fUSDC ($200/SOL spot price, $4,000 total TVL)
   // Deep Ocean Pool: 1,000 SOL, 200,000 fUSDC ($200/SOL spot price, $400,000 total TVL)
-  const shallowReserves = { sol: 10, usdc: 2000 };
-  const deepReserves = { sol: 1000, usdc: 200000 };
+  const currentReserves = poolType === 'shallow' ? LIQUIDITY_POOLS.shallow : LIQUIDITY_POOLS.deep;
 
-  const currentReserves = poolType === 'shallow' ? shallowReserves : deepReserves;
+  // Swap results for both pools, so the comparison stays honest.
+  const swapResult = poolType === 'shallow' ? lab.shallowTrade : lab.deepTrade;
+  const comparisonSwapResult = poolType === 'shallow' ? lab.deepTrade : lab.shallowTrade;
 
-  // Swap calculation: swapping fUSDC (token B) for SOL (token A)
-  // simulateSwap(amountIn, reserveA, reserveB, aToB = false, fee = 0.003)
-  const swapResult = useMemo(() => {
-    return simulateSwap(
-      tradeAmount,
-      currentReserves.sol,
-      currentReserves.usdc,
-      false, // B -> A (fUSDC to SOL)
-      0.003
-    );
-  }, [tradeAmount, currentReserves]);
-
-  // Comparison swap on the opposite pool for side-by-side comparison
-  const comparisonSwapResult = useMemo(() => {
-    const oppReserves = poolType === 'shallow' ? deepReserves : shallowReserves;
-    return simulateSwap(
-      tradeAmount,
-      oppReserves.sol,
-      oppReserves.usdc,
-      false,
-      0.003
-    );
-  }, [tradeAmount, poolType]);
-
-  const spotPrice = getSpotPrice(currentReserves.sol, currentReserves.usdc); // 200 fUSDC per SOL
-  const impactPct = swapResult.priceImpact * 100;
-
-  const handlePoolToggle = (type: 'shallow' | 'deep') => {
-    userTookOver.current = true;
-    setPoolType(type);
-    setHasInteracted(true);
-    if (type === 'deep' && onGoalAchieved) {
-      onGoalAchieved();
-    }
-  };
+  const spotPrice = swapResult.spotPrice; // 200 fUSDC per SOL
+  const impactPct = swapResult.impactPct;
 
   const handleReset = () => {
-    userTookOver.current = true;
-    setPoolType('shallow');
-    setTradeAmount(50);
+    lab.reset();
     setShowComparison(true);
   };
 
   // SVG Curve generation for constant product x * y = k
   const curvePoints = useMemo(() => {
-    const k = currentReserves.sol * currentReserves.usdc;
+    const reserves = LIQUIDITY_POOLS[poolType];
+    const k = reserves.sol * reserves.usdc;
     const points: { x: number; y: number }[] = [];
-    const minSol = currentReserves.sol * 0.4;
-    const maxSol = currentReserves.sol * 2.2;
+    const minSol = reserves.sol * 0.4;
+    const maxSol = reserves.sol * 2.2;
     const steps = 30;
 
     for (let i = 0; i <= steps; i++) {
@@ -133,12 +64,11 @@ export function LiquidityLab({ onGoalAchieved, className, autoPlay = false }: Li
       const usdcVal = k / solVal;
       // Map to SVG viewBox 0..240 (x) and 0..160 (y)
       const svgX = 20 + (i / steps) * 200;
-      const normalizedY =
-        140 - ((usdcVal - currentReserves.usdc * 0.4) / (currentReserves.usdc * 2.5)) * 110;
+      const normalizedY = 140 - ((usdcVal - reserves.usdc * 0.4) / (reserves.usdc * 2.5)) * 110;
       points.push({ x: svgX, y: Math.max(15, Math.min(145, normalizedY)) });
     }
     return points;
-  }, [currentReserves]);
+  }, [poolType]);
 
   const pathD = curvePoints.reduce(
     (acc, pt, idx) => `${acc} ${idx === 0 ? 'M' : 'L'} ${pt.x} ${pt.y}`,
@@ -184,7 +114,7 @@ export function LiquidityLab({ onGoalAchieved, className, autoPlay = false }: Li
   ];
 
   return (
-    <div ref={rootRef} className={`w-full max-w-2xl mx-auto space-y-5 ${className || ''}`}>
+    <div ref={lab.rootRef} className={`w-full max-w-2xl mx-auto space-y-5 ${className || ''}`}>
       <TourWrapper
         steps={tourSteps}
         isActive={isTourActive}
@@ -226,7 +156,7 @@ export function LiquidityLab({ onGoalAchieved, className, autoPlay = false }: Li
       <div data-tour="pool-selector" className="grid grid-cols-2 gap-3 p-1.5 bg-border/40 rounded-xl">
         <button
           type="button"
-          onClick={() => handlePoolToggle('shallow')}
+          onClick={() => lab.setPoolType('shallow')}
           className={`py-3 px-4 rounded-lg font-heading font-bold text-xs transition-all flex flex-col items-center gap-1 ${
             poolType === 'shallow'
               ? 'bg-surface text-ink shadow-sm ring-2 ring-warn/50'
@@ -244,7 +174,7 @@ export function LiquidityLab({ onGoalAchieved, className, autoPlay = false }: Li
 
         <button
           type="button"
-          onClick={() => handlePoolToggle('deep')}
+          onClick={() => lab.setPoolType('deep')}
           className={`py-3 px-4 rounded-lg font-heading font-bold text-xs transition-all flex flex-col items-center gap-1 ${
             poolType === 'deep'
               ? 'bg-surface text-ink shadow-sm ring-2 ring-accent/50'
@@ -273,11 +203,7 @@ export function LiquidityLab({ onGoalAchieved, className, autoPlay = false }: Li
               max={500}
               step={10}
               unit="fUSDC"
-              onChange={(val) => {
-                userTookOver.current = true;
-                setTradeAmount(val);
-                setHasInteracted(true);
-              }}
+              onChange={(val) => lab.setTradeAmount(val)}
             />
           </div>
 
@@ -424,7 +350,7 @@ export function LiquidityLab({ onGoalAchieved, className, autoPlay = false }: Li
               <div className="flex justify-between">
                 <span className="text-ink-soft">Price impact:</span>
                 <span className="font-mono font-bold text-red-600">
-                  {((poolType === 'shallow' ? swapResult : comparisonSwapResult).priceImpact * 100).toFixed(2)}%
+                  {(poolType === 'shallow' ? swapResult : comparisonSwapResult).impactPct.toFixed(2)}%
                 </span>
               </div>
             </div>
@@ -442,9 +368,9 @@ export function LiquidityLab({ onGoalAchieved, className, autoPlay = false }: Li
               <div className="flex justify-between">
                 <span className="text-ink-soft">Price impact:</span>
                 <span className="font-mono font-bold text-emerald-700">
-                  {((poolType === 'deep' ? swapResult : comparisonSwapResult).priceImpact * 100 < 0.01
+                  {(poolType === 'deep' ? swapResult : comparisonSwapResult).impactPct < 0.01
                     ? '<0.01%'
-                    : `${((poolType === 'deep' ? swapResult : comparisonSwapResult).priceImpact * 100).toFixed(2)}%`)}
+                    : `${(poolType === 'deep' ? swapResult : comparisonSwapResult).impactPct.toFixed(2)}%`}
                 </span>
               </div>
             </div>
@@ -453,7 +379,7 @@ export function LiquidityLab({ onGoalAchieved, className, autoPlay = false }: Li
       )}
 
       {/* "What Just Happened?" Educational Callout Card */}
-      {hasInteracted && (
+      {lab.hasInteracted && (
         <Card className="p-4 bg-surface border-2 border-ink rounded-xl shadow-pop-lg flex items-start gap-3">
           <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
           <div className="space-y-1 text-xs">

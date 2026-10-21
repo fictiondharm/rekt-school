@@ -3,6 +3,7 @@ import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { supabase } from '@/lib/supabase';
 import { verifyBasePayment, BASE_TREASURY } from '@/lib/base';
 import { baseClient } from '@/lib/base';
+import { UNLOCK_PRICE_USD, UNLOCK_USDC_BASE_UNITS } from '@/lib/pricing';
 
 const SOLANA_MAINNET_RPC = process.env.SOLANA_MAINNET_RPC_URL || 'https://api.mainnet-beta.solana.com';
 const SOLANA_DEVNET_RPC = process.env.SOLANA_DEVNET_RPC_URL || 'https://api.devnet.solana.com';
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
         const result = await verifyBasePayment(txHash as `0x${string}`);
         valid = result.valid;
         if (result.from) from = result.from;
-        if (valid) usdValue = 1;
+        if (valid) usdValue = UNLOCK_PRICE_USD;
       } else {
         try {
           const receipt = await baseClient.getTransactionReceipt({ hash: txHash as `0x${string}` });
@@ -66,7 +67,7 @@ export async function POST(req: NextRequest) {
           const diff = tx.meta.postBalances[treasuryIdx] - tx.meta.preBalances[treasuryIdx];
           if (diff > 0) {
             if (asset === 'USDC') {
-              if (diff >= 900_000) {
+              if (diff >= UNLOCK_USDC_BASE_UNITS) {
                 valid = true;
                 from = accountKeys[0].pubkey.toBase58();
                 usdValue = diff / 1_000_000;
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
               const solAmount = diff / LAMPORTS_PER_SOL;
               const price = await getUsdPrice('solana');
               usdValue = solAmount * price;
-              if (usdValue >= 1) {
+              if (usdValue >= UNLOCK_PRICE_USD) {
                 valid = true;
                 from = accountKeys[0].pubkey.toBase58();
               }
@@ -86,11 +87,11 @@ export async function POST(req: NextRequest) {
     }
 
     if (!valid) {
-      return NextResponse.json({ success: false, message: 'Payment not found or below $1. Wait a few seconds and retry.' });
+      return NextResponse.json({ success: false, message: `Payment not found or below $${UNLOCK_PRICE_USD.toFixed(2)}. Wait a few seconds and retry.` });
     }
 
-    if (usdValue < 1) {
-      return NextResponse.json({ success: false, message: `Payment worth $${usdValue.toFixed(2)}. Must be at least $1.` });
+    if (usdValue < UNLOCK_PRICE_USD) {
+      return NextResponse.json({ success: false, message: `Payment worth $${usdValue.toFixed(2)}. Must be at least $${UNLOCK_PRICE_USD.toFixed(2)}.` });
     }
 
     // Record the payment best-effort. A DB hiccup must not block the user from
@@ -100,7 +101,7 @@ export async function POST(req: NextRequest) {
         reference: txHash,
         signature: txHash,
         payer_wallet: from,
-        amount_usdc: 1,
+        amount_usdc: UNLOCK_PRICE_USD,
         status: 'paid',
         paid_at: new Date().toISOString(),
       });

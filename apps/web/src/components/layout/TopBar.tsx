@@ -15,6 +15,14 @@ interface TopBarProps {
   showTourButton?: boolean;
   tier?: Tier;
   lessonId?: string;
+  /** Replaces the default course navigation (used by the landing page). */
+  navLinks?: NavLink[];
+  /** Hides the Aura chip. */
+  showAura?: boolean;
+  /** Hides the connect-wallet chip. */
+  showWallet?: boolean;
+  /** Call to action rendered at the end of the navigation. */
+  cta?: { label: string; href: string };
 }
 
 interface NavLink {
@@ -56,7 +64,15 @@ const NAV_LINKS: NavLink[] = [
   },
 ];
 
-export function TopBar({ lessonTitle, aura = 0, showTourButton = false }: TopBarProps) {
+export function TopBar({
+  lessonTitle,
+  aura = 0,
+  showTourButton = false,
+  navLinks = NAV_LINKS,
+  showAura = true,
+  showWallet = true,
+  cta,
+}: TopBarProps) {
   const pathname = usePathname() || '/';
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -65,7 +81,7 @@ export function TopBar({ lessonTitle, aura = 0, showTourButton = false }: TopBar
   }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-30 bg-white border-b-2 border-ink">
+    <header className="sticky top-0 z-30 bg-bg border-b-2 border-ink">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           <Link
@@ -91,7 +107,7 @@ export function TopBar({ lessonTitle, aura = 0, showTourButton = false }: TopBar
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map((link) => {
+            {navLinks.map((link) => {
               const active = link.isActive(pathname);
               return (
                 <Link
@@ -101,13 +117,21 @@ export function TopBar({ lessonTitle, aura = 0, showTourButton = false }: TopBar
                   className={`px-3 py-1.5 rounded-full text-sm font-bold transition-colors ${
                     active
                       ? 'bg-accent text-white'
-                      : 'text-ink hover:bg-accent/10 hover:text-accent'
+                      : 'text-ink hover:bg-accent-light hover:text-accent'
                   }`}
                 >
                   {link.label}
                 </Link>
               );
             })}
+            {cta && (
+              <Link
+                href={cta.href}
+                className="pop ml-2 inline-flex min-h-12 items-center rounded-full border-2 border-ink bg-accent-strong px-5 text-sm font-bold text-white shadow-pop focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-accent"
+              >
+                {cta.label}
+              </Link>
+            )}
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
@@ -116,21 +140,23 @@ export function TopBar({ lessonTitle, aura = 0, showTourButton = false }: TopBar
                 Tour
               </button>
             )}
-            <div
-              data-tour="topbar-aura"
-              title="Aura: correct answers add Aura, wrong ones subtract it"
-              className="hidden sm:flex bg-tertiary text-ink border-2 border-ink px-3 py-1 font-bold text-sm rounded-full items-center gap-1.5"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              {aura} Aura
-            </div>
-            <WalletChip />
+            {showAura && (
+              <div
+                data-tour="topbar-aura"
+                title="Aura: correct answers add Aura, wrong ones subtract it"
+                className="hidden sm:flex bg-tertiary text-ink border-2 border-ink px-3 py-1 font-bold text-sm rounded-full items-center gap-1.5"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                {aura} Aura
+              </div>
+            )}
+            {showWallet && <WalletChip />}
             <button
               type="button"
               onClick={() => setMenuOpen((o) => !o)}
               aria-label={menuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={menuOpen}
-              className="md:hidden p-2 rounded-lg border-2 border-ink bg-white hover:bg-accent/10 transition-colors shrink-0"
+              className="md:hidden p-2 rounded-lg border-2 border-ink bg-white hover:bg-accent-light transition-colors shrink-0"
             >
               {menuOpen ? <X className="w-5 h-5 text-ink" /> : <Menu className="w-5 h-5 text-ink" />}
             </button>
@@ -139,9 +165,9 @@ export function TopBar({ lessonTitle, aura = 0, showTourButton = false }: TopBar
       </div>
 
       {menuOpen && (
-        <div className="md:hidden border-t-2 border-ink bg-white animate-in fade-in">
+        <div className="md:hidden border-t-2 border-ink bg-bg animate-in fade-in">
           <nav className="mx-auto max-w-6xl px-4 sm:px-6 py-3 flex flex-col gap-1">
-            {NAV_LINKS.map((link) => {
+            {navLinks.map((link) => {
               const active = link.isActive(pathname);
               return (
                 <Link
@@ -150,13 +176,22 @@ export function TopBar({ lessonTitle, aura = 0, showTourButton = false }: TopBar
                   aria-current={active ? 'page' : undefined}
                   onClick={() => setMenuOpen(false)}
                   className={`px-3 py-2.5 rounded-lg text-sm font-bold transition-colors ${
-                    active ? 'bg-accent text-white' : 'text-ink hover:bg-accent/10 hover:text-accent'
+                    active ? 'bg-accent text-white' : 'text-ink hover:bg-accent-light hover:text-accent'
                   }`}
                 >
                   {link.label}
                 </Link>
               );
             })}
+            {cta && (
+              <Link
+                href={cta.href}
+                onClick={() => setMenuOpen(false)}
+                className="mt-1 inline-flex min-h-12 items-center justify-center rounded-full border-2 border-ink bg-accent-strong px-5 text-sm font-bold text-white shadow-pop"
+              >
+                {cta.label}
+              </Link>
+            )}
           </nav>
         </div>
       )}

@@ -45,6 +45,9 @@ import { P12Companion } from '@/components/lesson-engine/companions/pro/P12Compa
 import { FaucetWidget, PaymentModal, StuckChecklistCard, RaydiumSwapCard } from '@/components/onchain';
 import { canAccess, isAccessGateEnabled } from '@/lib/access';
 import { getLocalAura } from '@/lib/progress';
+import { PRICING_COPY, UNLOCK_PRICE_INR, type PaymentMethod } from '@/lib/pricing';
+import { startUpiCheckoutStub } from '@/lib/upiCheckout';
+import { hasUnlockedCourse, setCourseUnlocked } from '@/lib/unlock';
 import { Button, Card, Badge } from '@/components/ui';
 import { Lock, KeyRound, CheckCircle2, ArrowLeft, Lightbulb, Coins, BookOpen, X } from 'lucide-react';
 
@@ -65,15 +68,13 @@ export default function DynamicLessonPage({ params }: PageProps) {
   const [inviteInput, setInviteInput] = useState('');
   const [redeemLoading, setRedeemLoading] = useState(false);
   const [redeemError, setRedeemError] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('upi');
+  const [upiError, setUpiError] = useState<string | null>(null);
 
   useEffect(() => {
     setAura(getLocalAura());
     const checkUnlock = () => {
-      const unlocked =
-        localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
-        localStorage.getItem('defi_mommy_unlocked_all') === 'true' ||
-        localStorage.getItem('defi_quest_unlocked_all') === 'true';
-      if (unlocked) setHasUnlockedAll(true);
+      setHasUnlockedAll(hasUnlockedCourse());
     };
     checkUnlock();
     window.addEventListener('storage', checkUnlock);
@@ -118,9 +119,8 @@ export default function DynamicLessonPage({ params }: PageProps) {
       const data = await res.json();
 
       if (data.success) {
+        setCourseUnlocked();
         setHasUnlockedAll(true);
-        localStorage.setItem('defi_maxi_unlocked_all', 'true');
-        window.dispatchEvent(new Event('storage'));
       } else {
         setRedeemError(data.message || 'Invalid invite code.');
       }
@@ -129,6 +129,16 @@ export default function DynamicLessonPage({ params }: PageProps) {
     } finally {
       setRedeemLoading(false);
     }
+  };
+
+  const handleUnlockCta = async () => {
+    if (paymentMethod === 'crypto') {
+      setPaymentModalOpen(true);
+      return;
+    }
+    setUpiError(null);
+    const result = await startUpiCheckoutStub({ amountInr: UNLOCK_PRICE_INR });
+    if (!result.ok) setUpiError(result.message);
   };
 
   // Practice companion selector
@@ -264,13 +274,66 @@ export default function DynamicLessonPage({ params }: PageProps) {
                   {lesson.id}: {lesson.title}
                 </h3>
                 <p className="text-xs text-ink-soft leading-relaxed">
-                  This lesson is part of the full curriculum. Unlock the full course for $1 USDC on
-                  Solana or Base, or ask the owner for an invite code to unlock for free.
+                  This lesson is part of the full curriculum. Unlock every lesson once with UPI
+                  (₹{UNLOCK_PRICE_INR}) or USDC ($1.49) and keep them forever.
                 </p>
               </div>
 
+              {/* Payment method toggle */}
+              <div
+                role="group"
+                aria-label="Payment method"
+                className="flex gap-1.5 rounded-full border-2 border-ink bg-bg p-1.5"
+              >
+                {(['upi', 'crypto'] as PaymentMethod[]).map((option) => {
+                  const active = paymentMethod === option;
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => setPaymentMethod(option)}
+                      className={`flex-1 min-h-11 rounded-full border-2 px-4 py-2 text-xs font-bold transition-colors ${
+                        active
+                          ? 'border-ink bg-accent-strong text-white'
+                          : 'border-transparent bg-transparent text-ink'
+                      }`}
+                    >
+                      {option === 'upi' ? 'Pay with UPI' : 'Pay with USDC'}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <Button
+                type="button"
+                variant="primary"
+                onClick={handleUnlockCta}
+                className="w-full gap-2 text-xs"
+              >
+                <Coins className="w-4 h-4" /> {PRICING_COPY[paymentMethod].ctaLabel}
+              </Button>
+
+              <p className="text-[11px] text-ink-faint text-center -mt-3">
+                {PRICING_COPY[paymentMethod].payHint}
+              </p>
+
+              {upiError && (
+                <div className="p-3 rounded-lg bg-tertiary/20 text-ink border-2 border-tertiary text-xs">
+                  {upiError}
+                </div>
+              )}
+
               {/* Inline Redeem Form */}
               <form onSubmit={handleRedeemInline} className="space-y-3">
+                <div className="relative flex py-1 items-center">
+                  <div className="flex-grow border-t border-border"></div>
+                  <span className="flex-shrink mx-2 text-[10px] text-ink-soft uppercase font-bold">
+                    or use an invite code
+                  </span>
+                  <div className="flex-grow border-t border-border"></div>
+                </div>
+
                 <input
                   type="text"
                   placeholder="Enter your unlock code"
@@ -281,26 +344,11 @@ export default function DynamicLessonPage({ params }: PageProps) {
 
                 <Button
                   type="submit"
-                  variant="primary"
+                  variant="secondary"
                   isLoading={redeemLoading}
                   className="w-full gap-2 text-xs"
                 >
                   <KeyRound className="w-4 h-4" /> Unlock All Lessons
-                </Button>
-
-                <div className="relative flex py-1 items-center">
-                  <div className="flex-grow border-t border-border"></div>
-                  <span className="flex-shrink mx-2 text-[10px] text-ink-soft uppercase font-bold">or</span>
-                  <div className="flex-grow border-t border-border"></div>
-                </div>
-
-                <Button
-                  type="button"
-                  variant="accent"
-                  onClick={() => setPaymentModalOpen(true)}
-                  className="w-full gap-2 text-xs"
-                >
-                  <Coins className="w-4 h-4" /> Unlock Course for $1 USDC
                 </Button>
               </form>
 
@@ -382,9 +430,8 @@ export default function DynamicLessonPage({ params }: PageProps) {
         isOpen={paymentModalOpen}
         onClose={() => setPaymentModalOpen(false)}
         onSuccess={() => {
+          setCourseUnlocked();
           setHasUnlockedAll(true);
-          localStorage.setItem('defi_maxi_unlocked_all', 'true');
-          window.dispatchEvent(new Event('storage'));
         }}
       />
     </div>

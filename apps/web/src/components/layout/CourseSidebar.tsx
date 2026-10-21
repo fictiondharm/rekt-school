@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui';
 import { CheckCircle2, Lock, Play, ChevronLeft, ChevronRight, BookOpen, Skull } from 'lucide-react';
 import { isAccessGateEnabled } from '@/lib/access';
+import { hasUnlockedCourse } from '@/lib/unlock';
 
 export interface CourseSidebarProps {
   currentLessonId?: string;
@@ -27,11 +28,7 @@ export function CourseSidebar({
     const checkUnlock = () => {
       if (typeof window !== 'undefined') {
         setGateEnabled(isAccessGateEnabled());
-        const unlocked =
-          localStorage.getItem('defi_maxi_unlocked_all') === 'true' ||
-          localStorage.getItem('defi_mommy_unlocked_all') === 'true' ||
-          localStorage.getItem('defi_quest_unlocked_all') === 'true';
-        setHasUnlockedAll(unlocked);
+        setHasUnlockedAll(hasUnlockedCourse());
       }
     };
     checkUnlock();

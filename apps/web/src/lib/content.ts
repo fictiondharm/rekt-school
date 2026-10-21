@@ -20,6 +20,10 @@ import i7Data from '../../../../content/lessons/intermediate/I7.json';
 import i8Data from '../../../../content/lessons/intermediate/I8.json';
 import i9Data from '../../../../content/lessons/intermediate/I9.json';
 import i10Data from '../../../../content/lessons/intermediate/I10.json';
+import i11Data from '../../../../content/lessons/intermediate/I11.json';
+import i12Data from '../../../../content/lessons/intermediate/I12.json';
+import i13Data from '../../../../content/lessons/intermediate/I13.json';
+import i14Data from '../../../../content/lessons/intermediate/I14.json';
 import p1Data from '../../../../content/lessons/pro/P1.json';
 import p2Data from '../../../../content/lessons/pro/P2.json';
 import p3Data from '../../../../content/lessons/pro/P3.json';
@@ -65,6 +69,10 @@ export const LESSONS_MAP: Record<string, Lesson> = {
   I8: i8Data as unknown as Lesson,
   I9: i9Data as unknown as Lesson,
   I10: i10Data as unknown as Lesson,
+  I11: i11Data as unknown as Lesson,
+  I12: i12Data as unknown as Lesson,
+  I13: i13Data as unknown as Lesson,
+  I14: i14Data as unknown as Lesson,
   P1: p1Data as unknown as Lesson,
   P2: p2Data as unknown as Lesson,
   P3: p3Data as unknown as Lesson,

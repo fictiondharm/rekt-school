@@ -9,6 +9,8 @@ import { getAssociatedTokenAddress, createTransferInstruction } from '@solana/sp
 import { createPublicClient, http, parseUnits, parseEther, type Address } from 'viem';
 import { base } from 'viem/chains';
 import { BASE_USDC, BASE_TREASURY } from '@/lib/base';
+import { UNLOCK_PRICE_USD, UNLOCK_USDC_AMOUNT, UNLOCK_USDC_BASE_UNITS } from '@/lib/pricing';
+import { setCourseUnlocked } from '@/lib/unlock';
 
 const USDC_ABI = [
   {
@@ -127,7 +129,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
         const usdcMint = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v');
         const fromATA = await getAssociatedTokenAddress(usdcMint, publicKey);
         const toATA = await getAssociatedTokenAddress(usdcMint, treasury);
-        tx.add(createTransferInstruction(fromATA, toATA, publicKey, 1_000_000));
+        tx.add(createTransferInstruction(fromATA, toATA, publicKey, UNLOCK_USDC_BASE_UNITS));
       } else {
         const solAmount = parseFloat(amount);
         if (isNaN(solAmount) || solAmount <= 0) {
@@ -172,7 +174,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
           params: [{
             from: evmAddress,
             to: BASE_USDC,
-            data: encodeUsdcTransfer(BASE_TREASURY, parseUnits('1', 6)),
+            data: encodeUsdcTransfer(BASE_TREASURY, parseUnits(UNLOCK_USDC_AMOUNT, 6)),
           }],
         });
       } else {
@@ -214,7 +216,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
       if (data.success) {
         setCode(data.code);
         setStatus('done');
-        localStorage.setItem('defi_maxi_unlocked_all', 'true');
+        setCourseUnlocked();
         onSuccess();
       } else {
         setStatus('error');
@@ -245,7 +247,9 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
         <div className="flex justify-between items-start pb-2 border-b border-border">
           <div>
             <Badge variant="accent" className="text-[10px] mb-1">EARLY ACCESS</Badge>
-            <h3 className="font-heading font-bold text-xl text-ink">Unlock All Lessons for $1</h3>
+            <h3 className="font-heading font-bold text-xl text-ink">
+              Unlock All Lessons for ${UNLOCK_PRICE_USD.toFixed(2)}
+            </h3>
           </div>
           <button type="button" onClick={onClose} className="text-xs font-semibold text-ink-soft hover:text-ink">Close</button>
         </div>
@@ -296,7 +300,9 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
               {asset === 'USDC' && (
                 <div className="flex justify-between">
                   <span className="text-ink-soft">Amount:</span>
-                  <span className="font-mono font-bold text-accent text-sm">1.00 USDC</span>
+                  <span className="font-mono font-bold text-accent text-sm">
+                    {UNLOCK_USDC_AMOUNT} USDC
+                  </span>
                 </div>
               )}
               {needsAmount && (
@@ -311,7 +317,9 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
                     placeholder={asset === 'SOL' ? '0.005' : '0.0003'}
                     className="mt-1 w-full px-3 py-2 text-sm font-mono bg-white rounded-lg border-2 border-border focus:border-accent focus:outline-none"
                   />
-                  <p className="text-[11px] text-ink-faint mt-1">Must be worth at least $1 USD</p>
+                  <p className="text-[11px] text-ink-faint mt-1">
+                    Must be worth at least ${UNLOCK_PRICE_USD.toFixed(2)} USD
+                  </p>
                 </div>
               )}
             </div>

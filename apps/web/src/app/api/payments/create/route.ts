@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Keypair } from '@solana/web3.js';
+import { UNLOCK_PRICE_USD } from '@/lib/pricing';
 
 const pendingPayments: Record<string, { reference: string; amount: number; receiver: string; chain: string; createdAt: number }> = {};
 
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
 
     pendingPayments[referencePubkey] = {
       reference: referencePubkey,
-      amount: 1,
+      amount: UNLOCK_PRICE_USD,
       receiver,
       chain,
       createdAt: Date.now(),
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
       success: true,
       reference: referencePubkey,
       receiver,
-      amount: 1,
+      amount: UNLOCK_PRICE_USD,
       currency: 'USDC',
       chain,
     });

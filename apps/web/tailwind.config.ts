@@ -8,6 +8,10 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        // Reference breakpoint: the two-column hero / level map layout.
+        desktop: '860px',
+      },
       colors: {
         bg: 'var(--bg)',
         surface: {
@@ -23,16 +27,30 @@ const config: Config = {
           DEFAULT: 'var(--accent)',
           fg: 'var(--accent-fg)',
           light: '#EDE9FE',
-          hover: '#7C3AED',
+          hover: 'var(--accent-strong)',
+          strong: 'var(--accent-strong)',
+          tint: 'var(--accent-tint)',
         },
         primary: {
           DEFAULT: 'var(--accent)',
           light: '#EDE9FE',
-          hover: '#7C3AED',
+          hover: 'var(--accent-strong)',
         },
-        secondary: 'var(--secondary)',
-        tertiary: 'var(--tertiary)',
-        quaternary: 'var(--quaternary)',
+        secondary: {
+          DEFAULT: 'var(--secondary)',
+          dark: 'var(--secondary-dark)',
+          tint: 'var(--secondary-tint)',
+        },
+        tertiary: {
+          DEFAULT: 'var(--tertiary)',
+          dark: 'var(--tertiary-dark)',
+          tint: 'var(--tertiary-tint)',
+        },
+        quaternary: {
+          DEFAULT: 'var(--quaternary)',
+          tint: 'var(--quaternary-tint)',
+        },
+        line: 'var(--line)',
         warn: {
           DEFAULT: '#F59E0B',
           light: '#FEF3C7',
@@ -61,16 +79,21 @@ const config: Config = {
         button: '9999px',
       },
       fontFamily: {
-        sans: ['DM Sans', 'system-ui', 'sans-serif'],
-        heading: ['Outfit', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace'],
+        sans: ['var(--font-jakarta)', 'system-ui', 'sans-serif'],
+        heading: ['var(--font-outfit)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-mono)', 'monospace'],
       },
       boxShadow: {
         pop: '4px 4px 0px 0px var(--ink)',
         'pop-sm': '2px 2px 0px 0px var(--ink)',
+        'pop-xs': '3px 3px 0px 0px var(--ink)',
         'pop-lg': '8px 8px 0px 0px var(--border)',
+        'pop-ink-lg': '8px 8px 0px 0px var(--ink)',
         'pop-accent': '4px 4px 0px 0px var(--accent)',
+        'pop-accent-lg': '8px 8px 0px 0px var(--accent)',
         'pop-pink': '8px 8px 0px 0px var(--secondary)',
+        'pop-tertiary': '8px 8px 0px 0px var(--tertiary)',
+        'pop-mint': '8px 8px 0px 0px var(--quaternary)',
         'pop-hover': '6px 6px 0px 0px var(--ink)',
         'pop-active': '2px 2px 0px 0px var(--ink)',
       },
