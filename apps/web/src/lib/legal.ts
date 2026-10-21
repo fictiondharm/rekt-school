@@ -12,7 +12,7 @@ export const BUSINESS = {
   /** Domain the service is operated from. */
   domain: 'rektschool.app',
   /** Support address shown on the contact page and in every legal page. */
-  supportEmail: 'support@rektschool.app',
+  supportEmail: 'webdharme@gmail.com',
   /** Country that governs these terms. */
   jurisdiction: 'India',
   /** City used in the governing law clause. */
