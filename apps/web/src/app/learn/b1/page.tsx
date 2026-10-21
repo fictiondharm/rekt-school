@@ -27,7 +27,6 @@ export default function LessonB1Page() {
         lessonTitle={`${lesson.id}: ${lesson.title}`}
         aura={aura}
         streak={1}
-        showTourButton={true}
         lessonId={lesson.id}
       />
 

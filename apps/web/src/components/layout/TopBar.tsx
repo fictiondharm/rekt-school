@@ -13,7 +13,6 @@ interface TopBarProps {
   lessonTitle?: string;
   aura?: number;
   streak?: number;
-  showTourButton?: boolean;
   tier?: Tier;
   lessonId?: string;
   /** Replaces the shared navigation (rarely needed). */
@@ -29,7 +28,6 @@ interface TopBarProps {
 export function TopBar({
   lessonTitle,
   aura = 0,
-  showTourButton = false,
   navLinks = SITE_NAV,
   showAura = true,
   showWallet = true,
@@ -108,11 +106,6 @@ export function TopBar({
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            {showTourButton && (
-              <button className="bg-tertiary text-ink border-2 border-ink px-4 py-1.5 font-bold text-xs rounded-full hover:shadow-pop-sm transition-all active:translate-x-[1px] active:translate-y-[1px]">
-                Tour
-              </button>
-            )}
             {showAura && (
               <div
                 data-tour="topbar-aura"

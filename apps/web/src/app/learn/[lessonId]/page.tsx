@@ -249,7 +249,6 @@ export default function DynamicLessonPage({ params }: PageProps) {
         lessonTitle={`${lesson.id}: ${lesson.title}`}
         aura={aura}
         streak={1}
-        showTourButton={lesson.id === 'B1'}
         tier={lesson.tier}
         lessonId={lesson.id}
       />
