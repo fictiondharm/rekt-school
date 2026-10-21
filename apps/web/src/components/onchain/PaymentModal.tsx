@@ -1,30 +1,22 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Badge } from '@/components/ui';
-import { DollarSign, CheckCircle2, ShieldCheck, Copy } from 'lucide-react';
+import { DollarSign, CheckCircle2, ShieldCheck, Wallet } from 'lucide-react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Connection, SystemProgram, Transaction, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { getAssociatedTokenAddress, createTransferInstruction } from '@solana/spl-token';
-import { createPublicClient, http, parseUnits, parseEther, type Address } from 'viem';
+import {
+  getAssociatedTokenAddress,
+  createTransferInstruction,
+  createAssociatedTokenAccountIdempotentInstruction,
+  getMint,
+} from '@solana/spl-token';
+import { createPublicClient, http, parseEther, type Address } from 'viem';
 import { base } from 'viem/chains';
 import { BASE_USDC, BASE_TREASURY } from '@/lib/base';
-import { UNLOCK_PRICE_USD, UNLOCK_USDC_AMOUNT, UNLOCK_USDC_BASE_UNITS } from '@/lib/pricing';
+import { UNLOCK_PRICE_USD, UNLOCK_USDC_AMOUNT } from '@/lib/pricing';
 import { setCourseUnlocked } from '@/lib/unlock';
 import { WalletConnectButton } from './WalletPicker';
-
-const USDC_ABI = [
-  {
-    type: 'function',
-    name: 'transfer',
-    stateMutability: 'nonpayable',
-    inputs: [
-      { name: 'to', type: 'address' },
-      { name: 'amount', type: 'uint256' },
-    ],
-    outputs: [{ name: '', type: 'bool' }],
-  },
-] as const;
 
 type Chain = 'solana-mainnet' | 'solana-devnet' | 'base';
 type Asset = 'USDC' | 'SOL' | 'ETH';
@@ -35,6 +27,25 @@ const CHAIN_ASSETS: Record<Chain, Asset[]> = {
   base: ['USDC', 'ETH'],
 };
 
+/** Solana mainnet USDC mint. */
+const SOLANA_USDC_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
+// Devnet has its own tokens: the course fUSDC (from the in-app faucet) and
+// Circle's devnet USDC.
+const SOLANA_DEVNET_USDC_MINT = 'G5U9iSQwKogEbdQx9DuJ6qFcRyYpkqbtFiafCtLFoHNd';
+
+/** Treasury wallet that receives the unlock payment. */
+const TREASURY_SOLANA = 'HtKPeixUAG5a28rxn4weDqyNfwb8BwSmEp7y7xfZHTf5';
+
+/** Used when the live price feed is unreachable. */
+const FALLBACK_PRICES: Record<Asset, number> = {
+  USDC: 1,
+  SOL: 150,
+  ETH: 3000,
+};
+
+/** Buffer so a small price move between filling and paying never under-pays. */
+const PRICE_BUFFER = 1.03;
+
 export interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -44,11 +55,10 @@ export interface PaymentModalProps {
 export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) {
   const [chain, setChain] = useState<Chain>('solana-mainnet');
   const [asset, setAsset] = useState<Asset>('USDC');
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState(UNLOCK_USDC_AMOUNT);
+  const [priceUsd, setPriceUsd] = useState<number>(1);
   const [status, setStatus] = useState<'idle' | 'pending' | 'confirming' | 'done' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
-  const [code, setCode] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
   const [evmAddress, setEvmAddress] = useState<Address | null>(null);
   const [evmChainId, setEvmChainId] = useState<number | null>(null);
 
@@ -99,12 +109,56 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
     }
   }, []);
 
+  /** Live USD price of the selected asset, with a static fallback. */
+  const fetchAssetPrice = useCallback(async (selected: Asset): Promise<number> => {
+    if (selected === 'USDC') return 1;
+    const id = selected === 'SOL' ? 'solana' : 'ethereum';
+    try {
+      const res = await fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`
+      );
+      const data = await res.json();
+      const price = data?.[id]?.usd;
+      if (typeof price === 'number' && price > 0) return price;
+    } catch {
+      // Fall through to the static price.
+    }
+    return FALLBACK_PRICES[selected];
+  }, []);
+
+  // Auto-fill the amount whenever the asset changes: USDC is always 1.49,
+  // SOL/ETH are converted from the live price with a small buffer.
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+    (async () => {
+      const price = await fetchAssetPrice(asset);
+      if (cancelled) return;
+      setPriceUsd(price);
+      setAmount(
+        asset === 'USDC'
+          ? UNLOCK_USDC_AMOUNT
+          : ((UNLOCK_PRICE_USD / price) * PRICE_BUFFER).toFixed(asset === 'ETH' ? 6 : 4)
+      );
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [asset, isOpen, fetchAssetPrice]);
+
   if (!isOpen) return null;
 
   const isSolana = chain !== 'base';
   const walletConnected = isSolana ? solanaConnected : !!evmAddress;
   const walletAddress = isSolana ? publicKey?.toBase58() : evmAddress;
-  const needsAmount = asset === 'SOL' || asset === 'ETH';
+  const amountValue = parseFloat(amount);
+  const amountValid = Number.isFinite(amountValue) && amountValue > 0;
+  const usdValue = amountValid
+    ? asset === 'USDC'
+      ? amountValue
+      : amountValue * priceUsd
+    : 0;
+  const belowMinimum = usdValue < UNLOCK_PRICE_USD - 0.0001;
 
   const handleChainChange = (c: Chain) => {
     setChain(c);
@@ -113,32 +167,74 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
     setError(null);
   };
 
+  const handleAssetChange = (a: Asset) => {
+    setAsset(a);
+    setStatus('idle');
+    setError(null);
+  };
+
   const handleSolanaPay = async () => {
     if (!publicKey || !sendTransaction) return;
+    if (!amountValid) {
+      setStatus('error');
+      setError('Enter a valid amount.');
+      return;
+    }
+    if (belowMinimum) {
+      setStatus('error');
+      setError(`Minimum is $${UNLOCK_PRICE_USD.toFixed(2)} worth of ${asset}.`);
+      return;
+    }
+
     setStatus('pending');
     setError(null);
 
     try {
-      const rpc = chain === 'solana-devnet'
-          ? (process.env.NEXT_PUBLIC_SOLANA_DEVNET_RPC || 'https://api.devnet.solana.com')
-          : (process.env.NEXT_PUBLIC_SOLANA_MAINNET_RPC || 'https://api.mainnet-beta.solana.com');
+      const rpc =
+        chain === 'solana-devnet'
+          ? process.env.NEXT_PUBLIC_SOLANA_DEVNET_RPC || 'https://api.devnet.solana.com'
+          : process.env.NEXT_PUBLIC_SOLANA_MAINNET_RPC || 'https://api.mainnet-beta.solana.com';
       const conn = new Connection(rpc, 'confirmed');
-      const treasury = new PublicKey('HtKPeixUAG5a28rxn4weDqyNfwb8BwSmEp7y7xfZHTf5');
+      const treasury = new PublicKey(TREASURY_SOLANA);
       const tx = new Transaction();
 
       if (asset === 'USDC') {
-        const usdcMint = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v');
+        const usdcMint = new PublicKey(
+          chain === 'solana-devnet' ? SOLANA_DEVNET_USDC_MINT : SOLANA_USDC_MINT
+        );
         const fromATA = await getAssociatedTokenAddress(usdcMint, publicKey);
         const toATA = await getAssociatedTokenAddress(usdcMint, treasury);
-        tx.add(createTransferInstruction(fromATA, toATA, publicKey, UNLOCK_USDC_BASE_UNITS));
+        // Read the mint decimals on-chain so devnet fUSDC is not scaled wrong.
+        const mintInfo = await getMint(conn, usdcMint);
+        const baseUnits = Math.round(amountValue * 10 ** mintInfo.decimals);
+
+        // Idempotent ATA creation so a first-time payer without a USDC token
+        // account can still pay.
+        tx.add(
+          createAssociatedTokenAccountIdempotentInstruction(
+            publicKey,
+            fromATA,
+            publicKey,
+            usdcMint
+          )
+        );
+        tx.add(
+          createAssociatedTokenAccountIdempotentInstruction(
+            publicKey,
+            toATA,
+            treasury,
+            usdcMint
+          )
+        );
+        tx.add(createTransferInstruction(fromATA, toATA, publicKey, BigInt(baseUnits)));
       } else {
-        const solAmount = parseFloat(amount);
-        if (isNaN(solAmount) || solAmount <= 0) {
-          setStatus('error');
-          setError('Enter a valid SOL amount.');
-          return;
-        }
-        tx.add(SystemProgram.transfer({ fromPubkey: publicKey, toPubkey: treasury, lamports: Math.round(solAmount * LAMPORTS_PER_SOL) }));
+        tx.add(
+          SystemProgram.transfer({
+            fromPubkey: publicKey,
+            toPubkey: treasury,
+            lamports: Math.round(amountValue * LAMPORTS_PER_SOL),
+          })
+        );
       }
 
       const { blockhash } = await conn.getLatestBlockhash();
@@ -156,6 +252,17 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
 
   const handleBasePay = async () => {
     if (!evmAddress) return;
+    if (!amountValid) {
+      setStatus('error');
+      setError('Enter a valid amount.');
+      return;
+    }
+    if (belowMinimum) {
+      setStatus('error');
+      setError(`Minimum is $${UNLOCK_PRICE_USD.toFixed(2)} worth of ${asset}.`);
+      return;
+    }
+
     setStatus('pending');
     setError(null);
 
@@ -172,26 +279,27 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
       if (asset === 'USDC') {
         txHash = await provider.request({
           method: 'eth_sendTransaction',
-          params: [{
-            from: evmAddress,
-            to: BASE_USDC,
-            data: encodeUsdcTransfer(BASE_TREASURY, parseUnits(UNLOCK_USDC_AMOUNT, 6)),
-          }],
+          params: [
+            {
+              from: evmAddress,
+              to: BASE_USDC,
+              data: encodeUsdcTransfer(
+                BASE_TREASURY,
+                BigInt(Math.round(amountValue * 1_000_000))
+              ),
+            },
+          ],
         });
       } else {
-        const ethAmount = parseFloat(amount);
-        if (isNaN(ethAmount) || ethAmount <= 0) {
-          setStatus('error');
-          setError('Enter a valid ETH amount.');
-          return;
-        }
         txHash = await provider.request({
           method: 'eth_sendTransaction',
-          params: [{
-            from: evmAddress,
-            to: BASE_TREASURY,
-            value: `0x${parseEther(ethAmount.toString()).toString(16)}`,
-          }],
+          params: [
+            {
+              from: evmAddress,
+              to: BASE_TREASURY,
+              value: `0x${parseEther(amountValue.toString()).toString(16)}`,
+            },
+          ],
         });
       }
 
@@ -215,7 +323,6 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
       const data = await res.json();
 
       if (data.success) {
-        setCode(data.code);
         setStatus('done');
         setCourseUnlocked();
         onSuccess();
@@ -229,157 +336,209 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
     }
   };
 
-  const handleCopy = () => {
-    if (code) {
-      navigator.clipboard.writeText(code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
   const handlePay = () => {
     if (isSolana) handleSolanaPay();
     else handleBasePay();
   };
 
+  const networkLabel =
+    chain === 'solana-mainnet' ? 'Solana Mainnet' : chain === 'solana-devnet' ? 'Solana Devnet' : 'Base';
+
+  const payButtonLabel =
+    status === 'pending'
+      ? 'Confirm in wallet...'
+      : status === 'confirming'
+        ? 'Verifying on-chain...'
+        : `Pay ${amount || '0'} ${asset}`;
+
   return (
-    <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-surface rounded-xl border-2 border-ink p-6 sm:p-8 max-w-md w-full shadow-pop-lg space-y-5" onClick={(e) => e.stopPropagation()}>
-        <div className="flex justify-between items-start pb-2 border-b border-border">
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center overflow-y-auto"
+      onClick={onClose}
+    >
+      <div
+        className="bg-surface rounded-t-2xl sm:rounded-xl border-2 border-ink p-5 sm:p-8 max-w-md w-full shadow-pop-lg max-h-[92vh] sm:max-h-[90vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex justify-between items-start pb-3 border-b border-border shrink-0">
           <div>
-            <Badge variant="accent" className="text-[10px] mb-1">EARLY ACCESS</Badge>
+            <Badge variant="accent" className="text-[10px] mb-1">
+              EARLY ACCESS
+            </Badge>
             <h3 className="font-heading font-bold text-xl text-ink">
               Unlock All Lessons for ${UNLOCK_PRICE_USD.toFixed(2)}
             </h3>
           </div>
-          <button type="button" onClick={onClose} className="text-xs font-semibold text-ink-soft hover:text-ink">Close</button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-xs font-semibold text-ink-soft hover:text-ink"
+          >
+            Close
+          </button>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 p-1 bg-bg rounded-lg">
-          {(['solana-mainnet', 'solana-devnet', 'base'] as Chain[]).map((c) => (
-            <button key={c} type="button" onClick={() => handleChainChange(c)} className={`py-2 text-[11px] font-bold font-heading rounded-full transition-colors ${chain === c ? 'bg-accent text-white border-2 border-ink shadow-pop-sm' : 'bg-white text-ink-soft border-2 border-border'}`}>
-              {c === 'solana-mainnet' ? 'Solana' : c === 'solana-devnet' ? 'Devnet' : 'Base'}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-2 gap-2 p-1 bg-bg rounded-lg">
-          {CHAIN_ASSETS[chain].map((a) => (
-            <button key={a} type="button" onClick={() => { setAsset(a); setStatus('idle'); setError(null); }} className={`py-2 text-[11px] font-bold font-heading rounded-full transition-colors ${asset === a ? 'bg-tertiary text-ink border-2 border-ink shadow-pop-sm' : 'bg-white text-ink-soft border-2 border-border'}`}>
-              {a}
-            </button>
-          ))}
-        </div>
-
-        {status === 'done' && code ? (
-          <div className="space-y-4">
-            <div className="p-4 rounded-xl bg-quaternary/15 border-2 border-quaternary space-y-3 text-center">
-              <CheckCircle2 className="w-8 h-8 text-quaternary mx-auto" />
-              <p className="font-heading font-bold text-ink">Payment Confirmed!</p>
-              <p className="text-xs text-ink-soft">Your invite code:</p>
-              <div className="flex items-center justify-center gap-2">
-                <code className="font-mono font-bold text-lg text-ink bg-white px-4 py-2 rounded-lg border-2 border-ink">{code}</code>
-                <button type="button" onClick={handleCopy} className="p-2 rounded-lg border-2 border-ink bg-tertiary hover:shadow-pop-sm transition-all">
-                  <Copy className="w-4 h-4" />
-                </button>
+        <div className="flex-1 overflow-y-auto py-4 space-y-4">
+          {status === 'done' ? (
+            <div className="space-y-4">
+              <div className="p-4 rounded-xl bg-quaternary/15 border-2 border-quaternary space-y-3 text-center">
+                <CheckCircle2 className="w-8 h-8 text-quaternary mx-auto" />
+                <p className="font-heading font-bold text-ink">Payment Confirmed!</p>
+                <p className="text-xs text-ink-soft">
+                  Every lesson is unlocked — on this device and on any device that
+                  connects{' '}
+                  {publicKey
+                    ? `${publicKey.toBase58().slice(0, 6)}…${publicKey.toBase58().slice(-4)}`
+                    : 'this wallet'}
+                  . You will never be asked to pay again.
+                </p>
               </div>
-              {copied && <p className="text-[11px] text-quaternary font-bold">Copied!</p>}
+              <Button variant="primary" onClick={onClose} className="w-full">
+                Start Learning
+              </Button>
             </div>
-            <Button variant="primary" onClick={onClose} className="w-full">Start Learning</Button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="p-4 rounded-xl bg-accent/10 border border-accent/20 space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-ink-soft">Asset:</span>
-                <span className="font-mono font-bold text-ink">{asset}</span>
+          ) : (
+            <>
+              <div className="grid grid-cols-3 gap-2 p-1 bg-bg rounded-lg">
+                {(['solana-mainnet', 'solana-devnet', 'base'] as Chain[]).map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => handleChainChange(c)}
+                    className={`py-2 text-[11px] font-bold font-heading rounded-full transition-colors ${
+                      chain === c
+                        ? 'bg-accent text-white border-2 border-ink shadow-pop-sm'
+                        : 'bg-white text-ink-soft border-2 border-border'
+                    }`}
+                  >
+                    {c === 'solana-mainnet' ? 'Solana' : c === 'solana-devnet' ? 'Devnet' : 'Base'}
+                  </button>
+                ))}
               </div>
-              <div className="flex justify-between">
-                <span className="text-ink-soft">Network:</span>
-                <span className="font-mono text-ink">{chain === 'solana-mainnet' ? 'Solana Mainnet' : chain === 'solana-devnet' ? 'Solana Devnet' : 'Base'}</span>
+
+              <div className="grid grid-cols-2 gap-2 p-1 bg-bg rounded-lg">
+                {CHAIN_ASSETS[chain].map((a) => (
+                  <button
+                    key={a}
+                    type="button"
+                    onClick={() => handleAssetChange(a)}
+                    className={`py-2 text-[11px] font-bold font-heading rounded-full transition-colors ${
+                      asset === a
+                        ? 'bg-tertiary text-ink border-2 border-ink shadow-pop-sm'
+                        : 'bg-white text-ink-soft border-2 border-border'
+                    }`}
+                  >
+                    {a}
+                  </button>
+                ))}
               </div>
-              {asset === 'USDC' && (
+
+              <div className="p-4 rounded-xl bg-accent/10 border border-accent/20 space-y-2 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-ink-soft">Amount:</span>
-                  <span className="font-mono font-bold text-accent text-sm">
-                    {UNLOCK_USDC_AMOUNT} USDC
-                  </span>
+                  <span className="text-ink-soft">Asset:</span>
+                  <span className="font-mono font-bold text-ink">{asset}</span>
                 </div>
-              )}
-              {needsAmount && (
+                <div className="flex justify-between">
+                  <span className="text-ink-soft">Network:</span>
+                  <span className="font-mono text-ink">{networkLabel}</span>
+                </div>
+                {asset === 'USDC' && (
+                  <div className="flex justify-between">
+                    <span className="text-ink-soft">Amount:</span>
+                    <span className="font-mono font-bold text-accent text-sm">
+                      {UNLOCK_USDC_AMOUNT} USDC
+                    </span>
+                  </div>
+                )}
+
                 <div className="pt-1 border-t border-accent/20">
-                  <label className="text-ink-soft text-[11px] font-bold uppercase tracking-wide">Amount ({asset})</label>
+                  <label className="text-ink-soft text-[11px] font-bold uppercase tracking-wide">
+                    Amount ({asset})
+                  </label>
                   <input
                     type="number"
-                    step="0.001"
+                    step="0.0001"
                     min="0"
+                    inputMode="decimal"
                     value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder={asset === 'SOL' ? '0.005' : '0.0003'}
+                    onChange={(e) => {
+                      setAmount(e.target.value);
+                      setStatus('idle');
+                      setError(null);
+                    }}
+                    placeholder={asset === 'SOL' ? '0.0100' : asset === 'ETH' ? '0.000500' : '1.49'}
                     className="mt-1 w-full px-3 py-2 text-sm font-mono bg-white rounded-lg border-2 border-border focus:border-accent focus:outline-none"
                   />
-                  <p className="text-[11px] text-ink-faint mt-1">
-                    Must be worth at least ${UNLOCK_PRICE_USD.toFixed(2)} USD
+                  <p className="text-[11px] text-ink-faint mt-1 flex justify-between">
+                    <span>Minimum ${UNLOCK_PRICE_USD.toFixed(2)}</span>
+                    <span className="font-mono">
+                      ≈ ${usdValue ? usdValue.toFixed(2) : '0.00'}
+                      {asset !== 'USDC' && priceUsd ? ` @ $${priceUsd.toFixed(2)}` : ''}
+                    </span>
                   </p>
                 </div>
-              )}
-            </div>
-
-            {!walletConnected ? (
-              <div className="p-3 rounded-xl bg-tertiary/20 border border-tertiary text-xs text-center space-y-2">
-                <p className="font-bold text-ink mb-1">Connect your wallet first</p>
-                {!isSolana && (
-                  <Button variant="secondary" onClick={connectEvm} className="w-full text-xs">
-                    Connect EVM Wallet
-                  </Button>
-                )}
-                {isSolana && (
-                  <div className="space-y-2">
-                    <WalletConnectButton className="w-full" />
-                    <p className="text-ink-soft">Or use the Connect Wallet button in the top bar.</p>
-                  </div>
-                )}
               </div>
-            ) : (
-              <>
-                {!isSolana && evmChainId !== 8453 && (
-                  <div className="p-3 rounded-xl bg-tertiary/20 border border-tertiary text-xs text-center space-y-2">
-                    <p className="font-bold text-ink">Switch to Base network in your wallet</p>
-                    <Button variant="secondary" className="w-full text-xs" onClick={async () => {
-                      const provider = getEvmProvider();
-                      if (provider) {
-                        try {
-                          await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x2105' }] });
-                        } catch {
-                          setError('Please switch to Base network in your wallet.');
-                        }
-                      }
-                    }}>
-                      Switch to Base
-                    </Button>
-                  </div>
-                )}
-                {(!isSolana && evmChainId === 8453 || isSolana) && (
-                  <Button variant="primary" onClick={handlePay} isLoading={status === 'pending' || status === 'confirming'} className="w-full text-xs gap-1.5">
-                    <DollarSign className="w-4 h-4" />
-                    {status === 'pending' ? 'Confirm in wallet...' : status === 'confirming' ? 'Verifying on-chain...' : `Pay ${asset}`}
-                  </Button>
-                )}
-              </>
-            )}
 
-            {walletConnected && (
-              <p className="text-[11px] text-ink-faint text-center font-mono">{walletAddress?.slice(0, 8)}...{walletAddress?.slice(-8)}</p>
+              {!walletConnected ? (
+                <div className="p-3 rounded-xl bg-tertiary/20 border border-tertiary text-xs text-center space-y-2">
+                  <p className="font-bold text-ink mb-1">Connect your wallet first</p>
+                  {!isSolana && (
+                    <Button variant="secondary" onClick={connectEvm} className="w-full text-xs">
+                      Connect EVM Wallet
+                    </Button>
+                  )}
+                  {isSolana && (
+                    <div className="space-y-2">
+                      <WalletConnectButton className="w-full" />
+                      <p className="text-ink-soft">
+                        Or use the Connect Wallet button in the top bar.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : null}
+
+              {error && (
+                <div className="p-2.5 rounded-lg bg-red-50 text-red-900 border border-red-300 text-xs">
+                  {error}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {status !== 'done' && (
+          <div className="shrink-0 pt-3 border-t border-border space-y-2">
+            {walletConnected ? (
+              <>
+                <Button
+                  variant="primary"
+                  onClick={handlePay}
+                  isLoading={status === 'pending' || status === 'confirming'}
+                  disabled={!amountValid || belowMinimum}
+                  className="w-full text-xs gap-1.5"
+                >
+                  <DollarSign className="w-4 h-4" />
+                  {payButtonLabel}
+                </Button>
+                <p className="text-[11px] text-ink-faint text-center font-mono">
+                  {walletAddress?.slice(0, 8)}...{walletAddress?.slice(-8)}
+                </p>
+              </>
+            ) : (
+              <div className="flex items-center justify-center gap-1.5 text-[11px] text-ink-soft">
+                <Wallet className="w-3.5 h-3.5" />
+                Connect a wallet to unlock the Pay button
+              </div>
             )}
+            <div className="flex items-center gap-1.5 text-[11px] text-ink-soft pt-2 border-t border-border">
+              <ShieldCheck className="w-3.5 h-3.5 text-accent shrink-0" />
+              <span>One-time unlock for lifetime course access.</span>
+            </div>
           </div>
         )}
-
-        {error && <div className="p-2.5 rounded-lg bg-red-50 text-red-900 border border-red-300 text-xs">{error}</div>}
-
-        <div className="flex items-center gap-1.5 text-[11px] text-ink-soft pt-2 border-t border-border">
-          <ShieldCheck className="w-3.5 h-3.5 text-accent shrink-0" />
-          <span>One-time unlock for lifetime course access.</span>
-        </div>
       </div>
     </div>
   );

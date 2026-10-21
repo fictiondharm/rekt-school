@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CandyButton } from '@/components/landing/CandyButton';
 import { CheckItem } from '@/components/landing/CheckItem';
 import { GhostButton } from '@/components/landing/GhostButton';
@@ -8,7 +8,8 @@ import { PaymentModal } from '@/components/onchain';
 import { Badge } from '@/components/ui';
 import { PRICING_COPY, TOTAL_LESSON_COUNT, UNLOCK_PRICE_INR, type PaymentMethod } from '@/lib/pricing';
 import { startUpiCheckoutStub } from '@/lib/upiCheckout';
-import { setCourseUnlocked } from '@/lib/unlock';
+import { setCourseUnlocked, hasUnlockedCourse } from '@/lib/unlock';
+import { useWalletAccess } from '@/hooks/useWalletAccess';
 import { KeyRound } from 'lucide-react';
 
 const FREE_FEATURES = ['3 lessons: B1, I1, P5', 'All 3 arcade games', 'War Stories & Glossary'];
@@ -28,6 +29,18 @@ export function PricingSection() {
   const [inviteStatus, setInviteStatus] = useState<{ ok: boolean; message: string } | null>(null);
   const [redeeming, setRedeeming] = useState(false);
   const [upiMessage, setUpiMessage] = useState<string | null>(null);
+  const [unlocked, setUnlocked] = useState(false);
+
+  // A buyer is never asked to pay again: the local flag covers this device and
+  // the wallet check covers every other device.
+  useEffect(() => {
+    const sync = () => setUnlocked(hasUnlockedCourse());
+    sync();
+    window.addEventListener('storage', sync);
+    return () => window.removeEventListener('storage', sync);
+  }, []);
+
+  useWalletAccess(() => setUnlocked(true));
 
   const copy = PRICING_COPY[method];
 
@@ -157,10 +170,18 @@ export function PricingSection() {
               </CheckItem>
             ))}
           </div>
-          <CandyButton onClick={handlePrimaryCta} className="mt-1.5 w-full">
-            {copy.ctaLabel}
-          </CandyButton>
-          <div className="text-center text-sm font-medium text-ink-soft">{copy.payHint}</div>
+          {unlocked ? (
+            <CandyButton href="/learn/basic" className="mt-1.5 w-full" withArrow>
+              All lessons unlocked
+            </CandyButton>
+          ) : (
+            <CandyButton onClick={handlePrimaryCta} className="mt-1.5 w-full">
+              {copy.ctaLabel}
+            </CandyButton>
+          )}
+          <div className="text-center text-sm font-medium text-ink-soft">
+            {unlocked ? 'Access is tied to your wallet. Nothing else to pay.' : copy.payHint}
+          </div>
           {upiMessage && (
             <p className="rounded-xl border-2 border-border bg-surface-muted px-3.5 py-2.5 text-center text-xs font-medium text-ink-soft">
               {upiMessage}

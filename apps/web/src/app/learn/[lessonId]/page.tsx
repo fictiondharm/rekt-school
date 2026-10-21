@@ -48,6 +48,7 @@ import { getLocalAura } from '@/lib/progress';
 import { PRICING_COPY, UNLOCK_PRICE_INR, type PaymentMethod } from '@/lib/pricing';
 import { startUpiCheckoutStub } from '@/lib/upiCheckout';
 import { hasUnlockedCourse, setCourseUnlocked } from '@/lib/unlock';
+import { useWalletAccess } from '@/hooks/useWalletAccess';
 import { Button, Card, Badge } from '@/components/ui';
 import { Lock, KeyRound, CheckCircle2, ArrowLeft, Lightbulb, Coins, BookOpen, X } from 'lucide-react';
 
@@ -90,6 +91,9 @@ export default function DynamicLessonPage({ params }: PageProps) {
   useEffect(() => {
     setMobileSidebarOpen(false);
   }, [lessonId]);
+
+  // A wallet that already paid keeps access on every device.
+  useWalletAccess(() => setHasUnlockedAll(true));
 
   if (!lesson) {
     return (
