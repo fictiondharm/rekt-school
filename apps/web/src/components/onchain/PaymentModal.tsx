@@ -11,6 +11,7 @@ import { base } from 'viem/chains';
 import { BASE_USDC, BASE_TREASURY } from '@/lib/base';
 import { UNLOCK_PRICE_USD, UNLOCK_USDC_AMOUNT, UNLOCK_USDC_BASE_UNITS } from '@/lib/pricing';
 import { setCourseUnlocked } from '@/lib/unlock';
+import { WalletConnectButton } from './WalletPicker';
 
 const USDC_ABI = [
   {
@@ -332,7 +333,12 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
                     Connect EVM Wallet
                   </Button>
                 )}
-                {isSolana && <p className="text-ink-soft">Use the Connect Wallet button in the top bar.</p>}
+                {isSolana && (
+                  <div className="space-y-2">
+                    <WalletConnectButton className="w-full" />
+                    <p className="text-ink-soft">Or use the Connect Wallet button in the top bar.</p>
+                  </div>
+                )}
               </div>
             ) : (
               <>
