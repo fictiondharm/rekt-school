@@ -27,6 +27,7 @@ interface TopBarProps {
 
 export function TopBar({
   lessonTitle,
+  lessonId,
   aura = 0,
   navLinks = SITE_NAV,
   showAura = true,
@@ -69,11 +70,15 @@ export function TopBar({
             />
             <div className="flex flex-col min-w-0">
               <span className="font-heading font-bold text-lg leading-none tracking-tight">Rekt School</span>
-              {lessonTitle && (
-                <span className="hidden sm:block font-medium text-xs tracking-wider text-ink-faint mt-1 truncate">
+              {lessonId ? (
+                <span className="hidden sm:inline-flex w-fit mt-1 items-center rounded-full border-2 border-ink bg-tertiary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ink">
+                  {lessonId}
+                </span>
+              ) : lessonTitle ? (
+                <span className="hidden sm:block max-w-[12rem] truncate font-medium text-xs tracking-wider text-ink-faint mt-1">
                   {lessonTitle}
                 </span>
-              )}
+              ) : null}
             </div>
           </Link>
 

@@ -216,6 +216,9 @@ export function LessonEngine({
 
             {/* Step Title */}
             <div>
+              <span className="block text-[11px] font-semibold uppercase tracking-wider text-ink-faint mb-1">
+                {lesson.id} &middot; {lesson.title}
+              </span>
               <span className="text-xs font-bold uppercase tracking-wider text-accent">
                 {currentStep.type.toUpperCase()} STEP
               </span>

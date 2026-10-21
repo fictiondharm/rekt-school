@@ -246,7 +246,6 @@ export default function DynamicLessonPage({ params }: PageProps) {
   return (
     <div className="min-h-screen flex flex-col bg-bg text-ink">
       <TopBar
-        lessonTitle={`${lesson.id}: ${lesson.title}`}
         aura={aura}
         streak={1}
         tier={lesson.tier}

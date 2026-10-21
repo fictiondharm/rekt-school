@@ -24,7 +24,6 @@ export default function LessonB1Page() {
   return (
     <div className="min-h-screen flex flex-col bg-bg text-ink">
       <TopBar
-        lessonTitle={`${lesson.id}: ${lesson.title}`}
         aura={aura}
         streak={1}
         lessonId={lesson.id}
