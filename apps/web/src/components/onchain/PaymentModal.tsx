@@ -13,17 +13,21 @@ import {
   getMint,
 } from '@solana/spl-token';
 import {
-  createPublicClient,
   createWalletClient,
   custom,
   erc20Abi,
-  http,
   parseEther,
   type Address,
   type Hex,
 } from 'viem';
 import { base } from 'viem/chains';
-import { BASE_CHAIN_ID, BASE_USDC, BASE_TREASURY, USDC_DECIMALS } from '@/lib/base';
+import {
+  BASE_CHAIN_ID,
+  BASE_USDC,
+  BASE_TREASURY,
+  USDC_DECIMALS,
+  baseClient,
+} from '@/lib/base';
 import { UNLOCK_PRICE_USD, UNLOCK_USDC_AMOUNT } from '@/lib/pricing';
 import { setCourseUnlocked } from '@/lib/unlock';
 import { WalletConnectButton } from './WalletPicker';
@@ -62,6 +66,36 @@ const FALLBACK_PRICES: Record<Asset, number> = {
 /** Buffer so a small price move between filling and paying never under-pays. */
 const PRICE_BUFFER = 1.03;
 
+interface PendingPayment {
+  chain: string;
+  txHash: string;
+  wallet: string;
+}
+
+/** Remember a sent payment so a reload never asks the buyer to pay twice. */
+const PENDING_KEY = 'rekt_school_pending_tx';
+
+function persistPending(pending: PendingPayment | null) {
+  try {
+    if (pending) window.localStorage.setItem(PENDING_KEY, JSON.stringify(pending));
+    else window.localStorage.removeItem(PENDING_KEY);
+  } catch {
+    /* storage can be blocked — the in-memory copy still works */
+  }
+}
+
+function readPending(): PendingPayment | null {
+  try {
+    const raw = window.localStorage.getItem(PENDING_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed?.txHash && parsed?.chain && parsed?.wallet) return parsed;
+  } catch {
+    /* ignore malformed entries */
+  }
+  return null;
+}
+
 export interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -77,6 +111,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
   const [error, setError] = useState<string | null>(null);
   const [evmAddress, setEvmAddress] = useState<Address | null>(null);
   const [evmChainId, setEvmChainId] = useState<number | null>(null);
+  const [lastTx, setLastTx] = useState<PendingPayment | null>(null);
 
   const { publicKey, sendTransaction, connected: solanaConnected } = useWallet();
 
@@ -87,11 +122,6 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
       ((window as any).ethereum || (window as any).phantom?.ethereum)) ||
     null;
 
-  const baseClient = createPublicClient({
-    chain: base,
-    transport: http('https://mainnet.base.org'),
-  });
-
   const connectEvm = async () => {
     const provider = getEvmProvider();
     if (!provider) {
@@ -100,9 +130,25 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
     }
     try {
       const accounts: string[] = await provider.request({ method: 'eth_requestAccounts' });
-      setEvmAddress(accounts[0] as Address);
+      const evm = accounts[0] as Address;
+      setEvmAddress(evm);
       const chainId: string = await provider.request({ method: 'eth_chainId' });
       setEvmChainId(parseInt(chainId, 16));
+
+      // A wallet connected through Solana (Phantom) pays from its EVM account.
+      // If that EVM account already owns an entitlement, unlock instead of
+      // asking for a second payment.
+      try {
+        const res = await fetch(`/api/access/check?wallet=${evm}`);
+        const data = await res.json();
+        if (data?.unlocked) {
+          setStatus('done');
+          setCourseUnlocked();
+          onSuccess();
+        }
+      } catch {
+        /* entitlement lookup is best-effort */
+      }
     } catch (err: any) {
       setError(err?.message || 'Wallet connection failed.');
     }
@@ -123,6 +169,11 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
         setEvmAddress(accounts[0] as Address || null);
       });
     }
+  }, []);
+
+  useEffect(() => {
+    const pending = readPending();
+    if (pending) setLastTx(pending);
   }, []);
 
   /** Live USD price of the selected asset, with a static fallback. */
@@ -356,6 +407,20 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
         });
       }
 
+      // The hash exists as soon as the wallet signs, but the payment only
+      // counts once it is mined. Wait for the receipt so verification does not
+      // race the block and report a real payment as "not found".
+      setStatus('confirming');
+      try {
+        await baseClient.waitForTransactionReceipt({
+          hash: txHash,
+          timeout: 90_000,
+          pollingInterval: 2_000,
+        });
+      } catch {
+        // Still unconfirmed or the RPC hiccuped — the server waits as well.
+      }
+
       await verifyAndUnlock('base', txHash, from);
     } catch (err: any) {
       console.error('[base-pay]', err);
@@ -367,26 +432,90 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
   const verifyAndUnlock = async (chainName: string, txHash: string, wallet: string) => {
     setStatus('confirming');
     setError(null);
+    setLastTx({ chain: chainName, txHash, wallet });
+    persistPending({ chain: chainName, txHash, wallet });
+
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        const res = await fetch('/api/payments/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chain: chainName, txHash, wallet, asset }),
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          setStatus('done');
+          setLastTx(null);
+          persistPending(null);
+          setCourseUnlocked();
+          onSuccess();
+          return;
+        }
+
+        const retryable = /not found|below \$|wait a few seconds/i.test(data.message || '');
+        if (retryable && attempt < 2) {
+          await new Promise((resolve) => setTimeout(resolve, 5_000));
+          continue;
+        }
+
+        setStatus('error');
+        setError(data.message || 'Verification failed.');
+        return;
+      } catch {
+        if (attempt < 2) {
+          await new Promise((resolve) => setTimeout(resolve, 5_000));
+          continue;
+        }
+        setStatus('error');
+        setError('Network error. Your payment is safe — tap "Retry verification".');
+        return;
+      }
+    }
+  };
+
+  /** Re-check the payment that was already sent, without paying again. */
+  const retryVerification = async () => {
+    if (lastTx) {
+      await verifyAndUnlock(lastTx.chain, lastTx.txHash, lastTx.wallet);
+      return;
+    }
+    await restoreAccess();
+  };
+
+  /** Scan the treasury for a payment from this wallet and unlock it. */
+  const restoreAccess = async () => {
+    const wallet = evmAddress;
+    if (!wallet) {
+      setError('Connect the wallet you paid with first.');
+      return;
+    }
+
+    setStatus('confirming');
+    setError(null);
 
     try {
-      const res = await fetch('/api/payments/check', {
+      const res = await fetch('/api/payments/recover', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chain: chainName, txHash, wallet, asset }),
+        body: JSON.stringify({ chain: 'base', wallet }),
       });
       const data = await res.json();
 
       if (data.success) {
         setStatus('done');
+        setLastTx(null);
+        persistPending(null);
         setCourseUnlocked();
         onSuccess();
-      } else {
-        setStatus('error');
-        setError(data.message || 'Verification failed.');
+        return;
       }
+
+      setStatus('error');
+      setError(data.message || 'No payment found for this wallet.');
     } catch {
       setStatus('error');
-      setError('Network error. Try again.');
+      setError('Network error. Try again in a moment.');
     }
   };
 
@@ -559,8 +688,31 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
               ) : null}
 
               {error && (
-                <div className="p-2.5 rounded-lg bg-red-50 text-red-900 border border-red-300 text-xs">
-                  {error}
+                <div className="p-2.5 rounded-lg bg-red-50 text-red-900 border border-red-300 text-xs space-y-2">
+                  <p>{error}</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={retryVerification}
+                      className="rounded-full border border-red-400 bg-white px-3 py-1.5 font-bold hover:bg-red-100"
+                    >
+                      {lastTx ? 'Retry verification' : 'I already paid — restore access'}
+                    </button>
+                    {lastTx && chain === 'base' && (
+                      <button
+                        type="button"
+                        onClick={restoreAccess}
+                        className="rounded-full border border-red-400 bg-white px-3 py-1.5 font-bold hover:bg-red-100"
+                      >
+                        Search my Base payments
+                      </button>
+                    )}
+                  </div>
+                  {lastTx && (
+                    <p className="font-mono text-[10px] text-red-800 break-all">
+                      tx {lastTx.txHash}
+                    </p>
+                  )}
                 </div>
               )}
             </>
