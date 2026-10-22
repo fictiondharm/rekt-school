@@ -358,6 +358,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
 
       await verifyAndUnlock('base', txHash, from);
     } catch (err: any) {
+      console.error('[base-pay]', err);
       setStatus('error');
       setError(evmErrorMessage(err));
     }
