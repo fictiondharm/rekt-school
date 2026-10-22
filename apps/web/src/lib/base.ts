@@ -1,9 +1,14 @@
-import { createPublicClient, http, type Address, type Hash } from 'viem';
+import { createPublicClient, getAddress, http, type Address, type Hash } from 'viem';
 import { base } from 'viem/chains';
 import { UNLOCK_PRICE_USD } from '@/lib/pricing';
 
-export const BASE_USDC = '0x833589fCD1eD18E646dC60844d597A8678760cD0' as Address;
-export const BASE_TREASURY = '0x469a7cDbD8228fb1Eb29dA6A3D62949a880deaa2' as Address;
+/**
+ * Canonical Base mainnet USDC. `getAddress` throws on a bad EIP-55 checksum, so
+ * a typo fails the build instead of reaching a wallet as "invalid parameters".
+ */
+export const BASE_USDC = getAddress('0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913') as Address;
+export const BASE_TREASURY = getAddress('0x469a7cDbD8228fb1Eb29dA6A3D62949a880deaa2') as Address;
+export const BASE_CHAIN_ID = 8453;
 
 export const baseClient = createPublicClient({
   chain: base,

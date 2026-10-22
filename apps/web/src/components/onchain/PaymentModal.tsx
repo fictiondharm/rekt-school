@@ -14,7 +14,7 @@ import {
 } from '@solana/spl-token';
 import { createPublicClient, http, parseEther, type Address } from 'viem';
 import { base } from 'viem/chains';
-import { BASE_USDC, BASE_TREASURY, USDC_DECIMALS } from '@/lib/base';
+import { BASE_CHAIN_ID, BASE_USDC, BASE_TREASURY, USDC_DECIMALS } from '@/lib/base';
 import { UNLOCK_PRICE_USD, UNLOCK_USDC_AMOUNT } from '@/lib/pricing';
 import { setCourseUnlocked } from '@/lib/unlock';
 import { WalletConnectButton } from './WalletPicker';
@@ -281,9 +281,14 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
       const provider = getEvmProvider();
       if (!provider) {
         setStatus('error');
-        setError('No EVM wallet found. Install MetaMask.');
+        setError('No EVM wallet found. Install MetaMask or Phantom.');
         return;
       }
+
+      // Wallets refuse to send to a token contract that does not exist on the
+      // chain they are currently on, so make sure we are on Base first.
+      await ensureBaseChain(provider);
+      setEvmChainId(BASE_CHAIN_ID);
 
       let txHash: `0x${string}`;
 
@@ -294,6 +299,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
             {
               from: evmAddress,
               to: BASE_USDC,
+              value: '0x0',
               data: encodeTokenTransfer(
                 BASE_TREASURY,
                 BigInt(Math.round(amountValue * 10 ** USDC_DECIMALS))
@@ -317,7 +323,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
       await verifyAndUnlock('base', txHash, evmAddress);
     } catch (err: any) {
       setStatus('error');
-      setError(err?.message || 'Transaction failed.');
+      setError(evmErrorMessage(err));
     }
   };
 
@@ -580,4 +586,60 @@ function encodeTokenTransfer(to: Address, amount: bigint): `0x${string}` {
   const paddedTo = to.slice(2).padStart(64, '0');
   const paddedAmount = amount.toString(16).padStart(64, '0');
   return `0x${selector}${paddedTo}${paddedAmount}`;
+}
+
+/** Make sure the injected wallet is on Base (8453) before sending a tx. */
+async function ensureBaseChain(provider: any) {
+  const current: string = await provider.request({ method: 'eth_chainId' });
+  if (parseInt(current, 16) === BASE_CHAIN_ID) return;
+
+  try {
+    await provider.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: `0x${BASE_CHAIN_ID.toString(16)}` }],
+    });
+  } catch (err: any) {
+    if (err?.code === 4902) {
+      await provider.request({
+        method: 'wallet_addEthereumChain',
+        params: [
+          {
+            chainId: `0x${BASE_CHAIN_ID.toString(16)}`,
+            chainName: 'Base',
+            nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+            rpcUrls: ['https://mainnet.base.org'],
+            blockExplorerUrls: ['https://basescan.org'],
+          },
+        ],
+      });
+    } else if (err?.code === 4001) {
+      throw new Error(
+        'You cancelled the network switch. Switch your wallet to Base to pay with USDC.'
+      );
+    } else {
+      throw new Error('Switch your wallet network to Base (chain id 8453) and try again.');
+    }
+  }
+
+  const after: string = await provider.request({ method: 'eth_chainId' });
+  if (parseInt(after, 16) !== BASE_CHAIN_ID) {
+    throw new Error('Your wallet is not on Base. Switch to Base and try again.');
+  }
+}
+
+/** Turn wallet provider errors into something a buyer can act on. */
+function evmErrorMessage(err: any): string {
+  const raw =
+    err?.data?.message || err?.cause?.message || err?.shortMessage || err?.message || '';
+
+  if (err?.code === 4001 || /user rejected|denied|rejected the request/i.test(raw)) {
+    return 'Transaction cancelled.';
+  }
+  if (/insufficient funds/i.test(raw)) {
+    return 'Not enough ETH on Base to cover gas fees.';
+  }
+  if (/missing or invalid parameters|invalid params|-32602|invalid argument/i.test(raw)) {
+    return 'Your wallet rejected the request. Make sure it is on Base, then try again.';
+  }
+  return raw || 'Transaction failed.';
 }
