@@ -12,7 +12,16 @@ import {
   createAssociatedTokenAccountIdempotentInstruction,
   getMint,
 } from '@solana/spl-token';
-import { createPublicClient, http, parseEther, type Address } from 'viem';
+import {
+  createPublicClient,
+  createWalletClient,
+  custom,
+  erc20Abi,
+  http,
+  parseEther,
+  type Address,
+  type Hex,
+} from 'viem';
 import { base } from 'viem/chains';
 import { BASE_CHAIN_ID, BASE_USDC, BASE_TREASURY, USDC_DECIMALS } from '@/lib/base';
 import { UNLOCK_PRICE_USD, UNLOCK_USDC_AMOUNT } from '@/lib/pricing';
@@ -285,42 +294,69 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
         return;
       }
 
+      // Phantom only exposes accounts to dapps that asked for them explicitly,
+      // so request them here instead of trusting an address from a stale event.
+      const accounts: string[] = await provider.request({ method: 'eth_requestAccounts' });
+      const from = accounts?.[0] as Address | undefined;
+      if (!from) {
+        setStatus('error');
+        setError('Connect your wallet and try again.');
+        return;
+      }
+      setEvmAddress(from);
+
       // Wallets refuse to send to a token contract that does not exist on the
       // chain they are currently on, so make sure we are on Base first.
       await ensureBaseChain(provider);
       setEvmChainId(BASE_CHAIN_ID);
 
-      let txHash: `0x${string}`;
+      // Build the transaction through viem so every wallet gets a complete,
+      // standard payload (chainId, gas, nonce) instead of hand-rolled fields.
+      const wallet = createWalletClient({
+        account: from,
+        chain: base,
+        transport: custom(provider),
+      });
+
+      let txHash: Hex;
 
       if (asset === 'USDC') {
-        txHash = await provider.request({
-          method: 'eth_sendTransaction',
-          params: [
-            {
-              from: evmAddress,
-              to: BASE_USDC,
-              value: '0x0',
-              data: encodeTokenTransfer(
-                BASE_TREASURY,
-                BigInt(Math.round(amountValue * 10 ** USDC_DECIMALS))
-              ),
-            },
-          ],
+        const amount = BigInt(Math.round(amountValue * 10 ** USDC_DECIMALS));
+        // Estimate against a public RPC first so a missing balance is reported
+        // by us, not by the wallet as an opaque "invalid parameters" error.
+        const gas = await estimateGasSafe(() =>
+          baseClient.estimateContractGas({
+            account: from,
+            address: BASE_USDC,
+            abi: erc20Abi,
+            functionName: 'transfer',
+            args: [BASE_TREASURY, amount],
+          })
+        );
+        txHash = await wallet.writeContract({
+          address: BASE_USDC,
+          abi: erc20Abi,
+          functionName: 'transfer',
+          args: [BASE_TREASURY, amount],
+          account: from,
+          chain: base,
+          ...(gas ? { gas } : {}),
         });
       } else {
-        txHash = await provider.request({
-          method: 'eth_sendTransaction',
-          params: [
-            {
-              from: evmAddress,
-              to: BASE_TREASURY,
-              value: `0x${parseEther(amountValue.toString()).toString(16)}`,
-            },
-          ],
+        const value = parseEther(amountValue.toString());
+        const gas = await estimateGasSafe(() =>
+          baseClient.estimateGas({ account: from, to: BASE_TREASURY, value })
+        );
+        txHash = await wallet.sendTransaction({
+          to: BASE_TREASURY,
+          value,
+          account: from,
+          chain: base,
+          ...(gas ? { gas } : {}),
         });
       }
 
-      await verifyAndUnlock('base', txHash, evmAddress);
+      await verifyAndUnlock('base', txHash, from);
     } catch (err: any) {
       setStatus('error');
       setError(evmErrorMessage(err));
@@ -580,14 +616,6 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
   );
 }
 
-/** ERC-20 `transfer(address,uint256)` call data. */
-function encodeTokenTransfer(to: Address, amount: bigint): `0x${string}` {
-  const selector = '0xa9059cbb';
-  const paddedTo = to.slice(2).padStart(64, '0');
-  const paddedAmount = amount.toString(16).padStart(64, '0');
-  return `0x${selector}${paddedTo}${paddedAmount}`;
-}
-
 /** Make sure the injected wallet is on Base (8453) before sending a tx. */
 async function ensureBaseChain(provider: any) {
   const current: string = await provider.request({ method: 'eth_chainId' });
@@ -627,19 +655,60 @@ async function ensureBaseChain(provider: any) {
   }
 }
 
+/** viem nests provider errors; flatten them into one searchable string. */
+function collectErrorText(err: any): string {
+  const parts: string[] = [];
+  let cursor: any = err;
+  for (let i = 0; i < 6 && cursor; i += 1) {
+    if (typeof cursor === 'string') {
+      parts.push(cursor);
+      break;
+    }
+    if (cursor.message) parts.push(String(cursor.message));
+    if (cursor.shortMessage) parts.push(String(cursor.shortMessage));
+    if (cursor.data?.message) parts.push(String(cursor.data.message));
+    cursor = cursor.cause;
+  }
+  return parts.join(' | ');
+}
+
+/**
+ * Estimate gas with a public RPC so balance problems surface as our message.
+ * If the RPC itself fails, fall back to letting the wallet estimate.
+ */
+async function estimateGasSafe(fn: () => Promise<bigint>): Promise<bigint | undefined> {
+  try {
+    return await fn();
+  } catch (err) {
+    const text = collectErrorText(err);
+    if (/exceeds balance|insufficient balance|exceeds allowance|reverted/i.test(text)) {
+      throw err;
+    }
+    return undefined;
+  }
+}
+
 /** Turn wallet provider errors into something a buyer can act on. */
 function evmErrorMessage(err: any): string {
-  const raw =
-    err?.data?.message || err?.cause?.message || err?.shortMessage || err?.message || '';
+  const raw = collectErrorText(err);
 
-  if (err?.code === 4001 || /user rejected|denied|rejected the request/i.test(raw)) {
+  if (err?.code === 4001 || /user rejected|user denied|rejected the request|cancelled|canceled/i.test(raw)) {
     return 'Transaction cancelled.';
   }
   if (/insufficient funds/i.test(raw)) {
     return 'Not enough ETH on Base to cover gas fees.';
   }
+  if (/exceeds balance|insufficient balance|transfer amount exceeds/i.test(raw)) {
+    return 'Not enough USDC on Base. Add USDC to this wallet and try again.';
+  }
+  if (/chain mismatch|does not match the target chain|current chain of the wallet/i.test(raw)) {
+    return 'Your wallet is not on Base. Switch to Base and try again.';
+  }
   if (/missing or invalid parameters|invalid params|-32602|invalid argument/i.test(raw)) {
     return 'Your wallet rejected the request. Make sure it is on Base, then try again.';
+  }
+  if (/execution reverted|reverted/i.test(raw)) {
+    return 'The token transfer was rejected by the contract. Check you have enough USDC on Base.';
   }
   return raw || 'Transaction failed.';
 }
