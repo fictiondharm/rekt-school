@@ -140,3 +140,46 @@ export async function grantEntitlement(wallet: string) {
     console.warn('[payments] entitlement upsert threw:', e);
   }
 }
+
+/**
+ * True when `wallet` already paid. `'unreachable'` means the database could
+ * not be queried, which callers must not treat as "not paid".
+ */
+export async function hasPaidAccess(wallet: string): Promise<boolean | 'unreachable'> {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('entitlements')
+      .select('tier')
+      .eq('wallet', wallet)
+      .maybeSingle();
+
+    if (error) {
+      if (/fetch failed|timeout|abort/i.test(error.message)) return 'unreachable';
+    } else if (data) {
+      return true;
+    }
+
+    // Fallback for databases where the entitlement row is missing: look for a
+    // recorded payment. Column names and status vocabulary differ between
+    // databases, so each variant is tried.
+    const paidStatuses = ['confirmed', 'paid', 'completed'];
+    for (const column of ['from_wallet', 'payer_wallet', 'wallet']) {
+      const { data: rows, error: rowsError } = await supabaseAdmin
+        .from('payments')
+        .select('id')
+        .eq(column, wallet)
+        .in('status', paidStatuses)
+        .limit(1);
+
+      if (rowsError) {
+        if (/fetch failed|timeout|abort/i.test(rowsError.message)) return 'unreachable';
+        continue;
+      }
+      if (rows && rows.length > 0) return true;
+    }
+
+    return false;
+  } catch {
+    return 'unreachable';
+  }
+}

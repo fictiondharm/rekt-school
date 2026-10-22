@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { grantEntitlement, hasPaidAccess } from '@/lib/payments';
+import { resolveLinkedWallets } from '@/lib/walletLinks';
 
 /**
  * Wallet-scoped access check.
  *
  * A buyer who paid with a wallet keeps access on every device that connects
- * the same wallet, even if the local unlock flag was cleared.
+ * the same wallet, even if the local unlock flag was cleared. Linked wallets
+ * are followed too, so a payment made from a Base (EVM) account also unlocks
+ * the Solana account the same person connects with.
  */
 export async function GET(req: NextRequest) {
   try {
@@ -17,64 +20,45 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const { data: entitlement, error: entitlementError } = await supabaseAdmin
-      .from('entitlements')
-      .select('tier, source')
-      .eq('wallet', wallet)
-      .maybeSingle();
+    const direct = await hasPaidAccess(wallet);
 
-    if (entitlementError) {
-      console.warn('[access/check] entitlement lookup failed:', entitlementError.message);
-      // The database is unreachable: do not burn the request budget on the
-      // fallback queries.
-      if (/fetch failed|timeout|abort/i.test(entitlementError.message)) {
-        return NextResponse.json({ success: false, unlocked: false, message: 'Database unreachable.' });
-      }
-    }
-    if (entitlement) {
+    if (direct === 'unreachable') {
       return NextResponse.json({
-        success: true,
-        unlocked: true,
-        tier: entitlement.tier || 'all',
-        source: entitlement.source || 'payment',
+        success: false,
+        unlocked: false,
+        message: 'Database unreachable.',
       });
     }
 
-    // Fallback for databases where the entitlement row is missing: look for a
-    // recorded payment. The status vocabulary and the wallet column name
-    // differ between databases, so both are tried.
-    const paidStatuses = ['confirmed', 'paid', 'completed'];
-    const walletColumns = ['from_wallet', 'payer_wallet', 'wallet'];
-    let paidRows = 0;
+    if (direct) {
+      return NextResponse.json({
+        success: true,
+        unlocked: true,
+        tier: 'all',
+        source: 'payment',
+      });
+    }
 
-    for (const column of walletColumns) {
-      try {
-        const { data, error } = await supabaseAdmin
-          .from('payments')
-          .select('id')
-          .eq(column, wallet)
-          .in('status', paidStatuses)
-          .limit(1);
-
-        if (error) {
-          if (/fetch failed|timeout|abort/i.test(error.message)) break;
-          continue;
-        }
-
-        paidRows = data?.length ?? 0;
-        if (paidRows > 0) break;
-      } catch {
-        /* try the next column name */
+    // The wallet itself never paid, but an address proven to belong to the
+    // same person did. Re-grant so the local row exists for future checks.
+    for (const linked of await resolveLinkedWallets(wallet)) {
+      const linkedPaid = await hasPaidAccess(linked);
+      if (linkedPaid === true) {
+        await grantEntitlement(wallet);
+        return NextResponse.json({
+          success: true,
+          unlocked: true,
+          tier: 'all',
+          source: 'linked-wallet',
+        });
       }
     }
 
-    const unlocked = paidRows > 0;
-
     return NextResponse.json({
       success: true,
-      unlocked,
-      tier: unlocked ? 'all' : null,
-      source: unlocked ? 'payment' : null,
+      unlocked: false,
+      tier: null,
+      source: null,
     });
   } catch {
     return NextResponse.json(

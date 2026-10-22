@@ -17,10 +17,13 @@ import {
   custom,
   erc20Abi,
   parseEther,
+  toHex,
   type Address,
   type Hex,
 } from 'viem';
 import { base } from 'viem/chains';
+import bs58 from 'bs58';
+import { buildLinkMessage } from '@/lib/linkMessage';
 import {
   BASE_CHAIN_ID,
   BASE_USDC,
@@ -112,8 +115,10 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
   const [evmAddress, setEvmAddress] = useState<Address | null>(null);
   const [evmChainId, setEvmChainId] = useState<number | null>(null);
   const [lastTx, setLastTx] = useState<PendingPayment | null>(null);
+  const [linkState, setLinkState] = useState<'idle' | 'signing' | 'done' | 'error'>('idle');
+  const [linkError, setLinkError] = useState<string | null>(null);
 
-  const { publicKey, sendTransaction, connected: solanaConnected } = useWallet();
+  const { publicKey, sendTransaction, connected: solanaConnected, signMessage } = useWallet();
 
   // Phantom exposes an EVM provider too (window.phantom.ethereum). Fall back to
   // it when no standard window.ethereum is injected so Base payments work.
@@ -519,6 +524,72 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
     }
   };
 
+  /**
+   * Prove that the connected Solana address and the EVM address belong to the
+   * same person, so one payment unlocks both. The Solana wallet signs the link
+   * message; the EVM wallet signs too when the payment is on the Solana side.
+   */
+  const linkWalletsFlow = async () => {
+    if (!publicKey || !evmAddress || !signMessage) {
+      setLinkState('error');
+      setLinkError('Connect both wallets first.');
+      return;
+    }
+
+    setLinkState('signing');
+    setLinkError(null);
+
+    try {
+      const solana = publicKey.toBase58();
+      const message = buildLinkMessage(solana, evmAddress);
+      const signed = await signMessage(new TextEncoder().encode(message));
+
+      const payload: Record<string, string> = {
+        solanaAddress: solana,
+        evmAddress,
+        message,
+        solanaSignature: bs58.encode(signed),
+      };
+
+      const post = () =>
+        fetch('/api/wallet/link', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }).then((res) => res.json());
+
+      let data = await post();
+
+      if (!data.success && data.needsEvmSignature) {
+        const provider = getEvmProvider();
+        if (!provider) throw new Error('No EVM wallet found to sign with.');
+        const evmSignature: string = await provider.request({
+          method: 'personal_sign',
+          params: [toHex(message), evmAddress],
+        });
+        payload.evmSignature = evmSignature;
+        data = await post();
+      }
+
+      if (data.success) {
+        setLinkState('done');
+        setCourseUnlocked();
+        onSuccess();
+        return;
+      }
+
+      setLinkState('error');
+      setLinkError(data.message || 'Could not link these wallets.');
+    } catch (err: any) {
+      setLinkState('error');
+      setLinkError(
+        /rejected|denied|cancel/i.test(err?.message || '')
+          ? 'Signature cancelled.'
+          : err?.message || 'Could not link these wallets.'
+      );
+    }
+  };
+
   const handlePay = () => {
     if (isSolana) handleSolanaPay();
     else handleBasePay();
@@ -716,6 +787,35 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
                 </div>
               )}
             </>
+          )}
+
+          {solanaConnected && evmAddress && (
+            <div className="rounded-xl border border-border bg-surface-muted p-3 text-xs space-y-2">
+              {linkState === 'done' ? (
+                <p className="font-bold text-quaternary">
+                  Linked — this payment now covers both addresses.
+                </p>
+              ) : (
+                <>
+                  <p className="font-bold text-ink">Paid from your Base account?</p>
+                  <p className="text-ink-soft">
+                    This site connects through Solana, but the payment was signed by your
+                    EVM address. Sign once to prove both addresses are yours.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={linkWalletsFlow}
+                    disabled={linkState === 'signing'}
+                    className="rounded-full border-2 border-ink bg-white px-3 py-1.5 font-bold text-ink shadow-pop-sm disabled:opacity-60"
+                  >
+                    {linkState === 'signing' ? 'Waiting for signature…' : 'Link these wallets'}
+                  </button>
+                  {linkState === 'error' && linkError && (
+                    <p className="text-red-800">{linkError}</p>
+                  )}
+                </>
+              )}
+            </div>
           )}
         </div>
 
