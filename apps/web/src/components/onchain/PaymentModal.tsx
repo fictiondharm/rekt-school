@@ -124,13 +124,13 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
   // it when no standard window.ethereum is injected so Base payments work.
   const getEvmProvider = () =>
     (typeof window !== 'undefined' &&
-      ((window as any).ethereum || (window as any).phantom?.ethereum)) ||
+      ((window as any).ethereum || (window as any).phantom?.ethereum || (window as any).okxwallet?.ethereum || (window as any).okxwallet || (window as any).rabby || (window as any).solflare?.ethereum)) ||
     null;
 
   const connectEvm = async () => {
     const provider = getEvmProvider();
     if (!provider) {
-      setError('No EVM wallet found. Install MetaMask or Phantom.');
+      setError('No EVM wallet found. Install MetaMask, OKX, Rabby or Phantom.');
       return;
     }
     try {
@@ -346,7 +346,7 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
       const provider = getEvmProvider();
       if (!provider) {
         setStatus('error');
-        setError('No EVM wallet found. Install MetaMask or Phantom.');
+        setError('No EVM wallet found. Install MetaMask, OKX, Rabby or Phantom.');
         return;
       }
 
@@ -741,7 +741,9 @@ export function PaymentModal({ isOpen, onClose, onSuccess }: PaymentModalProps) 
 
               {!walletConnected ? (
                 <div className="p-3 rounded-xl bg-tertiary/20 border border-tertiary text-xs text-center space-y-2">
-                  <p className="font-bold text-ink mb-1">Connect your wallet first</p>
+                  <p className="font-bold text-ink mb-1">
+                    {isSolana ? 'Connect a Solana wallet to pay' : 'Connect an EVM wallet (MetaMask, OKX, Rabby, Phantom) to pay on Base'}
+                  </p>
                   {!isSolana && (
                     <Button variant="secondary" onClick={connectEvm} className="w-full text-xs">
                       Connect EVM Wallet
